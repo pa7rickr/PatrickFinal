@@ -30,6 +30,7 @@
     "dotenv": "^8.2.0",
     "encodeurl": "^1.0.2",
     "escape-string-regexp": "^1.0.5",
+    "express": "^4.17.1",
     "fake-useragent": "^1.0.1",
     "figlet": "^1.5.2",
     "fluent-ffmpeg": "^2.1.2",
