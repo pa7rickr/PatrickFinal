@@ -2,13 +2,13 @@
   "name": "termux-wabot",
   "version": "0.0.2",
   "description": "No comment",
-  "main": "index.js",
+  "main": "main.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node patrickMsg.js"
+    "start": "node main.js"
   },
   "keywords": [
     "termux",
