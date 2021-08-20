@@ -1,8 +1,8 @@
 const lolcatjs = require('lolcatjs')
 const figlet = require('figlet')
 let { spawn } = require('child_process')
-const http = require("http")
 let path = require('path')
+const keepAlive =require('./server.js')
 const CFonts  = require('cfonts')
 const fs = require('fs')
 lolcatjs.options.seed = Math.round(Math.random() * 1000);
@@ -26,29 +26,6 @@ await uncache(require.resolve(module))
      })
 }
 
-const server = http.createServer((req, res) => {
-	if (req.url == "/") {
-		res.end(fs.readFileSync("templates/index.html", "utf-8"));
-	} else {
-		res.end("404");
-	}
-})
-
-const io = require("socket.io")(server);
-io.on("connection", (socket) => {
-	conn.on("qr", async (qr) => {
-		const imgURI = await qrcode.toDataURL(qr);
-		socket.emit("qr", imgURI);
-	});
-
-	conn.on("open", () => {
-		socket.emit("connected");
-	});
-})
-
-
-server.listen(process.env.PORT || 3000);
-
 function start() {
   let args = [path.join('index.js'), ...process.argv.slice(2)]
   CFonts.say([process.argv[0], ...args].join(' '), {
@@ -68,4 +45,5 @@ function start() {
     }
   })
 }
+keepAlive()
 start()
