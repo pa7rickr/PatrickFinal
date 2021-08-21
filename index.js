@@ -538,14 +538,6 @@ patrick.on('message-update', async (mek) => {
 })
 patrick.on('message-new', async (mek) => {
 		try {
-		let infoMSG = JSON.parse(fs.readFileSync('./src/msg.data.json'))
-		infoMSG.push(JSON.parse(JSON.stringify(mek)))
-		fs.writeFileSync('./src/msg.data.json', JSON.stringify(infoMSG, null, 2))
-		const urutan_pesan = infoMSG.length
-		if (urutan_pesan === 5000) {
-			infoMSG.splice(0, 4300)
-			fs.writeFileSync('./src/msg.data.json', JSON.stringify(infoMSG, null, 2))
-		    }
 			if (!mek.message) return
 			if (mek.key && mek.key.remoteJid == 'status@broadcast') return
 			if (mek.key.fromMe) return
