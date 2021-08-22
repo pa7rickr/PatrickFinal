@@ -9,8 +9,6 @@ apt-get install ffmpeg -y
 apt-get install wget -y
 apt-get install tesseract -y
 wget -O ~/../usr/share/tessdata/ind.traineddata "https://github.com/tesseract-ocr/tessdata/blob/master/ind.traineddata?raw=true"
-npm i
-npm install
-npm audit fix
+node index.js
 
 echo "[*] Semua telah di install, Untuk menjalankan ketik \"npm start\" 👍"
