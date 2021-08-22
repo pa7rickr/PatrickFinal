@@ -59,8 +59,10 @@ const qrcode = require("qrcode-terminal")
 const crypto = require('crypto')
 const ms = require('parse-ms')
 const toMs = require('ms')
+const request = require('request')
 const axios = require('axios')
 const Math_js = require('mathjs')
+const yts = require( 'yt-search')
 const Exif = require('./lib/exif')
 const exif = new Exif()
 const encodeUrl = require('encodeurl')
@@ -117,10 +119,14 @@ const {
 const {
 	ind
 } = require('./database/language')
+const { yta, ytv } = require("./lib/ytdl");
 const { 
     addCountStc, 
     isCountStc, 
-    delCountStc 
+    delCountStc, 
+    addCountKsr, 
+    isCountKsr, 
+    delCountKsr 
 } = require('./lib/antispamstc')
 //=============JSON GAME==============\\
 const game = require('./lib/game')
@@ -180,8 +186,8 @@ numbernye = '0@s.whatsapp.net'
 
 const vcard = 'BEGIN:VCARD\n' +
 	'VERSION:3.0\n' +
-	`FN:${ownerName}\n` +
-	`ORG:Pengembang ${botName}~;\n` +
+	'FN:Me Is Pa7rick?\n' +
+	'ORG:Pengembang ${botName}~;\n' +
 	`TEL;type=CELL;type=VOICE;waid=${numberOwner}:+${numberOwner}\n` +
 	'END:VCARD'
 
@@ -195,7 +201,7 @@ const uang3 = 6000
 const uang4 = 15000
 numbernye: 0
 fake = 'AntiDelete aktif'
-
+shp = '⬡'
 initialLimit = setting.initialLimits
 memberLimit = setting.memberLimits
 
@@ -302,7 +308,7 @@ fs.existsSync('./patrickQR.json') && patrick.loadAuthInfo('./patrickQR.json')
 patrick.connect();
 
 
-patrick.on('group-participants-update', async (anu) => {
+    patrick.on('group-participants-update', async (anu) => {
 	if (!welcome.includes(anu.jid)) return
 	try {
 		const mdata = await patrick.groupMetadata(anu.jid)
@@ -335,7 +341,8 @@ patrick.on('group-participants-update', async (anu) => {
 		shortpc = await axios.get(`https://tinyurl.com/api-create.php?url=${ppimg}`)
 		shortgc = await axios.get(`https://tinyurl.com/api-create.php?url=${ppgc}`)
 		if (anu.action == 'add') {
-			teks = `*Hello* *${ini_user.notify}*
+			teks = 
+`*Hello* *${ini_user.notify}*
 Welcome To *${mdata.subject}*
 *> Nama:*
 *> Umur:*
@@ -362,7 +369,10 @@ Welcome To *${mdata.subject}*
 		} else
 		if (anu.action == 'promote') {
 			img = await getBuffer(`http://hadi-api.herokuapp.com/api/card/promote?nama=${encodeUrl(namaewa)}&member=${member}&pesan=Selamat anda menjadi admin group!&pp=${shortpc.data}&bg=https://dappa-result.herokuapp.com/bgverify.jpeg`)
-			teks = `◪ Promote Detected\n\n\n├─ Nomor: ${num.replace('@s.whatsapp.net', '')}\n├─ Pesan: Selamat anda menjadi admin group!\n└─ ❏ @${num.split('@')[0]}`
+			teks = ` Information *${mdata.subject}*
+>  Terdeteksi *Di-Promote*
+>  Nomor: ${num.replace('@s.whatsapp.net', '')}
+>  @${num.split('@')[0]}`
 			patrick.sendMessage(mdata.id, img, MessageType.image, {
 				caption: teks,
 				contextInfo: {
@@ -372,7 +382,11 @@ Welcome To *${mdata.subject}*
 		} else
 		if (anu.action == 'demote') {
 			img = await getBuffer(`http://hadi-api.herokuapp.com/api/card/demote?nama=${encodeUrl(namaewa)}&member=${member}&pesan=Awokawok di unadmin, mampus:v&pp=${shortpc.data}&bg=https://dappa-result.herokuapp.com/bgverify.jpeg`)
-			teks = `◪ DEMOTE DETECT\n\n\n├─ Nomor: ${num.replace('@s.whatsapp.net', '')}\n├─ Pesan: Awokawok di unadmin, mampus:v\n└─ ❏ @${num.split('@')[0]}`
+			teks = 
+` Information *${mdata.subject}*
+>  Terdeteksi *Di-Demote*
+>  Nomor: ${num.replace('@s.whatsapp.net', '')}
+>  @${num.split('@')[0]}`
 			patrick.sendMessage(mdata.id, img, MessageType.image, {
 				caption: teks,
 				contextInfo: {
@@ -393,7 +407,7 @@ patrick.on('CB:Blocklist', json => {
 const sleep = async (ms) => {
 	return new Promise(resolve => setTimeout(resolve, ms))
 }
-patrick.on('CB:action,,call', async json => {
+    patrick.on('CB:action,,call', async json => {
 	const callerId = json[2][0][1].from;
 	console.log('call dari ' + callerId)
 	patrick.sendMessage(callerId, 'Auto block system, dont call please', MessageType.text)
@@ -401,142 +415,7 @@ patrick.on('CB:action,,call', async json => {
 	await patrick.blockUser(callerId, 'add')
 })
 
-patrick.on('message-update', async (mek) => {
-	try {
-		const from = mek.key.remoteJid
-		const messageStubType = WA_MESSAGE_STUB_TYPES[mek.messageStubType] || 'MESSAGE'
-		const dataRevoke = JSON.parse(fs.readFileSync('./src/gc-revoked.json'))
-		const dataCtRevoke = JSON.parse(fs.readFileSync('./src/ct-revoked.json'))
-		const dataBanCtRevoke = JSON.parse(fs.readFileSync('./src/ct-revoked-banlist.json'))
-		const sender = mek.key.fromMe ? patrick.user.jid : mek.key.remoteJid.endsWith('@g.us') ? mek.participant : mek.key.remoteJid
-		const isRevoke = mek.key.remoteJid.endsWith('@s.whatsapp.net') ? true : mek.key.remoteJid.endsWith('@g.us') ? dataRevoke.includes(from) : false
-		const isCtRevoke = mek.key.remoteJid.endsWith('@g.us') ? true : dataCtRevoke.data ? true : false
-		const isBanCtRevoke = mek.key.remoteJid.endsWith('@g.us') ? true : !dataBanCtRevoke.includes(sender) ? true : false
-		if (messageStubType == 'REVOKE') {
-			console.log(`Status untuk grup : ${!isRevoke}\nStatus semua kontak : ${!isCtRevoke}\nStatus kontak dikecualikan : ${!isBanCtRevoke}`)
-			if (!isRevoke) return
-			if (!isCtRevoke) return
-			if (!isBanCtRevoke) return
-			const from = mek.key.remoteJid
-			const isGroup = mek.key.remoteJid.endsWith('@g.us') ? true : false
-			let int
-			let infoMSG = JSON.parse(fs.readFileSync('./src/msg.data.json'))
-			const id_deleted = mek.key.id
-			const conts = mek.key.fromMe ? patrick.user.jid : patrick.contacts[sender] || {
-				notify: jid.replace(/@.+/, '')
-			}
-			const pushname = mek.key.fromMe ? patrick.user.name : conts.notify || conts.vname || conts.name || '-'
-			const opt4tag = {
-				contextInfo: {
-					mentionedJid: [sender]
-				}
-			}
-			for (let i = 0; i < infoMSG.length; i++) {
-				if (infoMSG[i].key.id == id_deleted) {
-					const dataInfo = infoMSG[i]
-					const type = Object.keys(infoMSG[i].message)[0]
-					const timestamp = infoMSG[i].messageTimestamp
-					int = {
-						no: i,
-						type: type,
-						timestamp: timestamp,
-						data: dataInfo
-					}
-				}
-			}
-			const index = Number(int.no)
-			const body = int.type == 'conversation' ? infoMSG[index].message.conversation : int.type == 'extendedTextMessage' ? infoMSG[index].message.extendedTextMessage.text : int.type == 'imageMessage' ? infoMSG[index].message.imageMessage.caption : int.type == 'stickerMessage' ? 'Sticker' : int.type == 'audioMessage' ? 'Audio' : int.type == 'videoMessage' ? infoMSG[index].videoMessage.caption : infoMSG[index]
-			const mediaData = int.type === 'extendedTextMessage' ? JSON.parse(JSON.stringify(int.data).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo : int.data
-			var itsme = `${numbernye}@s.whatsapp.net`
-			var split = `${fake}`
-			var selepbot72 = {
-				contextInfo: {
-					participant: itsme,
-					quotedMessage: {
-						extendedTextMessage: {
-							text: split,
-						}
-					}
-				}
-			}
-			if (int.type == 'conversation' || int.type == 'extendedTextMessage') {
-				const strConversation = `		 「 *ANTI-DELETE* 」
-
-▢ *Nama :* *${pushname}* 
-▢ *Nomer :* @${sender.replace('@s.whatsapp.net', '')}
-▢ *Tipe :* Text
-▢ *Waktu :* *${moment.unix(int.timestamp).format('HH:mm:ss')}*
-▢ *Tanggal :* *${moment.unix(int.timestamp).format('DD/MM/YYYY')}*
-▢ *Pesan :* *${body ? body : '-'}*
-━━━━━━━━━━━━━━━━`
-				patrick.sendMessage(from, strConversation, MessageType.text, selepbot72)
-			} else if (int.type == 'stickerMessage') {
-				var itsme = `${numbernye}@s.whatsapp.net`
-				var split = `${fake}`
-				const pingbro23 = {
-					contextInfo: {
-						participant: itsme,
-						quotedMessage: {
-							extendedTextMessage: {
-								text: split,
-							}
-						}
-					}
-				}
-				const filename = `${sender.replace('@s.whatsapp.net', '')}-${moment().unix()}`
-				const savedFilename = await patrick.downloadAndSaveMediaMessage(int.data, `./media/sticker/${filename}`);
-				const strConversation = `		 「 *ANTI-DELETE* 」
-
-▢ *Nama :* *${pushname}* 
-▢ *Nomer :* @${sender.replace('@s.whatsapp.net', '')}
-▢ *Tipe :* *Sticker*
-▢ *Waktu :* *${moment.unix(int.timestamp).format('HH:mm:ss')}*
-▢ *Tanggal :* *${moment.unix(int.timestamp).format('DD/MM/YYYY')}*
-━━━━━━━━━━━━━━━━━`
-				const buff = fs.readFileSync(savedFilename)
-				patrick.sendMessage(from, strConversation, MessageType.text, opt4tag)
-				patrick.sendMessage(from, buff, MessageType.sticker, pingbro23)
-				fs.unlinkSync(savedFilename)
-
-			} else if (int.type == 'imageMessage') {
-				var itsme = `${numbernye}@s.whatsapp.net`
-				var split = `${fake}`
-				const pingbro22 = {
-					contextInfo: {
-						participant: itsme,
-						quotedMessage: {
-							extendedTextMessage: {
-								text: split,
-							}
-						}
-					}
-				}
-				const filename = `${sender.replace('@s.whatsapp.net', '')}-${moment().unix()}`
-				const savedFilename = await patrick.downloadAndSaveMediaMessage(int.data, `./media/revoke/${filename}`);
-				const buff = fs.readFileSync(savedFilename)
-				const strConversation = `	 「 *ANTI-DELETE* 」
-
-▢ *Nama :* *${pushname}* 
-▢ *Nomer :* @${sender.replace('@s.whatsapp.net', '')}
-▢ *Tipe :* Image
-▢ *Waktu :* *${moment.unix(int.timestamp).format('HH:mm:ss')}*
-▢ *Tanggal :* *${moment.unix(int.timestamp).format('DD/MM/YYYY')}*
-▢ *Pesan :* ${body ? body : '-'}\`\`\`
-━━━━━━━━━━━━━━━━`
-				patrick.sendMessage(from, buff, MessageType.image, {
-					contextInfo: {
-						mentionedJid: [sender]
-					},
-					caption: strConversation
-				})
-				fs.unlinkSync(savedFilename)
-			}
-		}
-	} catch (e) {
-		console.log('Message : %s', color(e, 'green'))
-	}
-})
-patrick.on('message-new', async (mek) => {
+        patrick.on('message-new', async (mek) => {
 		try {
 			if (!mek.message) return
 			if (mek.key && mek.key.remoteJid == 'status@broadcast') return
@@ -552,7 +431,7 @@ patrick.on('message-new', async (mek) => {
 			const timi = moment.tz('Asia/Jakarta').add(30, 'days').calendar();
 			const timu = moment.tz('Asia/Jakarta').add(20, 'days').calendar();
 			const cmd = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''.slice(1).trim().split(/ +/).shift().toLowerCase()
-			const prefix = /^[°•π÷×¶∆£¢€¥®™✓=|~zZ+×_*!#$%^&./\\©^]/.test(cmd) ? cmd.match(/^[°•π÷×¶∆£¢€¥®™✓=|~zZ+×_*!#$,|`÷?;:%abcdefghijklmnopqrstuvwxyz%^&./\\©^]/gi) : '.'
+			const prefix = /^[°•π÷×¶∆£¢€¥®™✓=|~zZ+×_*!#$%^&./\\©^]/.test(cmd) ? cmd.match(/^[°•π÷×¶∆£¢€¥®™✓=|~zZ+×_\ \!#$,|`÷?;:%abcdefghijklmnopqrstuvwxyz%^&./\\©^]/gi) : '.'
             body = (type === 'conversation' && mek.message.conversation.startsWith(prefix)) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption.startsWith(prefix) ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption.startsWith(prefix) ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text.startsWith(prefix) ? mek.message.extendedTextMessage.text : ''
 			budy = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : ''
 			var pes = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''
@@ -583,12 +462,6 @@ patrick.on('message-new', async (mek) => {
             const isBotGroupAdmins = groupAdmins.includes(botNumber) || false
             const isLevelingOn = isGroup ? _leveling.includes(from) : false
 			const isGroupAdmins = groupAdmins.includes(sender) || false 
-			const dataRevoke = JSON.parse(fs.readFileSync('./src/gc-revoked.json'))
-		    const dataCtRevoke = JSON.parse(fs.readFileSync('./src/ct-revoked.json'))
-	        const dataBanCtRevoke = JSON.parse(fs.readFileSync('./src/ct-revoked-banlist.json'))
-		    const isRevoke = dataRevoke.includes(from)
-		    const isCtRevoke = dataCtRevoke.data
-		    const isBanCtRevoke = dataBanCtRevoke.includes(sender) ? true : false
 			const isWelcome = isGroup ? welcome.includes(from) : false
 			const isNsfw = isGroup ? nsfw.includes(from) : false 
             const isAntiVirtex = isGroup ? antivirtex.includes(from) : false 
@@ -604,7 +477,7 @@ patrick.on('message-new', async (mek) => {
 			const isOwner = ownerNumber.includes(sender)
 			const isPrem = checkPremiumUser(sender, prem) || isOwner
 			const isImage = type === 'imageMessage'
-            const stickers = type === 'stickerMessage'
+            const isSticker = type === 'stickerMessage'
 			const isUrl = (url) => {
 			    return url.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/, 'gi'))
 			}
@@ -919,7 +792,7 @@ const fakestatus = (teks) => {
 		}
 	})
 }
-
+q2 = Object.keys(mek.message)[0] == "listResponseMessage" ? mek.message.listResponseMessage.singleSelectReply.selectedRowId: ""
 const randomPhotoGet = ['logo.jpeg', 'logo1.jpeg', 'logo2.jpeg', 'logo3.jpeg', 'logo4.jpeg', 'logo5.jpeg', 'logo6.jpeg', 'logo7.jpeg', 'logo8.jpeg', 'logo9.jpeg', 'logo10.jpeg']
 const randomGetPhoto = randomPhotoGet[Math.floor(Math.random() * randomPhotoGet.length)]
 const freply = {
@@ -1035,6 +908,84 @@ const wita = moment.tz('Asia/Makassar').format('HH:mm:ss')
 const wit = moment.tz('Asia/Jayapura').format('HH:mm:ss')
 const wib = moment.tz('Asia/Jakarta').format('HH:mm:ss')
 const dater = new Date().toLocaleDateString()
+
+const sendStickerFromUrl = async(to, url) => {
+			console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Downloading sticker...'))
+				var names = getRandom('.webp')
+				var namea = getRandom('.png')
+				var download = function (uri, filename, callback) {
+					request.head(uri, function (err, res, body) {
+						request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+					});
+				};
+				download(url, namea, async function () {
+					let filess = namea
+					let asw = names
+					require('./lib/exif.js')
+					exec(`ffmpeg -i ${filess} -vcodec libwebp -filter:v fps=fps=20 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 512:512 ${asw}`, (err) => {
+					exec(`webpmux -set exif ./src/sticker/data.exif ${asw} -o ${asw}`, async (error) => {
+					let media = fs.readFileSync(asw)
+					senku.sendMessage(to, media, sticker)
+					console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Succes send sticker...'))
+					fs.unlinkSync(asw)
+					fs.unlinkSync(filess)
+					});
+					});
+				});
+			}
+
+const sendStickerUrl = async(to, url) => {
+console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Downloading sticker...'))
+var names = getRandom('.webp')
+var namea = getRandom('.png')
+var download = function (uri, filename, callback) {
+request.head(uri, function (err, res, body) {
+request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+});
+};
+download(url, namea, async function () {
+let filess = namea
+let asw = names
+require('./lib/exif.js')
+exec(`ffmpeg -i ${filess} -vcodec libwebp -filter:v fps=fps=20 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 512:512 ${asw}`, (err) => {
+exec(`webpmux -set exif ./sticker/data.exif ${asw} -o ${asw}`, async (error) => {
+let media = fs.readFileSync(asw)
+senku.sendMessage(from, media, sticker, {quoted: sen})
+console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Succes send sticker...'))  
+});
+});
+});
+}
+
+const sendMediaURL = async(to, url, text="", mids=[]) =>{
+if(mids.length > 0){
+text = normalizeMention(to, text, mids)
+}
+const fn = Date.now() / 10000;
+const filename = fn.toString()
+let mime = ""
+var download = function (uri, filename, callback) {
+request.head(uri, function (err, res, body) {
+mime = res.headers['content-type']
+request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+});
+};
+download(url, filename, async function () {
+console.log('done');
+let media = fs.readFileSync(filename)
+let type = mime.split("/")[0]+"Message"
+if(mime === "image/gif"){
+type = MessageType.video
+mime = Mimetype.gif
+}
+if(mime.split("/")[0] === "audio"){
+mime = Mimetype.mp4Audio
+}
+patrick.sendMessage(to, media, type, { quoted: mek, mimetype: mime, caption: text,contextInfo: {"mentionedJid": mids}})
+		    
+fs.unlinkSync(filename)
+});
+}
 
 var per = '*[▒▒▒▒▒▒▒▒▒▒] 0%*'
 const peri = 5000 * (Math.pow(2, getLevelingLevel(sender)) - 1)
@@ -1374,7 +1325,7 @@ if (isGroup) {
 		    if (!isBotGroupAdmins) return reply(ind.badmin())
             if (isAntiVirtex) return reply('Fitur Anti Virtex Sudah aktif!')
 			antivirtex.push(from)
-			fs.writeFileSync('./database/antivirtex.json', JSON.stringify(antivirtex))
+			fs.writeFileSync('./database/json/antivirtex.json', JSON.stringify(antivirtex))
 			reply('❬ *SUKSES* ❭ *MENGAKTIFKAN FITUR ANTIVIRTEX DI GROUP INI*')
 			} 
 			if (rspndbutton == 'Anti Link') {
@@ -1411,7 +1362,7 @@ if (isGroup) {
 		    if (!isGroupAdmins) return reply(ind.admin())
 		    if (isSimi) return reply('Fitur Simi Simi Sudah aktif!')
 			samih.push(from)
-			fs.writeFileSync('./database/simi.json', JSON.stringify(samih))
+			fs.writeFileSync('./database/json/simi.json', JSON.stringify(samih))
 			reply('❬ *SUKSES* ❭ *MENGAKTIFKAN FITUR SIMI DI GROUP INI*')
 			} 
             if (rspndbutton == 'NSFW Mode') {
@@ -1438,7 +1389,7 @@ if (isGroup) {
 		    if (rspndbutton == 'Disable Anti Virtex') {
 			if (!isAntiVirtex) return reply('Fitur Anti Virtex Belum aktif!')
 			antivirtex.push(from)
-			fs.writeFileSync('./database/antivirtex.json', JSON.stringify(antivirtex))
+			fs.writeFileSync('./database/json/antivirtex.json', JSON.stringify(antivirtex))
 			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR ANTIVIRTEX DI GROUP INI*')
 			} else
 		    if (rspndbutton == 'Disable Anti Link') {
@@ -1463,7 +1414,7 @@ if (isGroup) {
 		    if (rspndbutton == 'Disable Simi Simi') {
 			if (!isSimi) return reply('Fitur Simi Simi Belum aktif!')
 			samih.splice(from, 1)
-			fs.writeFileSync('./database/simi.json', JSON.stringify(samih))
+			fs.writeFileSync('./database/json/simi.json', JSON.stringify(samih))
 			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR SIMI DI GROUP INI*')
 			} else
 		    if (rspndbutton == 'Disable NSFW Mode') {
@@ -1609,78 +1560,311 @@ if (isGroup) {
 		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
 			patrick.sendMessage(from, `*RULES BAGI PENGGUNA BOT*\n    \n➣ Tolong Gunakan Delay Jangan Terlalunge-Spam Saat Menggunakan Bot.\n➣ Call/VC Bot Auto Banned.\n➣ Jangan Call/VC Bot Kalau Tidak aktif.\n➣ Bot Online 24 Jam tapi kadang Disconnect.\n\n*Konsekuensi Bila Melanggar Rules*\nBot Akan Mem-Banned Kamu dan Memblokir kamu.\n\nRules ini untuk kenyamanan semua yang memakai\nbot ini \n1. Jangan terlalu spam bot. \nSanksi: *WARN/SOFT BLOCK* = Tidak Direspon selama 5 detik!\n\n2. Jangan telepon bot.\nSanksi: *SOFT BLOCK* = Block!\n\n3. Jangan mengeksploitasi bot.\nSanksi: *PERMANENT BLOCK* = Banned + Block!\n\nJika sudah dipahami rules-nya, silakan ketik *${prefix}menu* untuk memulai!\nJika Ada yang error ketik *${prefix}report [Bug]`)
 		    } else 
-            //=================== Soal ABCD Coming Soon =============\\ 
-		 /* else   if (rspndbutton == `${abcd.data.jawaban.benar}`) {
-		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
-			_leveling.splice(from, 1)
-			fs.writeFileSync('./database/json/leveling.json', JSON.stringify(_leveling))
-			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR LEVELING DI GROUP INI*')
-		    } else
-	        if (rspndbutton == `${abcd.data.jawaban.a}`) {
-		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
-			_leveling.splice(from, 1)
-			fs.writeFileSync('./database/json/leveling.json', JSON.stringify(_leveling))
-			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR LEVELING DI GROUP INI*')
-		    } else
-		    if (rspndbutton == `${abcd.data.jawaban.b}`) {
-		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
-			_leveling.splice(from, 1)
-			fs.writeFileSync('./database/json/leveling.json', JSON.stringify(_leveling))
-			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR LEVELING DI GROUP INI*')
-		    } else
-		    if (rspndbutton == `${abcd.data.jawaban.c}`) {
-		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
-			_leveling.splice(from, 1)
-			fs.writeFileSync('./database/json/leveling.json', JSON.stringify(_leveling))
-			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR LEVELING DI GROUP INI*')
-		    } else
-		    if (rspndbutton == `${abcd.data.jawaban.d}`) {
-		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
-			_leveling.splice(from, 1)
-			fs.writeFileSync('./database/json/leveling.json', JSON.stringify(_leveling))
-			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR LEVELING DI GROUP INI*')
-		    } */
-				
-				
-        if (bad.includes(messagesC)) {
-		if (!isGroup) return
-        if (!isBadWord) return
-		if (!isGroupAdmins) return reply('karena kamu adalah admin, bot tidak akan kick kamu')
-		if (!isOwner) return reply('karena kamu adalah owner, bot tidak akan kick kamu')
-		var Kick = `${sender.split('@')[0]}@s.whatsapp.net`
-		setTimeout( () => {
-		reply(`sᴀʏᴏɴᴀʀᴀ ʙᴇʙᴀɴ ɢʀᴜᴘ`)
-		}, 100)
-		setTimeout( () => {
-		patrick.groupRemove(from, [Kick]).catch((e) => {reply(`ERROR: ${e}`)}) 
-		}, 10)
-		setTimeout( () => {
-		reply(`_「 ʙᴀᴅᴡᴏʀᴅ ᴅᴇᴛᴇᴄᴛᴇᴅ 」_\nᴍᴀᴀғ ${pushname} ᴀɴᴅᴀ ʙᴇʀʙɪᴄᴀʀᴀ ᴋᴏᴛᴏʀ!, ᴀɴᴅᴀ ꜱᴇɢᴇʀᴀ ᴅɪᴋɪᴄᴋ ᴅᴀʀɪ ɢʀᴜᴘ ${groupMetadata.subject}`)
-		}, 0)
-		}
+            //=================== Menu Nya =============\\ 
+            if (rspndbutton == 'Owner Menu') {
+            if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true) 
+            await patrickhay(ind.owner(prefix), MessageType.text, tescuk, `${ucapanFakereply}`) 
+            } else 
+            if (rspndbutton == 'Maker Menu') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    await patrickhay(ind.maker(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else  
+            if (rspndbutton == 'Fun Menu') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    await patrickhay(ind.fun(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else 
+            if (rspndbutton == 'Game Menu') { 
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+            let vovo = patrick.prepareMessageFromContent(from, {
+            "listMessage": {
+            "title": '*Game Menu*',
+            "footerText": 'PatrickBot Created by _pa7rick',
+            "description": 
+`Hello ${pushname}, PatrickBot is here
+Created by @_pa7rick
 
-       if (isGroup && isAntiSpam && !isGroupAdmins){
-        if (stickers){
-         if (isCountStc(sender, sensticker)){
-          if (!isBotGroupAdmins) return reply(`Kamu beruntung karena bot bukan admin`)
-           reply(`*「 ANTI SPAM STICKER 」*\n\nSepertinya kamu sudah kirim sticker lebih dari 5x sekaligus dalam 5 menit, maaf kamu akan di kick`)
-            patrick.groupRemove(from, [sender])
-             delCountStc(sender, sensticker)
+Pilih Game di bawah ini
+*>  ${prefix}tictactoe @tag*
+
+Boleh Dong Follow Insta: _pa7rick :)`,
+        "buttonText": 'Click Disini || Click Here',
+        "listType": 'SINGLE_SELECT',
+        "sections": [{
+            "title": 'Pilih Salah Satu!',
+            "rows": [{
+                "title": `Family 100`,
+                "rowId": '0'
+            }, {
+                "title": `Siapakah Aku?`
+,                "rowId": '0'
+            }, {
+                "title": `Tebak Gambar`,
+                "rowId": '0'
+            }, {
+                "title": `Tebak Angka`,
+                "rowId": '0'
+            }]
+              }]
+             }
+            }, {});
+            patrick.relayWAMessage(vovo, {
+               waitForAck: true
+            })
+            } else 
+            if (rspndbutton == 'Kerang Menu') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    await patrickhay(ind.kerang(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else  
+            if (rspndbutton == 'Download Menu') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    await patrickhay(ind.download(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else  
+            if (rspndbutton == 'Group Menu') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (!isGroup) return reply(ind.groupo())
+		    await patrickhay(ind.group(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else 
+            if (rspndbutton == 'Search Menu') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    await patrickhay(ind.search(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else  
+            if (rspndbutton == 'Berita Menu') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    await patrickhay(ind.berita(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else  
+            if (rspndbutton == 'Anime Menu') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    if (!isRegistered) return reply(ind.noregis()) 
+		    let pope = patrick.prepareMessageFromContent(from, {
+            "listMessage": {
+            "title": '*Anime Menu*',
+            "footerText": 'PatrickBot Created by _pa7rick',
+            "description": 
+`Hello ${pushname}, PatrickBot is here
+Created by @_pa7rick
+
+Pilih Foto Anime di bawah ini
+Jangan Dispam!!
+
+Boleh Dong Follow Insta: _pa7rick :)`,
+        "buttonText": 'Click Disini || Click Here',
+        "listType": 'SINGLE_SELECT',
+        "sections": [{
+            "title": 'Pilih Salah Satu!',
+            "rows": [{
+                "title": `KDU / Kdu Image`,
+                "rowId": '0'
+            }, {
+                "title": `Femdom Image`
+,                "rowId": '0'
+            }, {
+                "title": `Walpaper Anime`,
+                "rowId": '0'
+            }, {
+                "title": `Kemono Mimi Image`,
+                "rowId": '0'
+            }, {
+                "title": `Kuni Image`,
+                "rowId": '0'
+            }, {
+                "title": `Kawai Image`,
+                "rowId": '0'
+            }, {
+                "title": `Holo Image`,
+                "rowId": '0'
+            }, {
+                "title": `Neko Image`,
+                "rowId": '0'
+                }]
+              }]
+             }
+            }, {});
+            patrick.relayWAMessage(pope, {
+               waitForAck: true
+            })
+            } else  
+            if (rspndbutton == 'Islam Menu') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    await patrickhay(ind.islam(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else 
+            if (rspndbutton == 'Cloud Storage') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    await patrickhay(ind.cloud(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else  
+            if (rspndbutton == 'Menu Lainnya') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    await patrickhay(ind.other(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
+            } else 
+            //======================= GAME MENU =========================\\
+            if (rspndbutton == 'Family 100') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    if (isLimit(sender)) return reply(limitend(pushname))
+            if (game.isfam(from, family100)) return reply(`Masih ada soal yang belum di selesaikan`)
+            let anehaja = await fetchJson(`https://api.zeks.xyz/api/family100?apikey=${zeksApi}`)
+            getFamily = anehaja.data
+            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${getFamily.soal}\n*Total Jawaban :* ${getFamily.jawaban.array.length}\n\nWaktu : ${gamewaktu}s`)
+            let anoh = getFamily.jawaban.array
+            let rgfds = []
+            for (let i of anoh){
+            let fefs = i.split('/') ? i.split('/')[0] : i
+            let iuhbb = fefs.startsWith(' ') ? fefs.replace(' ','') : fefs
+            let axsf = iuhbb.endsWith(' ') ? iuhbb.replace(iuhbb.slice(-1), '') : iuhbb
+            rgfds.push(axsf.toLowerCase())
+            }
+            game.addfam(from, rgfds, gamewaktu, family100)
+            limitAdd(sender)
+            } else 
+            if (rspndbutton == 'Math') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    if (isLimit(sender)) return reply(limitend(pushname))
+            if (game.isMath(from, math)) return reply(`Masih ada soal yang belum di selesaikan`)
+            gamewaktus = 20
+            extsoal5 = `${extsoal}`
+            extanswer5 = `${extanswer}`
+            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${extsoal5}\n\nWaktu : ${gamewaktus}s`)
+            let anihs = extanswer5.toLowerCase()
+            game.addmath(from, anihs, gamewaktus, math)
+            limitAdd(sender)
+            } else  
+            if (rspndbutton == 'Tebak Gambar') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    if (isLimit(sender)) return reply(limitend(pushname))
+            if (game.isTebakGambar(from, tebakgambar)) return reply(`Masih ada soal yang belum di selesaikan`)
+            let aneaja = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/tebakgambar?apikey=${dappaApi}`)
+            sendFileFromUrl(from, aneaja.result.image, monospace(`Silahkan jawab soal berikut ini\n\nPetunjuk : ${aneaja.result.clue}\nWaktu : ${gamewaktu}s`), mek)
+            let anih = aneaja.result.jawaban.toLowerCase()
+            game.addgambar(from, anih, gamewaktu, tebakgambar)
+            limitAdd(sender)
+            } else 
+            if (rspndbutton == 'Siapakah Aku?') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    if (isLimit(sender)) return reply(limitend(pushname))
+            if (game.isSiapakah(from, siapakah)) return reply(`Masih ada soal yang belum di selesaikan`)
+            let anuh = await fetchJson(`https://api.zeks.xyz/api/siapa-aku?apikey=${zeksApi}`)
+            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.data.soal}\n\nWaktu : ${gamewaktu}s`)
+            let anihp = anuh.data.jawaban.toLowerCase()
+            game.addSPK(from, anihp, gamewaktu, siapakah)
+            limitAdd(sender)
+            } else 
+            if (rspndbutton == 'Tebak Angka') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    if (isLimit(sender)) return reply(limitend(pushname))
+            if (game.isMath(from, math)) return reply(`Masih ada soal yang belum di selesaikan`)
+            gamewaktuts = 5
+            angkaBot = `${Math.floor(Math.random() * 10)}`
+            reply(`*Tebak Angka*\n\nPilih Angka  Dari 1-10\nContoh: 4\nWaktu : ${gamewaktuts}s`)
+            let anoehs = angkaBot.toLowerCase()
+            game.addangka(from, anoehs, gamewaktuts, tebakangka)
+            limitAdd(sender)
+            } else 
+            if (rspndbutton == 'MP3') {
+            try{
+            downm = await yta(q2)
+            const { dl_link, thumb, title, filesizeF, filesize } = downm
+            if(Number(filesize) >= 50000){
+            short = await axios.get(`https://tinyurl.com/api-create.php?url=${dl_link}`)
+             return sendMediaURL(from, thumb, `*Y O U T U B E  D O W N L O A D E R*\n\n${shp} Judul : ${title}\n${shp} Size : ${filesizeF}\n${shp} Link : ${short.data}\n\n${mess.oversize}`)
+             }
+            teks = `*Y O U T U B E  D O W N L O A D E R*\n\n${shp} Judul : ${title}\n${shp} Size : ${filesizeF}\n${shp} Type : MP3\n\nTunggu sebentar\nMusic segera dikirim`
+            sendMediaURL(from, thumb, teks)
+            sendMediaURL(from, dl_link)
+            } catch(e) {
+            	console.log(e)
+            reply(ind.stikga())
+              }    
+            } else 
+            if (rspndbutton == 'MP4') {
+            try{
+downm = await ytv(q2)
+const { dl_link, thumb, title, filesizeF, filesize } = downm
+if(Number(filesize) >= 50000){
+short = await axios.get(`https://tinyurl.com/api-create.php?url=${dl_link}`)
+return sendMediaURL(from, thumb, `*Y O U T U B E  D O W N L O A D E R*\n\n${shp} Judul : ${title}\n${shp} Size : ${filesizeF}\n${shp} Link : ${short.data}\n\n${mess.oversize}`)
+        }
+teks = `*Y O U T U B E  D O W N L O A D E R*\n\n${shp} Judul : ${title}\n${shp} Size : ${filesizeF}\n${shp} Type : MP4\n\nTunggu sebentar\nMusic segera dikirim`
+sendMediaURL(from, thumb, teks)
+sendMediaURL(from, dl_link)
+}catch(e){
+reply(ind.stikga())
+}
+              
+            } 
+        
+            
+       if (isGroup && isBadWord && !isGroupAdmins) {
+       for (let kasar of badword) {
+       if (chats.toLowerCase().includes(kasar)) {
+       if (isCountKasar(sender, senbadword)) {
+       if (!isBotGroupAdmins) return reply(`Kamu beruntung karena bot bukan admin`)
+          reply(`*Anti Badword!!*\n\nSepertinya kamu sudah berkata kasar lebih dari 5x sekaligus dalam 5 menit, maaf kamu akan di kick`)
+          patrick.groupRemove(from, [sender])
+          delCountKsr(sender, senbadword)
+       } else {
+           addCountKsr(sender, senbadword)
+           for (let n of senbadword) {
+	       if (n.id === sender) {
+           let ksrcount = n.count 
+           reply(`Kamu terdeteksi berkata kasar\nJika kamu berkata kasar *lebih dari 5x* sekaligus dalam 5 menit\nkamu akan dikick\n*Kamu sudah berkata kasar*\n*${ksrcount}x*`)
+           await sleep(300000)
+           delCountKsr(sender, senbadword)
+           console.log('Succes Delete Badword From' + sender)
+          }
+        }
+      }
+    }
+  } 
+ }
+
+       if (isGroup && isAntiSpam && !isGroupAdmins) {
+       if (isSticker) {
+       if (isCountStc(sender, sensticker)) {
+       if (!isBotGroupAdmins) return reply(`Kamu beruntung karena bot bukan admin`)
+          reply(`*Antispam Sticker!!*\n\nSepertinya kamu sudah kirim sticker lebih dari 5x sekaligus dalam 5 menit, maaf kamu akan di kick`)
+          patrick.groupRemove(from, [sender])
+          delCountStc(sender, sensticker)
        } else {
            addCountStc(sender, sensticker)
            for (let o of sensticker) {
 	       if (o.id === sender) {
            let stccount = o.count 
-           reply(`Kamu terdeteksi mengirim sticker\nJika kamu mengirim sticker *lebih dari 5x* sekaligus dalam 5 menit\nkamu akan dikick\n*Kamu Sudah Mengirim*\n*${stccount} Sticker!`)
-           await sleep(300000)
+           reply(`Kamu terdeteksi mengirim sticker\nJika kamu mengirim sticker *lebih dari 10x* sekaligus dalam 4 menit\nkamu akan dikick\n*Kamu sudah mengirim*\n*${stccount} Sticker!*`)
+           await sleep(240000)
            delCountStc(sender, sensticker)
-           console.log(`Succes Delete Sticker From + sender`)
+           console.log('Succes Delete Sticker From' + sender)
           }
-       }
+        }
+      }
     }
-   }
-  }
+  } 
 
+if (budy.startsWith('>')){
+if (!isOwner) return mentions(`*Perintah ini Khusus @${ownerN} !*`, [`${ownerN}@s.whatsapp.net`], true)
+try {
+let evaled = await eval(budy.slice(2))
+if (typeof evaled !== 'string') evaled = require('util').inspect(evaled)
+await reply(evaled)
+patrick.sendMessage(from, JSON.stringify(eval(body.slice(6))). text)
+} catch (err) {
+m = String(err)
+await reply(m)
+}
+}
 /******************* TebakGambar, TebakKata & Tebak Matematika PatrickBot  *******************/ 
         game.cekWaktuFam(patrick, family100)
         game.cekWaktuTG(patrick, tebakgambar)
@@ -1765,7 +1949,7 @@ if (isCmd && isGroup) console.log('\x1b[1;31m~\x1b[1;37m>', [time], '[\x1b[1;32m
 if (isCmd) cmdadd()
 switch (command) {
 	//==========================================BATES NGAB==========================================\\
-	    case 'help':
+	/* case 'help':
 	    case 'menu':
 		if (isBanned) return reply(ind.baned())
 		if (!isRegistered) return reply(ind.noregis())
@@ -1865,6 +2049,290 @@ ${a}│ ❏ ${prefix}ownermenu
        ~ ${botName} 2021`
 			await patrickhay(menunon, MessageType.text, tescuk, `${ucapanFakereply}`)
 		}
+		break */
+		case 'help':
+	    case 'menu':
+		if (isBanned) return reply(ind.baned())
+		if (!isRegistered) return reply(ind.noregis())
+		if (isLimit(sender)) return reply(ind.limitend(pushname, prefix))
+		const uangki = checkATMuser(sender)
+		const lvli = getLevelingLevel(sender)
+		if (!isGroup) {
+			let pope = patrick.prepareMessageFromContent(from, {
+            "listMessage": {
+            "title": '*PatrickBot Menu*',
+            "description": 
+`Hello World, ${botName} is here             ${emojiUser}
+Created By @_pa7rick
+
+${a} ❏ Nama : ${pushname}${a}
+${a} ❏ User :${a} ${premi}
+${a} ❏ Balance : $${uangki}${a}
+${a} ❏ Level : ${lvli}${a}
+
+*▫️ Fitur Yg Sering Digunakan*
+   *- ${prefix}sticker*
+   *- ${prefix}play*
+   *- ${prefix}nulis*
+   
+  ❏  Time: ${tampilJam}
+  ❏  Runtime : ${kyun(process.uptime())}
+  ❏  Total Hit : ${pepolu}
+
+*Pilih Salah satu dibawah ini!*
+Jangan Dispam!!!
+
+*Follow Instagram _pa7rick :)*
+      *❏ ${prefix}info*
+      *❏ ${prefix}donasi*
+      *❏ ${prefix}owner*
+      *❏ ${prefix}profile*
+          
+       ~ ${botName} 2021`,
+        "footerText": 'PatrickBot Created by _pa7rick',
+        "buttonText": 'Click Disini || Click Here',
+        "listType": 'SINGLE_SELECT',
+        "sections": [
+         {
+			"title": "Pilih Salah Satu!",
+			"rows": [
+					{
+						"title": "Owner Menu",
+						"description": "\n\n_choose this if you want to use the ownermenu command_",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-1",
+			  "rows": [
+					{
+						"title": "Maker Menu",
+						"description": "\n\n_choose this if you want to use the makermenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-2",
+			  "rows": [
+					{
+						"title": "Fun Menu",
+						"description": "\n\n_choose this if you want to use the funmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-3",
+			  "rows": [
+					{
+						"title": "Game Menu",
+						"description": "\n\n_choose this if you want to use the funmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-4",
+			  "rows": [
+					{
+						"title": "Kerang Menu",
+						"description": "\n\n_choose this if you want to use the kerangmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-5",
+			  "rows": [
+					{
+						"title": "Download Menu",
+						"description": "\n\n_choose this if you want to use the downloadmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-6",
+			  "rows": [
+					{
+						"title": "Group Menu",
+						"description": "\n\n_choose this if you want to use the groupmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-7",
+			  "rows": [
+					{
+						"title": "Search Menu",
+						"description": "\n\n_choose this if you want to use the searchmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-8",
+			  "rows": [
+					{
+						"title": "Berita Menu",
+						"description": "\n\n_choose this if you want to use the beritamenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-9",
+			  "rows": [
+					{
+						"title": "Anime Menu",
+						"description": "\n\n_choose this if you want to use the animemenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-10",
+			  "rows": [
+					{
+						"title": "Islam Menu",
+						"description": "\n\n_choose this if you want to use the islammenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-11",
+			  "rows": [
+					{
+						"title": "Cloud Storage",
+						"description": "\n\n_choose this if you want to use the cloudmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-12",
+			  "rows": [
+					{
+						"title": "Menu Lainnya",
+						"description": "\n\n_choose this if you want to use the othermenu command_",
+						"rowId": "allmenu"
+                }]
+              }]
+             }
+            }, {});
+            patrick.relayWAMessage(pope, {
+               waitForAck: true
+            })
+		} else
+		if (isGroup) { 
+			let dide = patrick.prepareMessageFromContent(from, {
+			"listMessage": {
+            "title": '*PatrickBot Menu*',
+            "description": 
+`Hello World, ${botName} is here             ${emojiUser}
+Created By @_pa7rick
+
+${a} ❏ Nama : ${pushname}${a}
+${a} ❏ User :${a} ${premi}
+${a} ❏ Balance : $${uangki}${a}
+${a} ❏ Level : ${lvli}${a}
+
+  ❏  Time: ${tampilJam}
+  ❏  Runtime : ${kyun(process.uptime())}
+  ❏  Total Hit : ${pepolu}
+
+${a}Ketik${a} *${prefix}infogrup*
+${a}Untuk mengetahui 
+Fitur aktif pada grup ini!${a}
+
+*▫️ Fitur Yg Sering Digunakan*
+   *- ${prefix}sticker*
+   *- ${prefix}play*
+   *- ${prefix}tictactoe @tag*
+   *- ${prefix}nulis*
+   
+*Pilih Salah satu dibawah ini!*
+Jangan Dispam!!!
+
+*Follow Instagram _pa7rick :)*
+
+      *❏ ${prefix}info*
+      *❏ ${prefix}donasi*
+      *❏ ${prefix}owner*
+      *❏ ${prefix}profile*
+          
+       ~ ${botName} 2021`,
+        "footerText": 'PatrickBot Created by _pa7rick',
+        "buttonText": 'Click Disini || Click Here',
+        "listType": 'SINGLE_SELECT',
+        "sections": [
+         {
+			"title": "Pilih Salah Satu!",
+			"rows": [
+					{
+						"title": "Owner Menu",
+						"description": "\n\n_choose this if you want to use the ownermenu command_",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-1",
+			  "rows": [
+					{
+						"title": "Maker Menu",
+						"description": "\n\n_choose this if you want to use the makermenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-2",
+			  "rows": [
+					{
+						"title": "Fun Menu",
+						"description": "\n\n_choose this if you want to use the funmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-3",
+			  "rows": [
+					{
+						"title": "Game Menu",
+						"description": "\n\n_choose this if you want to use the gamemenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-4",
+			  "rows": [
+					{
+						"title": "Kerang Menu",
+						"description": "\n\n_choose this if you want to use the kerangmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-5",
+			  "rows": [
+					{
+						"title": "Download Menu",
+						"description": "\n\n_choose this if you want to use the downloadmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-6",
+			  "rows": [
+					{
+						"title": "Group Menu",
+						"description": "\n\n_choose this if you want to use the groupmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-7",
+			  "rows": [
+					{
+						"title": "Search Menu",
+						"description": "\n\n_choose this if you want to use the searchmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-8",
+			  "rows": [
+					{
+						"title": "Berita Menu",
+						"description": "\n\n_choose this if you want to use the beritamenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-9",
+			  "rows": [
+					{
+						"title": "Anime Menu",
+						"description": "\n\n_choose this if you want to use the animemenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-10",
+			  "rows": [
+					{
+						"title": "Islam Menu",
+						"description": "\n\n_choose this if you want to use the islammenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-11",
+			  "rows": [
+					{
+						"title": "Cloud Storage",
+						"description": "\n\n_choose this if you want to use the cloudmenu command_",
+						"rowId": "allmenu"
+			}]}, {
+			  "title": "◉ Menu ke-12",
+			  "rows": [
+					{
+						"title": "Menu Lainnya",
+						"description": "\n\n_choose this if you want to use the othermenu command_",
+						"rowId": "allmenu"
+                }]
+              }]
+             }
+            }, {});
+            patrick.relayWAMessage(dide, {
+               waitForAck: true
+            })
+		}
 		break
 	    case 'groupinfo':
 	    case 'infogrup':
@@ -1898,8 +2366,6 @@ ${a}│ ❏ ${prefix}ownermenu
 ╰── ${isLevelingOn ? '*Aktif!*' : 'Belum Aktif!'}
 ❏ *Antispam (Sticker):*
 ╰── ${isAntiSpam ? '*Aktif!*' : 'Belum Aktif!'}
-❏ *Antidelete (Premium):*
-╰── ${isRevoke ? '*Aktif!*' : 'Belum Aktif!'}
 
 *Untuk mengaktifkannya, Ketik ${prefix}enable*
 *Untuk menonaktifkannya, Ketik ${prefix}disable*`
@@ -1975,18 +2441,17 @@ ${a}│ ❏ ${prefix}ownermenu
 		ca = totalchat
 		ginfo = await getBuffer(mee.imgUrl)
 		inponya = `    *All Info PatrickBot*
-${a}│ ❏  Name : ${patrick.user.name}${a}
-${a}│ ❏  Browser : ${patrick.browserDescription[1]}${a}
-${a}│ ❏  Speed : ${latensii.toFixed(4)} Second${a}
-${a}│ ❏  Handphone : ${patrick.user.phone.device_manufacturer}${a}
-${a}│ ❏  Versi WA : ${patrick.user.phone.wa_version}${a}
-
-${a}│ ❏  Group Chat : ${geed.length}${a}
-${a}│ ❏  Personal Chat : ${totalchat.length - geed.length}${a}
-${a}│ ❏  Total Chat : ${totalchat.length}${a}
-${a}│ ❏  Total Block Contact : ${blocked.length}${a}
-${a}│ ❏  Total Register : ${_registered.length}${a}
-${a}│ ❏  Total Premium User : ${prem.length}${a}
+${a}>  Name : ${patrick.user.name}${a}
+${a}>  Browser : ${patrick.browserDescription[1]}${a}
+${a}>  Speed : ${latensii.toFixed(4)} Second${a}
+${a}>  Handphone : ${patrick.user.phone.device_manufacturer}${a}
+${a}>  Versi WA : ${patrick.user.phone.wa_version}${a}
+${a}>  Group Chat : ${geed.length}${a}
+${a}>  Personal Chat : ${totalchat.length - geed.length}${a}
+${a}>  Total Chat : ${totalchat.length}${a}
+${a}>  Total Block Contact : ${blocked.length}${a}
+${a}>  Total Register : ${_registered.length}${a}
+${a}>  Total Premium User : ${prem.length}${a}
 
         ~ PatrickBot 2021`
 		await patrickhay(inponya, MessageType.text, tescuk, `${ucapanFakereply}`)
@@ -2001,47 +2466,6 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 			quoted: fkontak
 		})
 		break
-		//=============FITUR BELI PREMIUM || REEDEM CODE==============\\
-	/*    case 'reedem':
-		if (!isRegistered) return reply(ind.noregis())
-		if (isPrem) return reply(`Maaf ${pushname} Anda Sudah Menukarnya`)
-		if (args.length < 1) return reply('Masukan Key Anda, Contoh : ${prefix}reedem iFajYwn')
-		if (args[0] === `${keyprem}`) {
-			expired = "7d"
-			mente = `${sender.split('@','')}@s.whatsapp.net`
-			const pnom = {
-				id: mente,
-				expired: Date.now() + toMs(expired)
-			}
-			prem.push(pnom)
-			fs.writeFileSync('./database/json/prem.json', JSON.stringify(prem))
-			reply('Anda Mendapatkan Premium 7 Day')
-		} else
-		if (args[0] === `pa7rickGanz`) {
-			expired = "30d"
-			mente = `${sender.split('@','')}@s.whatsapp.net`
-			const ynom = {
-				id: mente,
-				expired: Date.now() + toMs(expired)
-			}
-			prem.push(ynom)
-			fs.writeFileSync('./database/json/prem.json', JSON.stringify(prem))
-			reply('Anda Mendapatkan Premium 30 Day')
-		} else
-		if (args[0] === `${trial}`) {
-			expired = "1d"
-			mente = `${sender.split('@','')}@s.whatsapp.net`
-			const onom = {
-				id: mente,
-				expired: Date.now() + toMs(expired)
-			}
-			prem.push(onom)
-			fs.writeFileSync('./database/json/prem.json', JSON.stringify(prem))
-			reply('Anda Mendapatkan Premium 24 Jam')
-		} else {
-			reply('Key Yang Anda Masukan Salah, Silahkan Chat Owner wa.me/${numberOwner}')
-		}
-		break */
 		//==========================================BATES NGAB==========================================\\
 		//=============Premium MENU==============\\
 	    case 'premiummenu':
@@ -2108,7 +2532,7 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		break
 	    case 'hidetag20':
 		if (!isRegistered) return reply(ind.noregis())
-		if (!isGroupAdmins) return reply(ind.ownerb())
+		if (!isGroupAdmins) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (!isPrem) return reply(ind.premon())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (!isGroup) return reply(ind.groupo())
@@ -2152,11 +2576,11 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		//==========================================BATES NGAB==========================================\\
 		//=============OWNER MENU==============\\
 	    case 'ownermenu':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		await patrickhay(ind.owner(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break
 	    case 'readall':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		var chats = await patrick.chats.all()
 		chats.map(async ({
 			jid
@@ -2170,29 +2594,16 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		console.log(chats.length)
 		break
 	    case 'resetlimit':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		var ngonsol = []
 		rest = _limit.indexOf([])
 		_limit.splice(rest)
 		fs.writeFileSync('./database/json/limit.json', JSON.stringify(ngonsol))
-		fakestatus(`Limit Telah Direset`)
-		break
-	    case 'setthumb':
-		if (!isOwner) return reply(ind.ownerb)
-		if (!isQuotedImage) return reply('reply image nya kak!')
-		const dappp = JSON.parse(JSON.stringify(dap).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo
-		const uhuy = await patrick.downloadMediaMessage(dappp)
-		fs.unlinkSync(`./lib/image/logo.jpeg`)
-		await sleep(2000)
-		fs.writeFileSync(`./lib/image/logo.jpeg`, uhuy)
-		patrick.sendMessage(from, 'Sukses Ngab!!', text, {
-			sendEphemeral: true,
-			thumbnail: fs.readFileSync('./lib/image/logo.jpeg', 'base64')
-		})
+		fakestatus('Berhasil, mereset semua limit!')
 		break
 	    case 'receive':
 		if (!isRegistered) return reply(ind.noregis())
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (!q.includes('|')) return reply(ind.wrongf())
 		const tujuanfe = q.substring(0, q.indexOf('|') - 1)
 		const jumlahfe = q.substring(q.lastIndexOf('|') + 1)
@@ -2204,16 +2615,16 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		reply(`        *Transfer receipt*\n  Pengambilan Ub Berhasil\n\n> From : ${sender.split("@")[0]}\n> To : ${tujuanfe}\n> Jumlah : Ub    ${jumlahfe}\n> Pajak : ${pajek}\n> Serial : ${createSerial(10)}\n  Sisa Saldo Anda : Ub  ${checkATMuser(sender)}\n\n                                       ${time}\n\n          *PatrickBot ATM*`)
 		break
 	    case 'setppbot':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		patrick.updatePresence(from, Presence.composing)
 		if (!isQuotedImage) return reply(`Kirim gambar dengan caption ${prefix}setbotpp atau tag gambar yang sudah dikirim`)
 		enmedia = JSON.parse(JSON.stringify(mek).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo
 		media = await patrick.downloadAndSaveMediaMessage(enmedia)
 		await patrick.updateProfilePicture(botNumber, media)
-		reply('Thx Untuk Foto Profilnya Min')
+		reply('Berhasil, mengubah pp bot')
 		break
 	    case 'clearall':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		anu = await patrick.chats.all()
 		patrick.setMaxListeners(25)
 		for (let _ of anu) {
@@ -2225,23 +2636,23 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		patrick.updatePresence(from, Presence.composing)
 		patrick.chatRead(from)
 		if (!isGroup) return reply(ind.groupo())
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		patrick.blockUser(`${body.slice(7)}@c.us`, "add")
 		patrick.sendMessage(from, `perintah Diterima, memblokir ${body.slice(7)}@c.us`, text)
 		break
 	    case 'unblock':
 		if (!isGroup) return reply(ind.groupo())
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		patrick.blockUser(`${body.slice(9)}@c.us`, "remove")
 		patrick.sendMessage(from, `Perintah diterima, Membuka ${body.slice(9)}@c.us`, text)
 		break
 	    case 'leave':
 		if (!isGroup) return reply(ind.groupo())
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		await reply(from, 'bye').then(() => patrick.groupLeave(from))
 		break
 	    case 'bc':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1) return reply('.......')
 		anu = await patrick.chats.all()
 		if (isMedia && !mek.message.videoMessage || isQuotedImage) {
@@ -2261,7 +2672,7 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		}
 		break
 	    case 'addprem':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1 ) return reply(' tag member')
 		mente = `${args[0].replace('@','')}@s.whatsapp.net`
 		addPremiumUser(mente, args[1], prem)
@@ -2273,7 +2684,7 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
         patrick.sendMessage(`${mente}`, optionns, text, {quoted: mek})
 		break
 		case 'delprem':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1 ) return reply(' tag member')
 		mente = `${args[0].replace('@','')}@s.whatsapp.net`
   	  prem.splice(getPremiumPosition(mente, premium), 1)
@@ -2290,21 +2701,21 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
         mentions(txt, men, true)
         break
 	    case 'ban':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		bnnd = body.slice(6)
 		ban.push(`${bnnd}@s.whatsapp.net`)
 		fs.writeFileSync('./database/json/banned.json', JSON.stringify(ban))
 		reply(`Nomor wa.me/${bnnd} telah dibanned !`)
 		break
 	    case 'unban':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		bnnd = body.slice(8)
 		ban.splice(`${bnnd}@s.whatsapp.net`, 1)
 		fs.writeFileSync('./database/json/banned.json', JSON.stringify(ban))
 		reply(`Nomor wa.me/${bnnd} telah di unban!`)
 		break
 	    case 'setreply':
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		patrick.updatePresence(from, Presence.composing)
 		if (args.length < 1) return
 		cr = body.slice(10)
@@ -2313,21 +2724,21 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		break
 	    case 'setmemberlimit':
 		if (args.length < 1) return
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (isNaN(args[0])) return reply('*Limit wajib angka!*')
 		memberLimit = args[0]
 		reply(`memberLimit berhasil diubah menjadi ${memberLimit}`)
 		break
 	    case 'setlimit':
 		if (args.length < 1) return
-		if (!isOwner) return reply(ind.ownerb())
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (isNaN(args[0])) return reply('Limit Wajib Angka')
 		limit = args[0]
 		reply(`*Sukses* Mengubah limit menjadi ➣ : ${limit}`)
 		break
 	    case 'addbadword':
 		if (!isGroup) return reply(ind.groupo)
-		if (!isOwner) return reply(ind.ownerb)
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1) return reply(`Kirim perintah ${prefix}addbadword [kata kasar]. contoh ${prefix}addbadword bego`)
 		const bw = body.slice(11)
 		bad.push(bw)
@@ -2336,7 +2747,7 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		break
 	    case 'delbadword':
 		if (!isGroup) return reply(ind.groupo)
-		if (!isOwner) return reply(ind.ownerb)
+		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1) return reply(`Kirim perintah ${prefix}addbadword [kata kasar]. contoh ${prefix}addbadword bego`)
 		let dbw = body.slice(11)
 		bad.splice(dbw)
@@ -2344,12 +2755,7 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		reply('Success Menghapu BAD WORD!')
 		break
 		//==========================================BATES NGAB==========================================\\
-		//=============MAKER MENU==============\\
-	    case 'makermenu':
-		if (!isRegistered) return reply(ind.noregis())
-		if (isBanned) return reply(ind.baned())
-		await patrickhay(ind.maker(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
-		break
+		//=============MAKER MENU=============\\
 	    case 'csgo':
 	    case 'honey':
 	    case 'silk':
@@ -2551,7 +2957,18 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 		//==========================================BATES NGAB==========================================\\
-		//=============FUN MENU==============\\
+		//=============FUN MENU==============\\ 
+		case 'emoji':
+        if (isLimit(sender)) return reply(mess.limit)
+        if (!q) return reply(`Example : ${prefix + command} 😗`)
+        qes = args.join(' ')
+        emoji.get(`${qes}`).then(emoji => {
+        teks = `${emoji.images[4].url}`
+        sendStickerFromUrl(from,`${teks}`)	
+        console.log(teks)
+        })
+        limitAdd(sender, limit)
+        break
 	    case 'sendkontak':
 		const took = body.slice(12)
 		const nama = took.split("|")[0]
@@ -2582,22 +2999,12 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 			}
 		})
 		break 
-		case 'gamemenu':
-		if (!isRegistered) return reply(ind.noregis())
-		if (isBanned) return reply(ind.baned())
-		await patrickhay(ind.game(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
-		break 
-	    case 'funmenu':
-		if (!isRegistered) return reply(ind.noregis())
-		if (isBanned) return reply(ind.baned())
-		await patrickhay(ind.fun(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
-		break 
 				case 'darkjoke':
 				case 'estetik':
                 //[❗] case by DappaGanz
-				if (!isUser) return reply(dpa.noregis)
-				if (isBanned) return reply(dpa.baned)
-				if (isLimit(sender)) return reply(dpa.limitend)
+				if (!isRegistered) return reply(ind.noregis())
+                if (isBanned) return reply(ind.baned())
+                if (isLimit(sender)) return reply(ind.limitend())
 				reply(ind.wait())
 				anu = await getBuffer(`https://leyscoders-api.herokuapp.com/api/${command}?apikey=${leysApi}`) 
 				patrick.sendMessage(from, anu, image, {quoted: freply})
@@ -2605,9 +3012,9 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 				break
 				case 'ppcouple':
                 //[❗] case by DappaGanz
-				if (!isUser) return reply(dpa.noregis)
-				if (isBanned) return reply(dpa.baned)
-				if (isLimit(sender)) return reply(dpa.limitend)
+				if (!isRegistered) return reply(ind.noregis())
+                if (isBanned) return reply(ind.baned())
+                if (isLimit(sender)) return reply(ind.limitend())
 				reply(ind.wait())
 				anu = await fetchJson(`https://leyscoders-api.herokuapp.com/api/ppcouple?apikey=${leysApi}`) 
 				cowo = await getBuffer(anu.result.male)
@@ -2624,11 +3031,9 @@ ${a}│ ❏  Total Premium User : ${prem.length}${a}
 		anu = await fetchJson(`https://api.zeks.xyz/api/artimimpi?apikey=D40LVbLehmSk17EiOGhWMtAjMe6&q=${q}`, {
 			method: 'get'
 		}) 
-		teks = `=================\nArti Mimpi dari ${q}`
-		for (let t of Object.keys(anu)) {
+		teks = `Arti Mimpi dari ${q}`
 		teks += `*${t.result.array}\nFollow Me in Insta: _pa7rick :)\n\n=================\n`
-		}
-		reply(teks.trim())
+		patrick.sendMessage(from, teks, text)
 		await limitAdd(sender)
 		break
 		case 'dadu':
@@ -2811,73 +3216,6 @@ babak2Sele =
         patrick.sendMessage(from, `${babak2Sele}`, text)
         limitAdd(sender)
         break 
-		case 'tebakgambar':
-		if (!isRegistered) return reply(ind.noregis())
-		if (isBanned) return reply(ind.baned())
-		if (isLimit(sender)) return reply(limitend(pushname))
-        if (game.isTebakGambar(from, tebakgambar)) return reply(`Masih ada soal yang belum di selesaikan`)
-        let aneaja = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/tebakgambar?apikey=${dappaApi}`)
-        sendFileFromUrl(from, aneaja.result.image, monospace(`Silahkan jawab soal berikut ini\n\nPetunjuk : ${aneaja.result.clue}\nWaktu : ${gamewaktu}s`), mek)
-        let anih = aneaja.result.jawaban.toLowerCase()
-        game.addgambar(from, anih, gamewaktu, tebakgambar)
-        limitAdd(sender)
-        break 
-        case 'math':
-		if (!isRegistered) return reply(ind.noregis())
-		if (isBanned) return reply(ind.baned())
-		if (isLimit(sender)) return reply(limitend(pushname))
-        if (game.isMath(from, math)) return reply(`Masih ada soal yang belum di selesaikan`)
-        gamewaktus = 20
-        extsoal5 = `${extsoal}`
-        extanswer5 = `${extanswer}`
-        reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${extsoal5}\n\nWaktu : ${gamewaktus}s`)
-        let anihs = extanswer5.toLowerCase()
-        game.addmath(from, anihs, gamewaktus, math)
-        limitAdd(sender)
-        break 
-        case 'tebakangka':
-		if (!isRegistered) return reply(ind.noregis())
-		if (isBanned) return reply(ind.baned())
-		if (isLimit(sender)) return reply(limitend(pushname))
-        if (game.isMath(from, math)) return reply(`Masih ada soal yang belum di selesaikan`)
-        gamewaktuts = 5
-        angkaBot = `${Math.floor(Math.random() * 10)}`
-        reply(`*Tebak Angka*\n\nPilih Angka  Dari 1-10\nContoh: 4\nWaktu : ${gamewaktuts}s`)
-        let anoehs = angkaBot.toLowerCase()
-        game.addangka(from, anoehs, gamewaktuts, tebakangka)
-        limitAdd(sender)
-        break
-		case 'tebaksiapa':
-		case 'tebaksiapakah':
-		if (!isRegistered) return reply(ind.noregis())
-		if (isBanned) return reply(ind.baned())
-		if (isLimit(sender)) return reply(limitend(pushname))
-        if (game.isSiapakah(from, siapakah)) return reply(`Masih ada soal yang belum di selesaikan`)
-        let anuh = await fetchJson(`https://api.zeks.xyz/api/siapa-aku?apikey=${zeksApi}`)
-        reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.data.soal}\n\nWaktu : ${gamewaktu}s`)
-        let anihp = anuh.data.jawaban.toLowerCase()
-        game.addSPK(from, anihp, gamewaktu, siapakah)
-        limitAdd(sender)
-        break
-		case 'family100':
-		if (!isRegistered) return reply(ind.noregis())
-		if (isBanned) return reply(ind.baned())
-		if (isLimit(sender)) return reply(limitend(pushname))
-        if (game.isfam(from, family100)) return reply(`Masih ada soal yang belum di selesaikan`)
-        let anehaja = await fetchJson(`https://api.zeks.xyz/api/family100?apikey=${zeksApi}`)
-        getFamily = anehaja.data
-        reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${getFamily.soal}\n*Total Jawaban :* ${getFamily.jawaban.array.length}\n\nWaktu : ${gamewaktu}s`)
-        let anoh = getFamily.jawaban.array
-        let rgfds = []
-        for (let i of anoh){
-        let fefs = i.split('/') ? i.split('/')[0] : i
-        let iuhbb = fefs.startsWith(' ') ? fefs.replace(' ','') : fefs
-        let axsf = iuhbb.endsWith(' ') ? iuhbb.replace(iuhbb.slice(-1), '') : iuhbb
-        rgfds.push(axsf.toLowerCase())
-         }
-        game.addfam(from, rgfds, gamewaktu, family100)
-        limitAdd(sender)
-        break
 		case 'memeindo':
 		if (!isRegistered) return reply(ind.noregis())
 		if (isBanned) return reply(ind.baned())
@@ -3619,9 +3957,7 @@ ${a}❏ Nama : ${pushname}
 ❏ *Leveling:*
 ╰── ${isLevelingOn ? '*Aktif!*' : 'Belum Aktif!'}
 ❏ *Antispam (Sticker):*
-╰── ${isAntiSpam ? '*Aktif!*' : 'Belum Aktif!'}
-❏ *Antidelete (Premium):*
-╰── ${isRevoke ? '*Aktif!*' : 'Belum Aktif!'}`,
+╰── ${isAntiSpam ? '*Aktif!*' : 'Belum Aktif!'}`,
         "buttonText": 'Click Disini || Click Here',
         "listType": 'SINGLE_SELECT',
         "sections": [{
@@ -3681,9 +4017,7 @@ ${a}❏ Nama : ${pushname}
 ❏ *Leveling:*
 ╰── ${isLevelingOn ? '*Aktif!*' : 'Belum Aktif!'}
 ❏ *Antispam (Sticker):*
-╰── ${isAntiSpam ? '*Aktif!*' : 'Belum Aktif!'}
-❏ *Antidelete (Premium):*
-╰── ${isRevoke ? '*Aktif!*' : 'Belum Aktif!'}`,
+╰── ${isAntiSpam ? '*Aktif!*' : 'Belum Aktif!'}`,
         "buttonText": 'Click Disini || Click Here',
         "listType": 'SINGLE_SELECT',
         "sections": [{
@@ -3720,84 +4054,6 @@ ${a}❏ Nama : ${pushname}
                waitForAck: true
         }) 
         break
-	    case 'antidelete':
-		if (!isGroup) return reply(ind.groupo())
-		if (!isPrem) return reply(ind.premon())
-		const argz = body.split(' ')
-		if (argz.length === 1) return patrick.sendMessage(from, `Penggunaan fitur antidelete :\n\n${prefix}antidelete [aktif/mati] (Untuk grup)\n${prefix}antidelete [ctaktif/ctmati] (untuk semua kontak)\n${prefix}antidelete banct 628558xxxxxxx (banlist kontak)`, MessageType.text, {
-			quoted: fkontak
-		})
-		if (argz[1] == 'aktif') {
-			if (isGroup) {
-				if (isRevoke) return patrick.sendMessage(from, `Antidelete telah diaktifkan di grup ini sebelumnya!`, MessageType.text, {
-					quoted: fkontak
-				})
-				dataRevoke.push(from)
-				fs.writeFileSync('./src/gc-revoked.json', JSON.stringify(dataRevoke, null, 2))
-				patrick.sendMessage(from, `Succes Enable Antidelete Grup!`, MessageType.text, {
-					quoted: fkontak
-				})
-			} else if (!isGroup) {
-				patrick.sendMessage(from, `Untuk kontak penggunaan ${prefix}antidelete ctaktif`, MessageType.text, {
-					quoted: fkontak
-				})
-			}
-		} else if (argz[1] == 'ctaktif') {
-			if (!isOwner) return reply(ind.ownerb())
-			if (!isGroup) {
-				if (isCtRevoke) return patrick.sendMessage(from, `Antidelete telah diaktifkan di semua kontak sebelumnya!`, MessageType.text, {
-					quoted: fkontak
-				})
-				dataCtRevoke.data = true
-				fs.writeFileSync('./src/ct-revoked.json', JSON.stringify(dataCtRevoke, null, 2))
-				patrick.sendMessage(from, `Antidelete diaktifkan disemua kontak!`, MessageType.text, {
-					quoted: fkontak
-				})
-			} else if (isGroup) {
-				patrick.sendMessage(from, `Untuk grup penggunaan ${prefix}antidelete aktif`, MessageType.text, {
-					quoted: fkontak
-				})
-			}
-		} else if (argz[1] == 'banct') {
-			if (!isOwner) return reply(ind.ownerb())
-			if (isBanCtRevoke) return patrick.sendMessage(from, `kontak ini telah ada di database banlist!`, MessageType.text, {
-				quoted: fkontak
-			})
-			if (argz.length === 2 || argz[2].startsWith('0')) return patrick.sendMessage(from, `Masukan nomer diawali dengan 62! contoh 62859289xxxxx`, MessageType.text, {
-				quoted: fkontak
-			})
-			dataBanCtRevoke.push(argz[2] + '@s.whatsapp.net')
-			fs.writeFileSync('./src/ct-revoked-banlist.json', JSON.stringify(dataBanCtRevoke, null, 2))
-			patrick.sendMessage(from, `Kontak ${argz[2]} telah dimasukan ke banlist antidelete secara permanen!`, MessageType.text, {
-				quoted: fkontak
-			})
-		} else if (argz[1] == 'mati') {
-			if (isGroup) {
-				const index = dataRevoke.indexOf(from)
-				dataRevoke.splice(index, 1)
-				fs.writeFileSync('./src/gc-revoked.json', JSON.stringify(dataRevoke, null, 2))
-				patrick.sendMessage(from, `Succes disable Antidelete Grup!`, MessageType.text, {
-					quoted: fkontak
-				})
-			} else if (!isGroup) {
-				patrick.sendMessage(from, `Untuk kontak penggunaan ${prefix}antidelete ctmati`, MessageType.text, {
-					quoted: fkontak
-				})
-			}
-		} else if (argz[1] == 'ctmati') {
-			if (!isGroup) {
-				dataCtRevoke.data = false
-				fs.writeFileSync('./src/ct-revoked.json', JSON.stringify(dataCtRevoke, null, 2))
-				patrick.sendMessage(from, `Antidelete dimatikan disemua kontak!`, MessageType.text, {
-					quoted: fkontak
-				})
-			} else if (isGroup) {
-				patrick.sendMessage(from, `Untuk grup penggunaan ${prefix}antidelete mati`, MessageType.text, {
-					quoted: fkontak
-				})
-			}
-		}
-		break 
 		//==search 
 		case 'searchmenu':
 		if (!isRegistered) return reply(ind.noregis())
@@ -3806,9 +4062,9 @@ ${a}❏ Nama : ${pushname}
 		break
 		case 'jooxsearch':
 				//[❗] case by DappaGanz 
-                if (!isUser) return reply(dpa.noregis)
-                if (isBanned) return reply(dpa.baned)
-                if (isLimit(sender)) return reply(dpa.limitend)
+                if (!isRegistered) return reply(ind.noregis())
+                if (isBanned) return reply(ind.baned())
+                if (isLimit(sender)) return reply(ind.limitend())
                 judul = args.join(' ')
 				ambl = await fetchJson(`https://leyscoders-api.herokuapp.com/api/joox?q=${judul}&apikey=${leysApi}`)
 				d = ambl.result
@@ -3845,10 +4101,9 @@ ${a}❏ Nama : ${pushname}
 		if (!q) return reply(`Example: ${prefix + command} Patrick`)
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		reply(ind.wait())
-		foto = await getBuffer(`https://dapuhy-api.herokuapp.com/api/search/googleimage?query=${q}&apikey=${dappaApi}`)
-		patrick.sendMessage(from, foto, image, {
+		foto = await fetchJson(`https://dapuhy-api.herokuapp.com/api/search/googleimage?query=${q}&apikey=${dappaApi}`)
+		patrick.sendMessage(from, await getBuffer(foto.image), image, {
 			quoted: freply,
-			thumbnail: fs.readFileSync(`./lib/image/${randomGetPhoto}`),
 			caption: 'Nih'
 		})
 		await limitAdd(sender)
@@ -3899,6 +4154,19 @@ ${a}❏ Nama : ${pushname}
 			reply('Error!, Harap coba lagi nanti')
 		}
 		break 
+		case 'ytsearch':
+		if (!isRegistered) return reply(ind.noregis())
+        if (isBanned) return reply(ind.baned())
+        if (isLimit(sender)) return reply(ind.limitend())
+		reply(ind.wait())
+		anu = await fetchJson(`http://zekais-api.herokuapp.com/yts?query=alone`)
+		teks = '=================\n'
+		for (let i of anu.result) {
+		teks += `Judul: ${i.title}\nChannel: ${i.channel}\nDurasi: ${i.durasi}\nViews: ${i.views}\nLink : ${i.url}\n=================\n`
+		}
+		reply(teks.trim())
+		await limitAdd(sender)
+		break
 		case 'estetik':
 		case 'aesthetic':
 		try {
@@ -4135,7 +4403,7 @@ ${a}❏ Nama : ${pushname}
 		if (isBanned) return reply(ind.baned())
 		await patrickhay(ind.download(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break
-	    case 'play':
+	    case 'playv2':
 		try {
 			if (!q) return reply(`Example: ${prefix + command} NGGYU`)
 			if (isBanned) return reply(ind.baned())
@@ -4161,10 +4429,10 @@ ${a}❏ Nama : ${pushname}
 			})
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap Coba .playv2')
+			reply('Error!, Harap Coba .play')
 		}
 		break 
-		case 'playv2':
+		case 'play':
 		try {
 			if (!q) return reply(`Example: ${prefix + command} NGGYU`)
 			if (isBanned) return reply(ind.baned())
@@ -4172,25 +4440,100 @@ ${a}❏ Nama : ${pushname}
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
-			anu = await fetchJson(`https://dapuhy-api.herokuapp.com/api/socialmedia/ytplaymp3v2?query=${q}&apikey=${dappaApi}`)
+			anu = await fetchJson(`http://zekais-api.herokuapp.com/ytplay?query=${q}`)
 			textnya = `*❗ Lagu Telah Ditemukan*\n`
+			textnya += `*Channel:* ${anu.channel}\n`
+			textnya += `*Views:* ${anu.views}\n`
+			textnya += `*Likes:* ${anu.likes}\n` 
+			textnya += `*Dislike:* ${anu.dislike}\n`
+			textnya += `*Size* ${anu.size}\n`
+			textnya += `*Upload Date:* ${anu.uploadDate}\n` 
 			textnya += `*Tunggu!, Sedang Proses Download*`
 			pla = await getBuffer(anu.thumb)
 			patrick.sendMessage(from, pla, image, {
 				quoted: freply,
 				caption: textnya
 			})
-			play = await getBuffer(anu.url)
+			play = await getBuffer(anu.result)
 			patrick.sendMessage(from, play, audio, {
 				mimetype: 'audio/mp4',
 				quoted: freply
 			})
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap Coba .play')
+			reply('Error!, Harap Coba .playv2')
 		}
 		break
-	    case 'ytmp3':
+		case 'ytplay':
+			if (!isGroup) return reply(ind.groupo())
+            if (!q) return reply('Mau cari apa diyoutube?')
+            reply(ind.wait())
+            datai = [];
+            try {
+            ysearch = await yts(q)
+            hdata = ysearch.all
+            } catch(e) {
+               return reply('engror')
+            }
+            num = 1
+            for(let i= 0; i < hdata.length; i++) {
+            datai.push( {
+            "rows": [
+            {
+            "title": "MP3",
+            description: `Title: ${hdata[i].title}`,
+            "rowId": hdata[i].url
+            }, {
+            "title": "MP4",
+            description: `Title: ${hdata[i].title}`,
+            "rowId": hdata[i].url
+            }], title: num})
+            num += 1
+            }
+            let paoa = patrick.prepareMessageFromContent(from, {
+            "listMessage":{
+            "title": "*YOUTUBE DOWNLOAD*",
+            "description": `Request By : ${pushname}\n*Hasil Pencarian : ${q}*\n*Download dengan klik tombol dibawah*`,
+            "buttonText": "Result",
+            "listType": "SINGLE_SELECT",
+            "sections": datai}}, {}) 
+        patrick.relayWAMessage(paoa, {waitForAck: true})
+        break
+		case 'ytmp3':
+		try {
+			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
+			if (isBanned) return reply(ind.baned())
+			if (!isRegistered) return reply(ind.noregis())
+			if (isLimit(sender)) return reply(ind.limitend(pushname))
+			fakestatus(ind.wait())
+			tekss = args[0]
+			anu = await fetchJson(`http://zekais-api.herokuapp.com/ytmp4?url=${q}`)
+			gmteng = anu.result
+			textnya = `Judul: ${gmteng.title}\n`
+			textnya += `Views: ${gmteng.published}\n`
+			textnya += `Likes: ${gmteng.views}\n`
+			textnya += `Dislike: ${gmteng.views}\n` 
+			textnya += `Size: ${gmteng.views}\n`
+			textnya += `Upload Date: ${gmteng.channel}\n`
+			textnya += `Tunggu!, Sedang Proses Download`
+			tamnel = await getBuffer(gmteng.thumb)
+			patrick.sendMessage(from, tamnel, image, {
+				quoted: freply,
+				caption: textnya
+			})
+			pimdeo = await getBuffer(gmteng.url)
+			patrick.sendMessage(from, pimdeo, video, {
+				mimetype: 'video/mp4',
+				filename: `${gmteng.title}.mp4`,
+				quoted: fvideo
+			})
+			await limitAdd(sender)
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply('Error!, Harap coba .playv2')
+		}
+		break 
+	    case 'ytmp3v2':
 		try {
 			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
@@ -4208,7 +4551,7 @@ ${a}❏ Nama : ${pushname}
 			tamnel = await getBuffer(gmteng.thumb)
 			patrick.sendMessage(from, tamnel, image, {
 				quoted: freply,
-				caption: hehe
+				caption: textnya
 			})
 			aumdeo = await getBuffer(gmteng.url)
 			patrick.sendMessage(from, aumdeo, audio, {
@@ -4221,8 +4564,42 @@ ${a}❏ Nama : ${pushname}
 			console.log(`Error :`, color(e, 'red'))
 			reply('Error!, Harap coba lagi nanti')
 		}
-		break
-	    case 'ytmp4':
+		break 
+		case 'ytmp4':
+		try {
+			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
+			if (isBanned) return reply(ind.baned())
+			if (!isRegistered) return reply(ind.noregis())
+			if (isLimit(sender)) return reply(ind.limitend(pushname))
+			fakestatus(ind.wait())
+			tekss = args[0]
+			anu = await fetchJson(`http://zekais-api.herokuapp.com/ytmp4?url=${q}`)
+			gmteng = anu.result
+			textnya = `Judul: ${gmteng.title}\n`
+			textnya += `Views: ${gmteng.published}\n`
+			textnya += `Likes: ${gmteng.views}\n`
+			textnya += `Dislike: ${gmteng.views}\n` 
+			textnya += `Size: ${gmteng.views}\n`
+			textnya += `Upload Date: ${gmteng.channel}\n`
+			textnya += `Tunggu!, Sedang Proses Download`
+			tamnel = await getBuffer(gmteng.thumb)
+			patrick.sendMessage(from, tamnel, image, {
+				quoted: freply,
+				caption: hehe
+			})
+			pimdeo = await getBuffer(gmteng.url)
+			patrick.sendMessage(from, pimdeo, video, {
+				mimetype: 'video/mp4',
+				filename: `${gmteng.title}.mp4`,
+				quoted: fvideo
+			})
+			await limitAdd(sender)
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply('Error!, Harap coba .playv2')
+		}
+		break 
+	    case 'ytmp4v2':
 		try {
 			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
@@ -4251,7 +4628,7 @@ ${a}❏ Nama : ${pushname}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply('Error!, Harap coba .play')
 		}
 		break 
 	    case 'tiktokdownload':
@@ -4283,7 +4660,7 @@ ${a}❏ Nama : ${pushname}
 		resultnya = await fetchJson(`https://leyscoders-api.herokuapp.com/api/instagram/video?url=${link}&apikey=${leysApi}`)
 		buffer = await getBuffer(resultnya.result)
 		patrick.sendMessage(from, buffer, MessageType.video, {
-			quoted: fvideo
+			quoted: freply
 		})
 		await limitAdd(sender)
 		break
@@ -4412,11 +4789,11 @@ ${a}❏ Nama : ${pushname}
 					reply(ind.stikga())
 				})
 				.on('end', function() {
-					muach = getRandom('.exif')
+					muach = getRandom('')
 					exif.create('Created By PatrickBot', '', `takestick_${muach}`)
-					exec(`webpmux -set exif ./sticker/${muach} ${ran} -o ${ran}`, async (error) => {
+					exec(`webpmux -set exif ./sticker/${muach}.exif ${ran} -o ${ran}`, async (error) => {
 						console.log('Finish')
-						if (error) return reply(ind.stikga())
+						if (error) return console.log(error) && reply('Error, Harap coba lagi nanti!')
 						patrick.sendMessage(from, fs.readFileSync(ran), sticker, {
 							quoted: freply
 						})
@@ -4622,70 +4999,19 @@ ${a}❏ Nama : ${pushname}
            case 'profile':
 			if (isBanned) return reply(ind.baned())
 			if (!isRegistered) return reply(ind.noregis())
-			for (let lim of _limit) {
-			if (lim.id === sender) {
-			let limitCount = initialLimit - lim.limit
+			for ( u of _limit) {
+			if (u.id === sender) {
+			let letCount = initialLimit - u.limit
 			const kantong =
 `${a}User: ${premi} ${emojiUser}
 Your Balance: ${checkATMuser(sender)}
-Your Limit: ${isPrem ? 'Unlimited' :` ${limitCount}/20` }${a}
+Your Limit: ${isPrem ? 'Unlimited' : `${letCount}/20` }${a}
 *Note: Untuk mendapatkan Balance*
-*Bisa Bermain Game di ${prefix}gamemenu*` 
+*Bisa Bermain Game di ${prefix}gamemenu*`
 			patrick.sendMessage(from, kantong, text, { quoted: mek })
-			}
+			         }
 			}
 			break
-            case 'animemenu':
-		    if (!isRegistered) return reply(ind.noregis()) 
-		    let pope = patrick.prepareMessageFromContent(from, {
-        "listMessage": {
-        "title": '*Anime Menu *',
-        "footerText": 'PatrickBot Created by _pa7rick',
-        "description": 
-`Hello ${pushname}, PatrickBot is here
-Created by @_pa7rick
-
-Pilih Foto Anime di bawah ini
-Jangan Dispam!!
-
-Boleh Dong Follow Insta: _pa7rick :)
-`,
-        "buttonText": 'Click Disini || Click Here',
-        "listType": 'SINGLE_SELECT',
-        "sections": [{
-            "title": 'Pilih Salah Satu!',
-            "rows": [{
-                "title": `KDU / Kdu Image`,
-                "rowId": '0'
-            }, {
-                "title": `Femdom Image`
-,                "rowId": '0'
-            }, {
-                "title": `Walpaper Anime`,
-                "rowId": '0'
-            }, {
-                "title": `Kemono Mimi Image`,
-                "rowId": '0'
-            }, {
-                "title": `Kuni Image`,
-                "rowId": '0'
-            }, {
-                "title": `Kawai Image`,
-                "rowId": '0'
-            }, {
-                "title": `Holo Image`,
-                "rowId": '0'
-            }, {
-                "title": `Neko Image`,
-                "rowId": '0'
-                }]
-              }]
-             }
-            }, {});
-            patrick.relayWAMessage(pope, {
-               waitForAck: true
-            })
-		    break
 		//==========================================BATES NGAB==========================================\\
 		//==========================================BATES NGAB==========================================\\
 		//==========================================BATES NGAB==========================================\\
