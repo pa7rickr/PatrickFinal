@@ -474,6 +474,7 @@ const sleep = async (ms) => {
 			const isQuotedImage = type === 'extendedTextMessage' && content.includes('imageMessage')
 			const isQuotedVideo = type === 'extendedTextMessage' && content.includes('videoMessage')
 			const isQuotedSticker = type === 'extendedTextMessage' && content.includes('stickerMessage')
+                        const isQuotedAudio = type === "extendedTextMessage" && content.includes("audioMessage")
 			const isOwner = ownerNumber.includes(sender)
 			const isPrem = checkPremiumUser(sender, prem) || isOwner
 			const isImage = type === 'imageMessage'
@@ -2075,7 +2076,7 @@ ${a} ❏ Level : ${lvli}${a}
    *- ${prefix}play*
    *- ${prefix}nulis*
    
-  ❏  Time: ${tampilJam}
+  ❏  Time: ${time}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
 
