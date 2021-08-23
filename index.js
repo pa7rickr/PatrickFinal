@@ -4790,7 +4790,7 @@ ${a}❏ Nama : ${pushname}
 				})
 				.on('end', function() {
 					muach = getRandom('')
-					exif.create('Created By PatrickBot', '', `takestick_${muach}`)
+					exif.create('Created By PatrickBot', '', `${muach}`)
 					exec(`webpmux -set exif ./sticker/${muach}.exif ${ran} -o ${ran}`, async (error) => {
 						console.log('Finish')
 						if (error) return console.log(error) && reply('Error, Harap coba lagi nanti!')
