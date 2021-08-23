@@ -4664,6 +4664,33 @@ ${a}❏ Nama : ${pushname}
 		})
 		await limitAdd(sender)
 		break
+             case 'searchmusic':
+        if (isLimit(sender)) return reply(ind.limitend())
+        if (!isRegistered) return reply(ind.noregis())
+        if (isQuotedAudio){
+        const dlfile = await patrick.downloadMediaMessage(JSON.parse(JSON.stringify(mek).replace('quotedM','m')).message.extendedTextMessage.contextInfo)
+        const FormData = require("form-data")
+        const bodyForm = new FormData()
+        bodyForm.append('audio', dlfile, 'music.mp3')
+        bodyForm.append('apikey', `${zeksApi}`)
+        axios('https://api.zeks.me/api/searchmusic', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "multipart/form-data",
+          ...bodyForm.getHeaders()
+        },
+        data: bodyForm
+          })
+        .then(({data}) =>{
+        if (data.status){
+          reply(`*「 Search Music 」*\n\n\n• *Title*: ${data.data.title}\n\n• *Artists*: ${data.data.artists}\n\n• *Genre*: ${data.data.genre}\n\n• *Album*: ${data.data.album}\n\n• *Release date*: ${data.data.release_date}`)
+          } else reply(data.message)
+          }).catch(() => reply('Internal server error!, try again later'))
+          } else {
+          reply('Reply Audionya!!!')
+          }
+         limitAdd(sender)
+         break
 	    case 'igphoto':
 		if (!isRegistered) return reply(ind.noregis())
 		if (isBanned) return reply(ind.baned())
