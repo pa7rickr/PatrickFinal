@@ -4793,7 +4793,7 @@ ${a}❏ Nama : ${pushname}
 					exif.create('Created By PatrickBot', '', `${muach}`)
 					exec(`webpmux -set exif ./sticker/${muach}.exif ${ran} -o ${ran}`, async (error) => {
 						console.log('Finish')
-						if (error) return console.log(error) && reply('Error, Harap coba lagi nanti!')
+						if (error) return reply('Error, Harap coba lagi nanti!')
 						patrick.sendMessage(from, fs.readFileSync(ran), sticker, {
 							quoted: freply
 						})
