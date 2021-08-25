@@ -212,6 +212,9 @@ let family100 = []
 let siapakah = []
 let math = []
 let tebakangka = []
+let susunkata = []
+let tekateki = []
+let asahotak = []
 
 /******************* XP, Level, Limit, Registered PatrickBot  *******************/
 const {
@@ -477,9 +480,7 @@ const sleep = async (ms) => {
 			const timu = moment.tz('Asia/Jakarta').add(20, 'days').calendar();
 			const isQuotedAudio =  type === "extendedTextMessage" && content.includes("audioMessage");
 			const cmd = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''.slice(1).trim().split(/ +/).shift().toLowerCase()
-			var prefixRegEx = /^[!&z?=#.+\/]/gi;
-            let _chats = type === "conversation" && mek.message.conversation ? mek.message.conversation : type == "imageMessage" && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : type == "videoMessage" && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : type == "extendedTextMessage" && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : type == "stickerMessage" && getCmd(mek.message[type].fileSha256.toString("base64")) !== null && getCmd(mek.message[type].fileSha256.toString("base64")) !== undefined ? getCmd(mek.message[type].fileSha256.toString("base64")) : "";
-            let prefix = _chats.match(prefixRegEx) ? prefixRegEx.exec(_chats)[0] : "";
+			const prefix = /^[°•π÷×¶∆£¢€¥®™✓=|~zZ+×_*!#$%^&./\\©^]/.test(cmd) ? cmd.match(/^[°•π÷×¶∆£¢€¥®™✓=|~zZ+×_\ \!#$,|`÷?;:%xyz%^&./\\©^]/gi) : '.'
             body = (type === 'conversation' && mek.message.conversation.startsWith(prefix)) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption.startsWith(prefix) ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption.startsWith(prefix) ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text.startsWith(prefix) ? mek.message.extendedTextMessage.text : ''
 			budy = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : ''
 			var pes = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''
@@ -489,7 +490,7 @@ const sleep = async (ms) => {
 			var tas = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''
 			const mesejAnti = tas.slice(0).trim().split(/ +/).shift().toLowerCase()
 			const args = body.trim().split(/ +/).slice(1)
-			const isCmd = _chats.match(prefixRegEx) ? prefixRegEx.exec(_chats)["input"] : _chats;
+			const isCmd = body.startsWith(prefix)
 			const tescuk = ["0@s.whatsapp.net"]
 			const totalchat = await patrick.chats.all()
 			const isGroup = from.endsWith('@g.us')
@@ -801,10 +802,10 @@ switch (waktoonyabro) {
 		waktoonyabro = `🕘 *Selamat Siang ${pushname}*`;
 		break;
 	case 22: //15
-		waktoonyabro = `🕙 *Selamat Siang ${pushname}*`;
+		waktoonyabro = `🕙 *Selamat Sore ${pushname}*`;
 		break;
 	case 23: //16
-		waktoonyabro = `🕚 *Selamat Siang ${pushname}*`;
+		waktoonyabro = `🕚 *Selamat Sore ${pushname}*`;
 		break;
 }
 var ucapanFakereply = '' + waktoonyabro;
@@ -1323,7 +1324,7 @@ if (budy.includes("://chat.whatsapp.com/")) {
 		patrick.sendMessage(from, '*TANDAI TELAH DIBACA*\nSeseorang Telah Mengirim Virtex\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n*', text)
 	}, 0)
 }
-
+        	
 if (isGroup) {
 	try {
 		const getmemex = groupMembers.length
@@ -1354,7 +1355,7 @@ if (isGroup) {
 	}
 }
             q2 = Object.keys(mek.message)[0] == "listResponseMessage" ? mek.message.listResponseMessage.singleSelectReply.selectedRowId: ""
-            rspndbutton = (type == 'listResponseMessage') ? mek.message.listResponseMessage.selectedDisplayText : '';
+            rspndbutton = (type == 'listResponseMessage') ? mek.message.listResponseMessage.selectedDisplayText : '' || isCmd
             //====================== Enable Feature Group ====================\\
 		    if (rspndbutton == 'Anti Badword') {
 			if (!isGroup) return reply(ind.groupo())
@@ -1643,10 +1644,19 @@ Boleh Dong Follow Insta: _pa7rick :)`,
                 "title": `Family 100`,
                 "rowId": '0'
             }, {
-                "title": `Siapakah Aku?`
-,                "rowId": '0'
+                "title": `Siapakah Aku?`,
+                "rowId": '0'
             }, {
                 "title": `Tebak Gambar`,
+                "rowId": '0'
+            }, {
+                "title": `Teka Teki`,
+                "rowId": '0'
+            }, {
+                "title": `Asah Otak`,
+                "rowId": '0'
+            }, {
+                "title": `Susun Kata`,
                 "rowId": '0'
             }, {
                 "title": `Tebak Angka`,
@@ -1806,6 +1816,39 @@ Boleh Dong Follow Insta: _pa7rick :)`,
             game.addSPK(from, anihp, gamewaktu, siapakah)
             limitAdd(sender)
             } else 
+            if (rspndbutton == 'Teka Teki') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    if (isLimit(sender)) return reply(limitend(pushname))
+            if (game.isTek(from, tekateki)) return reply(`Masih ada soal yang belum di selesaikan`)
+            let anuh = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/tekateki?apikey=${dappaApi}`)
+            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.pertanyaan}\n\nWaktu : ${gamewaktu}s`)
+            let anohc = anuh.jawaban.toLowerCase()
+            game.addTek(from, anohc, gamewaktu, tekateki)
+            limitAdd(sender)
+            } else 
+            if (rspndbutton == 'Susun Kata') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    if (isLimit(sender)) return reply(limitend(pushname))
+            if (game.isSK(from, susunkata)) return reply(`Masih ada soal yang belum di selesaikan`)
+            let anuh = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/susunkata?apikey=${dappaApi}`)
+            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.acak}\n*Tipe :* ${anuh.tipe}\n\nWaktu : ${gamewaktu}s`)
+            let anicch = anuh.jawaban.toLowerCase()
+            game.addSK(from, anicch, gamewaktu, susunkata)
+            limitAdd(sender)
+            } else 
+            if (rspndbutton == 'Asah Otak') {
+            if (!isRegistered) return reply(ind.noregis())
+		    if (isBanned) return reply(ind.baned())
+		    if (isLimit(sender)) return reply(limitend(pushname))
+            if (game.isAO(from, asahotak)) return reply(`Masih ada soal yang belum di selesaikan`)
+            let anuh = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/asahotak?apikey=${dappaApi}`)
+            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.acak}\n\nWaktu : ${gamewaktu}s`)
+            let anncch = anuh.jawaban.toLowerCase()
+            game.addAO(from, anncch, gamewaktu, asahotak)
+            limitAdd(sender)
+            } else
             if (rspndbutton == 'Tebak Angka') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
@@ -1879,7 +1922,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
        if (isSticker) {
        if (isCountStc(sender, sensticker)) {
        if (!isBotGroupAdmins) return reply(`Kamu beruntung karena bot bukan admin`)
-          reply(`*Antispam Sticker!!*\n\nSepertinya kamu sudah kirim sticker lebih dari 5x sekaligus dalam 5 menit, maaf kamu akan di kick`)
+          reply(`*Antispam Sticker!!*\n\nSepertinya kamu sudah kirim sticker lebih dari 10x sekaligus dalam 4 menit, maaf kamu akan di kick`)
           patrick.groupRemove(from, [sender])
           delCountStc(sender, sensticker)
        } else {
@@ -1887,7 +1930,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
            for (let o of sensticker) {
 	       if (o.id === sender) {
            let stccount = o.count 
-           reply(`Kamu terdeteksi mengirim sticker\nJika kamu mengirim sticker *lebih dari 10x* sekaligus dalam 4 menit\nkamu akan dikick\n*Kamu sudah mengirim*\n*${stccount} Sticker!*`)
+           reply(`Kamu terdeteksi mengirim sticker\nJika kamu mengirim sticker *lebih dari 10x* sekaligus dalam 4 menit\nkamu akan dikick\n*Kamu sudah mengirim*\n*${stccount} Sticker!*/4 Menit`)
            await sleep(240000)
            delCountStc(sender, sensticker)
            console.log('Succes Delete Sticker From' + sender)
@@ -1914,6 +1957,10 @@ await reply(m)
         game.cekWaktuTG(patrick, tebakgambar)
         game.cekWaktuMath(patrick, math)
         game.cekWaktuSPK(patrick, siapakah)
+        game.cekWaktuAngka(patrick, tebakangka)
+        game.cekWaktuTek(patrick, tekateki)
+        game.cekWaktuSK(patrick, susunkata)
+        game.cekWaktuAO(patrick, asahotak)
         if (game.isTebakGambar(from, tebakgambar) && isRegistered){
             if (chats.toLowerCase().includes(game.getJawabanTG(from, tebakgambar))){
                 var htgm = randomNomor(100)
@@ -1937,7 +1984,32 @@ await reply(m)
                 await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanSPK(from, siapakah)}\n*Hadiah :* ${htgms}\n\nIngin bermain lagi? kirim *${prefix}tebaksiapa*`)
                 siapakah.splice(game.getSPKPosi(from, siapakah), 1)
             }
+        }         
+        if (game.isTek(from, tekateki) && isRegistered){
+            if (chats.toLowerCase().includes(game.getJawabanTek(from, tekateki))){
+                var htggm = randomNomor(100)
+                addKoinUser(sender, htggm)
+                await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanTek(from, tekateki)}\n*Hadiah :* ${htggm}\n\nIngin bermain lagi? kirim *${prefix}tebaksiapa*`)
+                tekateki.splice(game.getTekPosi(from, tekateki), 1)
+            }
+        }  
+        if (game.isSK(from, susunkata) && isRegistered){
+            if (chats.toLowerCase().includes(game.getJawabanSK(from, susunkata))){
+                var httgms = randomNomor(100)
+                addKoinUser(sender, httgms)
+                await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanSK(from, susunkata)}\n*Hadiah :* ${httgms}\n\nIngin bermain lagi? kirim *${prefix}susunkata*`)
+                susunkata.splice(game.getSKPosi(from, susunkata), 1)
+            }
         } 
+        if (game.isAO(from, asahotak) && isRegistered){
+            if (chats.toLowerCase().includes(game.getJawabanAO(from, asahotak))){
+                var htgmms = randomNomor(100)
+                addKoinUser(sender, htgms)
+                await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanAO(from, asahotak)}\n*Hadiah :* ${htgmms}\n\nIngin bermain lagi? kirim *${prefix}tebaksiapa*`)
+                asahotak.splice(game.getAOPosi(from, asahotak), 1)
+            }
+        } 
+        
         if (game.isAngka(from, tebakangka) && isRegistered){
             if (chats.toLowerCase().includes(game.getJawabanAngka(from, tebakangka))){
                 var htgms = randomNomor(12)
@@ -2971,7 +3043,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 			if (isBanned) return reply(ind.baned())
 			if (args.length < 1) return reply(`teksnya mana bruh?\ncontoh ${prefix + command} ${pushname}|ganz`)
 			reply(ind.wait())
-			patrickganss = await getBuffer(`https://dapuhy-api.herokuapp.com/api/photooxy1/${command}?text=${q}&apikey=${dappaApi}`)
+			patrickganss = await getBuffer(`https://dapuhy-api.herokuapp.com/api/textpro/${command}?text=${q}&apikey=${dappaApi}`)
 			patrick.sendMessage(from, patrickganss, image, {
 				quoted: ftoko
 			})
@@ -4966,17 +5038,27 @@ ${a}❏ Nama : ${pushname}
            case 'profile':
 			if (isBanned) return reply(ind.baned())
 			if (!isRegistered) return reply(ind.noregis())
+			if (isPrem) {
+const kanting = `${a}User: ${premi}
+Your Balance: ${checkATMuser(sender)}
+Your Limit: Unlimited${a}
+*Note: Untuk mendapatkan Balance*
+*Bisa Bermain Game di ${prefix}gamemenu*`
+			patrick.sendMessage(from, kanting, text, { quoted: mek })
+			} else 
+			if (!isPrem) {
 			for ( u of _limit) {
 			if (u.id === sender) {
 			let letCount = initialLimit - u.limit
 			const kantong =
-`${a}User: ${premi} ${emojiUser}
+`${a}User: ${premi} l
 Your Balance: ${checkATMuser(sender)}
-Your Limit: ${isPrem ? 'Unlimited' : `${letCount}/20` }${a}
+Your Limit: ${letCount}/20${a}
 *Note: Untuk mendapatkan Balance*
 *Bisa Bermain Game di ${prefix}gamemenu*`
 			patrick.sendMessage(from, kantong, text, { quoted: mek })
 			         }
+			}
 			}
 			break
 		//==========================================BATES NGAB==========================================\\
@@ -4984,7 +5066,7 @@ Your Limit: ${isPrem ? 'Unlimited' : `${letCount}/20` }${a}
 		//==========================================BATES NGAB==========================================\\
 		//==========================================BATES NGAB==========================================\\
 	default:
-	    if (body.startsWith(`${prefix}${command}`)) {
+	    if (body.startsWith(`${prefix}${command}` && isRegistered)) {
         reply(`Maaf *${pushname}*, Command *${prefix}${command}* Tidak Terdaftar Di Dalam *${prefix}menu*!`)
          }
 		if (isGroup && !isCmd && isSimi && budy != undefined) {
