@@ -475,7 +475,7 @@ const sleep = async (ms) => {
 			const time = moment.tz('Asia/Jakarta').format('DD/MM | HH:mm:ss')
 			const timi = moment.tz('Asia/Jakarta').add(30, 'days').calendar();
 			const timu = moment.tz('Asia/Jakarta').add(20, 'days').calendar();
-			const isQuotedAudio =  ltype === "extendedTextMessage" && content.includes("audioMessage");
+			const isQuotedAudio =  type === "extendedTextMessage" && content.includes("audioMessage");
 			const cmd = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''.slice(1).trim().split(/ +/).shift().toLowerCase()
 			var prefixRegEx = /^[!&z?=#.+\/]/gi;
             let _chats = type === "conversation" && mek.message.conversation ? mek.message.conversation : type == "imageMessage" && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : type == "videoMessage" && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : type == "extendedTextMessage" && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : type == "stickerMessage" && getCmd(mek.message[type].fileSha256.toString("base64")) !== null && getCmd(mek.message[type].fileSha256.toString("base64")) !== undefined ? getCmd(mek.message[type].fileSha256.toString("base64")) : "";
@@ -917,8 +917,7 @@ const fgclink = {
 			"groupJid": "6288989029718-1624806045@g.us",
 			"inviteCode": "FIdMh612Iru1ZQgrXLp8KN",
 			"groupName": `PatrickGroup`,
-			"caption": `${ucapanFakereply} ${pushname}\n⎇Follow _pa7rick :v`,
-			'jpegThumbnail': fs.readFileSync(`./lib/image/${randomGetPhoto}`)
+			"caption": `${ucapanFakereply}\n⎇Follow _pa7rick :v`,
 		}
 	}
 }
