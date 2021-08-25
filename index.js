@@ -734,77 +734,77 @@ var tampilUcapan = '' + waktoo;
 var ase = new Date();
 var waktoonyabro = ase.getHours();
 switch (waktoonyabro) {
-	case 0:
-		waktoonyabro = `🕛 *Selamat Malam ${pushname}*`;
+	case 0: //17
+		waktoonyabro = `🕛 *Selamat Sore ${pushname}*`;
 		break;
 	case 1:
-		waktoonyabro = `🕐 *Selamat Malam ${pushname}*`;
+		waktoonyabro = `🕐 *Selamat Petang ${pushname}*`;
 		break;
 	case 2:
 		waktoonyabro = `🕑 *Selamat Malam ${pushname}*`;
 		break;
-	case 3:
-		waktoonyabro = `🕒 *Selamat Pagi ${pushname}*`;
+	case 3: //20
+		waktoonyabro = `🕒 *Selamat Malam ${pushname}*`;
 		break;
 	case 4:
-		waktoonyabro = `🕓 *Selamat Pagi ${pushname}*`;
+		waktoonyabro = `🕓 *Selamat Malam ${pushname}*`;
 		break;
 	case 5:
-		waktoonyabro = `🕔 *Selamat Pagi ${pushname}*`;
+		waktoonyabro = `🕔 *Selamat Malam ${pushname}*`;
 		break;
-	case 6:
-		waktoonyabro = `🕕 *Selamat Pagi ${pushname}*`;
+	case 6: //23
+		waktoonyabro = `🕕 *Selamat Malam ${pushname}*`;
 		break;
 	case 7:
-		waktoonyabro = `🕖 *Selamat Pagi ${pushname}*`;
+		waktoonyabro = `🕖 *Selamat Malam ${pushname}*`;
 		break;
 	case 8:
-		waktoonyabro = `🕗 *Selamat Pagi ${pushname}*`;
+		waktoonyabro = `🕗 *Selamat Malam ${pushname}*`;
 		break;
-	case 9:
+	case 9: //2
 		waktoonyabro = `🕘 *Selamat Pagi ${pushname}*`;
 		break;
 	case 10:
 		waktoonyabro = `🕙 *Selamat Pagi ${pushname}*`;
 		break;
 	case 11:
-		waktoonyabro = `🕚 *Selamat Siang ${pushname}*`;
+		waktoonyabro = `🕚 *Selamat Pagi ${pushname}*`;
 		break;
 	case 12:
-		waktoonyabro = `🕛 *Selamat Siang ${pushname}*`;
+		waktoonyabro = `🕛 *Selamat Pagi ${pushname}*`;
 		break;
-	case 13:
-		waktoonyabro = `🕐 *Selamat Siang ${pushname}*`;
+	case 13: //6
+		waktoonyabro = `🕐 *Selamat Pagi ${pushname}*`;
 		break;
 	case 14:
-		waktoonyabro = `🕑 *Selamat Siang ${pushname}*`;
+		waktoonyabro = `🕑 *Selamat Pagi ${pushname}*`;
 		break;
 	case 15:
-		waktoonyabro = `🕒 *Selamat Sore ${pushname}*`;
+		waktoonyabro = `🕒 *Selamat Pagi ${pushname}*`;
 		break;
 	case 16:
-		waktoonyabro = `🕓 *Selamat Sore ${pushname}*`;
+		waktoonyabro = `🕓 *Selamat Pagi ${pushname}*`;
 		break;
-	case 17:
-		waktoonyabro = `🕔 *Selamat Sore ${pushname}*`;
+	case 17: //10
+		waktoonyabro = `🕔 *Selamat Pagi ${pushname}*`;
 		break;
-	case 18:
-		waktoonyabro = `🕕 *Selamat Malam ${pushname}*`;
+	case 18: //11
+		waktoonyabro = `🕕 *Selamat Siang ${pushname}*`;
 		break;
 	case 19:
-		waktoonyabro = `🕖 *Selamat Malam ${pushname}*`;
+		waktoonyabro = `🕖 *Selamat Siang ${pushname}*`;
 		break;
 	case 20:
-		waktoonyabro = `🕗 *Selamat Malam ${pushname}*`;
+		waktoonyabro = `🕗 *Selamat Siang ${pushname}*`;
 		break;
 	case 21:
-		waktoonyabro = `🕘 *Selamat Malam ${pushname}*`;
+		waktoonyabro = `🕘 *Selamat Siang ${pushname}*`;
 		break;
-	case 22:
-		waktoonyabro = `🕙 *Selamat Malam ${pushname}*`;
+	case 22: //15
+		waktoonyabro = `🕙 *Selamat Siang ${pushname}*`;
 		break;
-	case 23:
-		waktoonyabro = `🕚 *Selamat Malam ${pushname}*`;
+	case 23: //16
+		waktoonyabro = `🕚 *Selamat Siang ${pushname}*`;
 		break;
 }
 var ucapanFakereply = '' + waktoonyabro;
@@ -2442,10 +2442,10 @@ Fitur aktif pada grup ini!${a}
 		//=============IN MENU==============\\
 		case 'reedem':
 		if (!isRegistered) return reply(ind.noregis())
-		if (isPrem) return reply('Fitur ini khusus free member!'))
-		if (args[0] == `${code}`) {
+		if (isPrem) return reply('Fitur ini khusus free member!')
+		if (args[0] == `${codeReedem}`) {
 		mente = `${sender.split('@','')}@s.whatsapp.net`
-		addPremiumUser(mente, 3d, prem)
+		addPremiumUser(mente, '3d', prem)
 		reply(`${a}Succes, Menambah User Premium${a}`)
 		texting = `🎟️ Selamat anda mendapatkan Premium User dari owner\nKetik .premiummenu untuk fitur premium`
 		codeReedem = createSerial(20)
@@ -2459,7 +2459,7 @@ Fitur aktif pada grup ini!${a}
 		break 
 		case 'buycode':
 		if (!isRegistered) return reply(ind.noregis())
-		if (isPrem) return reply('Fitur ini khusus free member!'))
+		if (isPrem) return reply('Fitur ini khusus free member!')
 		if (checkATMuser(sender) <= uang5) return reply(`Balance mu tidak cukup!\nHarga: $${uang5}`)
 		if (checkATMuser(sender) >= uang5) {
 			reply(`*Code ini bersifat PRIVATE*\n*Code mu* ${codeReedem}\nSilahkan ketik ${prefix}reedem untuk menukarnya!`)
