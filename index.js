@@ -735,77 +735,77 @@ var tampilUcapan = '' + waktoo;
 var ase = new Date();
 var waktoonyabro = ase.getHours();
 switch (waktoonyabro) {
-	case 0: //17
-		waktoonyabro = `🕛 *Selamat Sore ${pushname}*`;
-		break;
-	case 1:
-		waktoonyabro = `🕐 *Selamat Petang ${pushname}*`;
-		break;
-	case 2:
-		waktoonyabro = `🕑 *Selamat Malam ${pushname}*`;
-		break;
-	case 3: //20
-		waktoonyabro = `🕒 *Selamat Malam ${pushname}*`;
-		break;
-	case 4:
-		waktoonyabro = `🕓 *Selamat Malam ${pushname}*`;
-		break;
-	case 5:
-		waktoonyabro = `🕔 *Selamat Malam ${pushname}*`;
-		break;
-	case 6: //23
-		waktoonyabro = `🕕 *Selamat Malam ${pushname}*`;
-		break;
-	case 7:
-		waktoonyabro = `🕖 *Selamat Malam ${pushname}*`;
-		break;
-	case 8:
-		waktoonyabro = `🕗 *Selamat Malam ${pushname}*`;
-		break;
-	case 9: //2
-		waktoonyabro = `🕘 *Selamat Pagi ${pushname}*`;
-		break;
-	case 10:
-		waktoonyabro = `🕙 *Selamat Pagi ${pushname}*`;
-		break;
-	case 11:
-		waktoonyabro = `🕚 *Selamat Pagi ${pushname}*`;
-		break;
-	case 12:
+	case 0: // Time In Indonesia WIB 7
 		waktoonyabro = `🕛 *Selamat Pagi ${pushname}*`;
 		break;
-	case 13: //6
+	case 1: // Time In Indonesia WIB 8
 		waktoonyabro = `🕐 *Selamat Pagi ${pushname}*`;
 		break;
-	case 14:
+	case 2: // Time In Indonesia WIB 9
 		waktoonyabro = `🕑 *Selamat Pagi ${pushname}*`;
 		break;
-	case 15:
+	case 3: // Time In Indonesia WIB 10
 		waktoonyabro = `🕒 *Selamat Pagi ${pushname}*`;
 		break;
-	case 16:
+	case 4: // Time In Indonesia WIB 11
 		waktoonyabro = `🕓 *Selamat Pagi ${pushname}*`;
 		break;
-	case 17: //10
-		waktoonyabro = `🕔 *Selamat Pagi ${pushname}*`;
+	case 5: // Time In Indonesia WIB 12
+		waktoonyabro = `🕔 *Selamat Siang ${pushname}*`;
 		break;
-	case 18: //11
+	case 6: // Time In Indonesia WIB 13
 		waktoonyabro = `🕕 *Selamat Siang ${pushname}*`;
 		break;
-	case 19:
+	case 7: // Time In Indonesia WIB 14
 		waktoonyabro = `🕖 *Selamat Siang ${pushname}*`;
 		break;
-	case 20:
-		waktoonyabro = `🕗 *Selamat Siang ${pushname}*`;
+	case 8: // Time In Indonesia WIB 15
+		waktoonyabro = `🕗 *Selamat Sore ${pushname}*`;
 		break;
-	case 21:
-		waktoonyabro = `🕘 *Selamat Siang ${pushname}*`;
+	case 9: // Time In Indonesia WIB 16
+		waktoonyabro = `🕘 *Selamat Sore ${pushname}*`;
 		break;
-	case 22: //15
+	case 10: // Time In Indonesia WIB 17
 		waktoonyabro = `🕙 *Selamat Sore ${pushname}*`;
 		break;
-	case 23: //16
-		waktoonyabro = `🕚 *Selamat Sore ${pushname}*`;
+	case 11: // Time In Indonesia WIB 18
+		waktoonyabro = `🕚 *Selamat Petang ${pushname}*`;
+		break;
+	case 12: // Time In Indonesia WIB 19
+		waktoonyabro = `🕛 *Selamat Malam ${pushname}*`;
+		break;
+	case 13: // Time In Indonesia WIB 20
+		waktoonyabro = `🕐 *Selamat Malam ${pushname}*`;
+		break;
+	case 14: // Time In Indonesia WIB 21
+		waktoonyabro = `🕑 *Selamat Malam ${pushname}*`;
+		break;
+	case 15: // Time In Indonesia WIB 22
+		waktoonyabro = `🕒 *Selamat Malam ${pushname}*`;
+		break;
+	case 16: // Time In Indonesia WIB 23
+		waktoonyabro = `🕓 *Selamat Malam ${pushname}*`;
+		break;
+	case 17: // Time In Indonesia WIB 0
+		waktoonyabro = `🕔 *Selamat Malam ${pushname}*`;
+		break;
+	case 18: // Time In Indonesia WIB 1
+		waktoonyabro = `🕕 *Selamat Pagi ${pushname}*`;
+		break;
+	case 19: // Time In Indonesia WIB 2
+		waktoonyabro = `🕖 *Selamat Pagi ${pushname}*`;
+		break;
+	case 20: // Time In Indonesia WIB 3
+		waktoonyabro = `🕗 *Selamat Pagi ${pushname}*`;
+		break;
+	case 21: // Time In Indonesia WIB 4
+		waktoonyabro = `🕘 *Selamat Pagi ${pushname}*`;
+		break;
+	case 22: // Time In Indonesia WIB 5
+		waktoonyabro = `🕙 *Selamat Pagi ${pushname}*`;
+		break;
+	case 23: // Time In Indonesia WIB 6
+		waktoonyabro = `🕚 *Selamat Pagi ${pushname}*`;
 		break;
 }
 var ucapanFakereply = '' + waktoonyabro;
@@ -856,7 +856,7 @@ const freply = {
 		'imageMessage': {
 			'url': 'https://mmg.whatsapp.net/d/f/At0x7ZdIvuicfjlf9oWS6A3AR9XPh0P-hZIVPLsI70nM.enc',
 			'mimetype': 'image/png',
-			'caption': `${ucapanFakereply} ${pushname}\n⎇Follow _pa7rick :v`,
+			'caption': `${ucapanFakereply}\n⎇ ${prefix + command}`,
 			'fileSha256': '+Ia+Dwib70Y1CWRMAP9QLJKjIJt54fKycOfB2OEZbTU=',
 			'fileLength': '28777',
 			'height': 1080,
@@ -865,7 +865,6 @@ const freply = {
 			'fileEncSha256': 'sR9D2RS5JSifw49HeBADguI23fWDz1aZu4faWG/CyRY=',
 			'directPath': '/v/t62.7118-24/21427642_840952686474581_572788076332761430_n.enc?oh=3f57c1ba2fcab95f2c0bb475d72720ba&oe=602F3D69',
 			'mediaKeyTimestamp': '1610993486',
-			'jpegThumbnail': fs.readFileSync(`./lib/image/${randomGetPhoto}`)
 		}
 	}
 }
@@ -884,7 +883,7 @@ const ftoko = {
 					'mimetype': 'image/jpeg',
 					'jpegThumbnail': fs.readFileSync(`./lib/image/${randomGetPhoto}`)
 				},
-				'title': `${ucapanFakereply} ${pushname}\nFollow _pa7rick :v`,
+				'title': `${ucapanFakereply}\n⎇ ${prefix + command}`,
 				'productImageCount': 150
 			},
 			'businessOwnerJid': `6288989029718@s.whatsapp.net`
@@ -940,14 +939,13 @@ const fakevn = {
 }
 const fvideo = {
 	key: {
-		participant: '6285284001309@s.whatsapp.net'
+		participant: '6288989029718@s.whatsapp.net'
 	},
 	message: {
 		"videoMessage": {
 			"title": "Follow _pa7rick :v",
-			"h": `Hmm`,
 			'seconds': '99999',
-			'caption': `${ucapanFakereply} ${pushname}\nFollow _pa7rick :v`,
+			'caption': `${ucapanFakereply}\n⎇ ${prefix + command}`,
 			'jpegThumbnail': fs.readFileSync(`./lib/image/${randomGetPhoto}`)
 		}
 	}
@@ -1343,11 +1341,10 @@ if (isGroup) {
 			}, 2000)
 			setTimeout(() => {
 				patrick.updatePresence(from, Presence.composing)
-				reply("*PatrickBot Akan Keluar Dari Grup*")
 			}, 1000)
 			setTimeout(() => {
 				patrick.updatePresence(from, Presence.composing)
-				reply(`*Maaf Group ini membernya sedikit, Wajib ${memberLimit} Member*`)
+				reply(`*Halo ${pushname},  Untuk mengundang bot kedalam grup\nMinimal ${memberLimit} peserta\nJika sudah banyak bisa add kembali*`)
 			}, 0)
 		}
 	} catch (err) {
@@ -1604,24 +1601,24 @@ if (isGroup) {
 			} else 
 		    if (rspndbutton == 'Read Docs') {
 		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
-			patrick.sendMessage(from, `*RULES BAGI PENGGUNA BOT*\n    \n➣ Tolong Gunakan Delay Jangan Terlalunge-Spam Saat Menggunakan Bot.\n➣ Call/VC Bot Auto Banned.\n➣ Jangan Call/VC Bot Kalau Tidak aktif.\n➣ Bot Online 24 Jam tapi kadang Disconnect.\n\n*Konsekuensi Bila Melanggar Rules*\nBot Akan Mem-Banned Kamu dan Memblokir kamu.\n\nRules ini untuk kenyamanan semua yang memakai\nbot ini \n1. Jangan terlalu spam bot. \nSanksi: *WARN/SOFT BLOCK* = Tidak Direspon selama 5 detik!\n\n2. Jangan telepon bot.\nSanksi: *SOFT BLOCK* = Block!\n\n3. Jangan mengeksploitasi bot.\nSanksi: *PERMANENT BLOCK* = Banned + Block!\n\nJika sudah dipahami rules-nya, silakan ketik *${prefix}menu* untuk memulai!\nJika Ada yang error ketik *${prefix}report [Bug]`)
+			patrick.sendMessage(from, `*RULES BAGI PENGGUNA BOT*\n    \n➣ Tolong Gunakan Delay Jangan Terlalu Dispam Saat Menggunakan Bot.\n➣ Call/VC Bot Auto Banned.\n➣ Jangan Call/VC Bot Kalau Tidak aktif.\n➣ Bot Online 24 Jam tapi kadang Disconnect.\n\n*Konsekuensi Bila Melanggar Rules*\nBot Akan Mem-Banned Kamu dan Memblokir kamu.\n\nRules ini untuk kenyamanan semua yang memakai\nbot ini \n1. Jangan terlalu spam bot. \nSanksi: *WARN/SOFT BLOCK* = Tidak Direspon selama 5 detik!\n\n2. Jangan telepon bot.\nSanksi: *SOFT BLOCK* = Block!\n\n3. Jangan mengeksploitasi bot.\nSanksi: *PERMANENT BLOCK* = Banned + Block!\n\nJika sudah dipahami rules-nya, silakan ketik *${prefix}menu* untuk memulai!\nJika Ada yang error ketik *${prefix}report [Bug]`)
 		    } else 
             //=================== Menu Nya =============\\ 
-            if (rspndbutton == 'Owner Menu') {
+            if (rspndbutton == '▶ Owner Menu ◀') {
             if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true) 
             await patrickhay(ind.owner(prefix), MessageType.text, tescuk, `${ucapanFakereply}`) 
             } else 
-            if (rspndbutton == 'Maker Menu') {
+            if (rspndbutton == '▶ Maker Menu ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.maker(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == 'Fun Menu') {
+            if (rspndbutton == '▶ Fun Menu ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.fun(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else 
-            if (rspndbutton == 'Game Menu') { 
+            if (rspndbutton == '▶ Game Menu ◀') { 
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
             let vovo = patrick.prepareMessageFromContent(from, {
@@ -1669,32 +1666,32 @@ Boleh Dong Follow Insta: _pa7rick :)`,
                waitForAck: true
             })
             } else 
-            if (rspndbutton == 'Kerang Menu') {
+            if (rspndbutton == '▶ Kerang Menu ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.kerang(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == 'Download Menu') {
+            if (rspndbutton == '▶ Download Menu ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.download(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == 'Group Menu') {
+            if (rspndbutton == '▶ Group Menu ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (!isGroup) return reply(ind.groupo())
 		    await patrickhay(ind.group(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else 
-            if (rspndbutton == 'Search Menu') {
+            if (rspndbutton == '▶ Search Menu ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.search(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == 'Berita Menu') {
+            if (rspndbutton == '▶ Berita Menu ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.berita(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == 'Anime Menu') {
+            if (rspndbutton == '▶ Anime Menu ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    if (!isRegistered) return reply(ind.noregis()) 
@@ -1746,17 +1743,17 @@ Boleh Dong Follow Insta: _pa7rick :)`,
                waitForAck: true
             })
             } else  
-            if (rspndbutton == 'Islam Menu') {
+            if (rspndbutton == '▶ Islam Menu ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.islam(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else 
-            if (rspndbutton == 'Cloud Storage') {
+            if (rspndbutton == '▶ Cloud Storage ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.cloud(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == 'Menu Lainnya') {
+            if (rspndbutton == '▶ Menu Lainnya ◀') {
             if (!isRegistered) return reply(ind.noregis())
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.other(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
@@ -2208,93 +2205,93 @@ ${a} ❏ Level : ${lvli}${a}
 			"title": "Pilih Salah Satu!",
 			"rows": [
 					{
-						"title": "Owner Menu",
+						"title": "▶ Owner Menu ◀",
 						"description": "\n\n This Is Feature For Show Owner Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-1",
 			  "rows": [
 					{
-						"title": "Maker Menu",
+						"title": "▶ Maker Menu ◀",
 						"description": "\n\n This Is Feature For Show Maker Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-2",
 			  "rows": [
 					{
-						"title": "Fun Menu",
+						"title": "▶ Fun Menu ◀",
 						"description": "\n\n This Is Feature For Show Fun Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-3",
 			  "rows": [
 					{
-						"title": "Game Menu",
+						"title": "▶ Game Menu ◀",
 						"description": "\n\n This Is Feature For Show Game Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-4",
 			  "rows": [
 					{
-						"title": "Kerang Menu",
+						"title": "▶ Kerang Menu ◀",
 						"description": "\n\n This Is Feature For Show Kerang Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-5",
 			  "rows": [
 					{
-						"title": "Download Menu",
+						"title": "▶ Download Menu ◀",
 						"description": "\n\n This Is Feature For Show Download Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-6",
 			  "rows": [
 					{
-						"title": "Group Menu",
+						"title": "▶ Group Menu ◀",
 						"description": "\n\n This Is Feature For Show Group Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-7",
 			  "rows": [
 					{
-						"title": "Search Menu",
-						"description": "\n\n This Is Feature For Show Search Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Search Menu ◀",
+						"description": "\n\nThis Is Feature For Show Search Menu!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-8",
 			  "rows": [
 					{
-						"title": "Berita Menu",
-						"description": "\n\n This Is Feature For Show Berita Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Berita Menu ◀",
+						"description": "\n\nThis Is Feature For Show Berita Menu!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-9",
 			  "rows": [
 					{
-						"title": "Anime Menu",
-						"description": "\n\n This Is Feature For Show Anime Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Anime Menu ◀",
+						"description": "\n\nThis Is Feature For Show Anime Menu!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-10",
 			  "rows": [
 					{
-						"title": "Islam Menu",
-						"description": "\n\n This Is Feature For Show Islam Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Islam Menu ◀",
+						"description": "\n\nThis Is Feature For Show Islam Menu!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-11",
 			  "rows": [
 					{
-						"title": "Cloud Storage",
-						"description": "\n\n This Is Feature For Show Cloud Storage!",
-						"rowId": "allmenu"
+						"title": "▶ Cloud Storage ◀",
+						"description": "\n\nThis Is Feature For Show Cloud Storage!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-12",
 			  "rows": [
 					{
-						"title": "Menu Lainnya",
-						"description": "\n\n This Is Feature For Show Other Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Menu Lainnya ◀",
+						"description": "\n\nThis Is Feature For Show Other Menu!",
+						"rowId": "0"
                 }]
               }]
              }
@@ -2341,93 +2338,93 @@ Fitur aktif pada grup ini!${a}
 			"title": "Pilih Salah Satu!",
 			"rows": [
 					{
-						"title": "Owner Menu",
+						"title": "▶ Owner Menu ◀",
 						"description": "\n\n This Is Feature For Show Owner Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-1",
 			  "rows": [
 					{
-						"title": "Maker Menu",
+						"title": "▶ Maker Menu ◀",
 						"description": "\n\n This Is Feature For Show Maker Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-2",
 			  "rows": [
 					{
-						"title": "Fun Menu",
+						"title": "▶ Fun Menu ◀",
 						"description": "\n\n This Is Feature For Show Fun Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-3",
 			  "rows": [
 					{
-						"title": "Game Menu",
+						"title": "▶ Game Menu ◀",
 						"description": "\n\n This Is Feature For Show Game Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-4",
 			  "rows": [
 					{
-						"title": "Kerang Menu",
+						"title": "▶ Kerang Menu ◀",
 						"description": "\n\n This Is Feature For Show Kerang Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-5",
 			  "rows": [
 					{
-						"title": "Download Menu",
+						"title": "▶ Download Menu ◀",
 						"description": "\n\n This Is Feature For Show Download Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-6",
 			  "rows": [
 					{
-						"title": "Group Menu",
+						"title": "▶ Group Menu ◀",
 						"description": "\n\n This Is Feature For Show Group Menu!",
-						"rowId": "allmenu"
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-7",
 			  "rows": [
 					{
-						"title": "Search Menu",
-						"description": "\n\n This Is Feature For Show Search Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Search Menu ◀",
+						"description": "\n\nThis Is Feature For Show Search Menu!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-8",
 			  "rows": [
 					{
-						"title": "Berita Menu",
-						"description": "\n\n This Is Feature For Show Berita Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Berita Menu ◀",
+						"description": "\n\nThis Is Feature For Show Berita Menu!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-9",
 			  "rows": [
 					{
-						"title": "Anime Menu",
-						"description": "\n\n This Is Feature For Show Anime Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Anime Menu ◀",
+						"description": "\n\nThis Is Feature For Show Anime Menu!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-10",
 			  "rows": [
 					{
-						"title": "Islam Menu",
-						"description": "\n\n This Is Feature For Show Islam Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Islam Menu ◀",
+						"description": "\n\nThis Is Feature For Show Islam Menu!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-11",
 			  "rows": [
 					{
-						"title": "Cloud Storage",
-						"description": "\n\n This Is Feature For Show Cloud Storage!",
-						"rowId": "allmenu"
+						"title": "▶ Cloud Storage ◀",
+						"description": "\n\nThis Is Feature For Show Cloud Storage!",
+						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-12",
 			  "rows": [
 					{
-						"title": "Menu Lainnya",
-						"description": "\n\n This Is Feature For Show Other Menu!",
-						"rowId": "allmenu"
+						"title": "▶ Menu Lainnya ◀",
+						"description": "\n\nThis Is Feature For Show Other Menu!",
+						"rowId": "0"
                 }]
               }]
              }
