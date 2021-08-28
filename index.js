@@ -355,8 +355,7 @@ function addMetadata(packname, author) {
 async function starts() {
 	const patrick = new WAConnection()
 	 patrick.version = [2,2119,6]
-	 patrick.logger.level = 'warn' 
-	 patrick.browserDescription = ["PatrickBot", "Edge", "3.0"];
+	 patrick.logger.level = 'warn'
 	 console.log(banner.string)
 	 patrick.on('qr', () => {
 		console.log(color('[','white'), color('!','red'), color(']','white'), color(' Scan QR code nya Cok >_<'))
