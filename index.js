@@ -30,22 +30,23 @@ Note: Kalo Recode Jangan Hapus TQTO
 
 /******************* NPM  *******************/
 const {
-	WAConnection,
+    WAConnection: _WAConnection,
 	MessageType,
 	Presence,
 	MessageOptions,
 	Mimetype,
 	WALocationMessage,
 	WA_MESSAGE_STUB_TYPES,
+	WA_DEFAULT_EPHEMERAL,
 	ReconnectMode,
 	ProxyAgent,
+	ChatModification,
 	GroupSettingChange,
-	MessageInfo,
 	waChatKey,
 	mentionedJid,
-	WA_DEAFULT_EPHEMERAL,
 	processTime,
-} = require("@adiwajshing/baileys")
+	Browsers,
+} = require('@adiwajshing/baileys')
 const {
 	exec
 } = require("child_process")
@@ -53,6 +54,7 @@ const {
 	removeBackgroundFromImageFile
 } = require('remove.bg')
 const imageToBase64 = require('image-to-base64')
+const simple = require('./lib/simple')
 const moment = require("moment-timezone")
 const speed = require('performance-now')
 const qrcode = require("qrcode-terminal")
@@ -73,7 +75,7 @@ const ffmpeg = require('fluent-ffmpeg')
 const imgbb = require('imgbb-uploader')
 const fs = require("fs")
 const cd = 4.32e+7
-
+const WAConnection = simple.WAConnection(_WAConnection);
 /******************* LIB & JSON File *******************/
 const {
 	wait,
@@ -120,7 +122,13 @@ const {
 const {
 	ind
 } = require('./database/language')
-const { yta, ytv } = require("./lib/ytdl");
+const { 
+    EmojiAPI
+} = require("emoji-api");
+const emoji = new EmojiAPI()
+const { 
+    yta, 
+    ytv } = require("./lib/ytdl");
 const { 
     addCountStc, 
     isCountStc, 
@@ -143,6 +151,8 @@ const tictac = require('./lib/plugins/tictac.js')
 
 const antilink = JSON.parse(fs.readFileSync('./database/json/antilink.json'))
 const antivirtex = JSON.parse(fs.readFileSync('./database/json/antivirtex.json'))
+const antiviewonce = JSON.parse(fs.readFileSync('./database/json/antiviewonce.json'))
+const antihidetag = JSON.parse(fs.readFileSync('./database/json/antihidetag.json'))
 const samih = JSON.parse(fs.readFileSync('./database/json/simi.json'))
 const event = JSON.parse(fs.readFileSync('./database/json/event.json'))
 const badword = JSON.parse(fs.readFileSync('./database/json/badword.json'))
@@ -187,9 +197,9 @@ numbernye = '0@s.whatsapp.net'
 
 const vcard = 'BEGIN:VCARD\n' +
 	'VERSION:3.0\n' +
-	'FN:Me Is Pa7rick?\n' +
-	'ORG:Pengembang ${botName}~;\n' +
-	`TEL;type=CELL;type=VOICE;waid=${numberOwner}:+${numberOwner}\n` +
+	'FN:Who is pa7rick?\n' +
+	'ORG:Pengembang PatrickBot\n' +
+	'TEL;type=CELL;type=VOICE;waid=6288989029718:+62 889 8902 9718\n' +
 	'END:VCARD'
 
 const ownerNumber = [`${numberOwner}@s.whatsapp.net`]
@@ -200,11 +210,13 @@ const uang1 = 1500
 const uang2 = 3000
 const uang3 = 6000
 const uang4 = 15000
+antidel = false
 numbernye: 0
 fake = 'AntiDelete aktif'
 shp = '⬡'
 initialLimit = setting.initialLimits
 memberLimit = setting.memberLimits
+codeVerification = 8838
 
 let tictactoe = []
 let tebakgambar = []
@@ -340,21 +352,24 @@ function addMetadata(packname, author) {
 		return `./sticker/${name}.exif`
 	})
 }
-const patrick = new WAConnection()
-   patrick.version = [2, 2119, 6]
-   patrick.on('qr', qr => {
-   qrcode.generate(qr, { small: true })
-   console.log(color('(+)','white'),color('PatrickBot','red'),color('(+)','white'),color('Scan Codenya','blue'),color('Jangan','white'),color('Lupa','red'),color('Follow:@ouv.patrick','yellow'))
-})
-
-patrick.on('credentials-updated', () => {
-	const authInfo = patrick.base64EncodedAuthInfo()
-   console.log(`credentials updated!`)
-   fs.writeFileSync('./patrickQR.json', JSON.stringify(authInfo, null, '\t'))
-})
-fs.existsSync('./patrickQR.json') && patrick.loadAuthInfo('./patrickQR.json')
-patrick.connect();
-
+async function starts() {
+	const patrick = new WAConnection()
+	 patrick.version = [2,2119,6]
+	 patrick.logger.level = 'warn' 
+	 patrick.browserDescription = ["PatrickBot", "Edge", "3.0"];
+	 console.log(banner.string)
+	 patrick.on('qr', () => {
+		console.log(color('[','white'), color('!','red'), color(']','white'), color(' Scan QR code nya Cok >_<'))
+	})
+	fs.existsSync('./session.json') &&  patrick.loadAuthInfo('./session.json')
+	 patrick.on('connecting', () => {
+		start('2', '')
+	})
+	 patrick.on('open', () => {
+		success('2', 'Sukses Connect Ke Whatsapp Web, Ketik .menu')
+	})
+	await patrick.connect({timeoutMs: 30*1000})
+    fs.writeFileSync('./session.json', JSON.stringify( patrick.base64EncodedAuthInfo(), null, '\t'))
 
     patrick.on('group-participants-update', async (anu) => {
 	if (!welcome.includes(anu.jid)) return
@@ -462,13 +477,40 @@ const sleep = async (ms) => {
 	await sleep(4000)
 	await patrick.blockUser(callerId, 'add')
 })
+        patrick.on('message-delete', async (m) => {
+        if (m.key.remoteJid == 'status@broadcast') return
+        if (!m.key.fromMe && m.key.fromMe) return
+        if (antidel === false) return
+        m.message = (Object.keys(m.message)[0] === 'ephemeralMessage') ? m.message.ephemeralMessage.message : m.message
+        const jam = moment.tz('Asia/Jakarta').format('HH:mm:ss')
+        let d = new Date
+        let locale = 'id'
+        let gmt = new Date(0).getTime() - new Date('1 Januari 2021').getTime()
+        let weton = ['Pahing', 'Pon','Wage','Kliwon','Legi'][Math.floor(((d * 1) + gmt) / 84600000) % 5]
+        let week = d.toLocaleDateString(locale, { weekday: 'long' })
+        let calender = d.toLocaleDateString(locale, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+        })
+        const type = Object.keys(m.message)[0]
+        patrick.sendMessage(m.key.remoteJid, 
+`━━━━⬣  𝘼𝙉𝙏𝙄 𝘿𝙀𝙇𝙀𝙏𝙀  ⬣━━━━
 
-        patrick.on('message-new', async (mek) => {
-		try {
-			if (!mek.message) return
-			if (mek.key && mek.key.remoteJid == 'status@broadcast') return
+    *Nama  : @${m.participant.split("@")[0]}*
+    *Jam  : ${jam} ${week} ${calender}*
+    *Type  : ${type}*
+
+━━━━⬣  𝘼𝙉𝙏𝙄 𝘿𝙀𝙇𝙀𝙏𝙀  ⬣━━━━`, MessageType.text, {quoted: m.message, contextInfo: {"mentionedJid": [m.participant]}})
+        patrick.copyNForward(m.key.remoteJid, m.message)
+        })
+        patrick.on('chat-update', async (mek) => {
+		try { 
+			if (!mek.hasNewMessage) return
+            mek = mek.messages.all()[0]
+			if (!mek.message) return 
 			if (mek.key.fromMe) return
-			global.prefix
+			if (mek.key && mek.key.remoteJid == 'status@broadcast') return
 			global.blocked
             const content = JSON.stringify(mek.message)
             const from = mek.key.remoteJid
@@ -479,18 +521,21 @@ const sleep = async (ms) => {
 			const timi = moment.tz('Asia/Jakarta').add(30, 'days').calendar();
 			const timu = moment.tz('Asia/Jakarta').add(20, 'days').calendar();
 			const isQuotedAudio =  type === "extendedTextMessage" && content.includes("audioMessage");
+			var prefixRegEx = /^[!z?#.+\/]/gi;
+		    let _chats = type === "conversation" && mek.message.conversation ? mek.message.conversation : type == "imageMessage" && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : type == "videoMessage" && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : type == "extendedTextMessage" && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : type == "buttonsResponseMessage" && mek.message[type].selectedButtonId ? mek.message[type].selectedButtonId : type == "stickerMessage" && getCmd(mek.message[type].fileSha256.toString("base64")) !== null && getCmd(mek.message[type].fileSha256.toString("base64")) !== undefined ? getCmd(mek.message[type].fileSha256.toString("base64")) : "!";
+		    let prefix = _chats.match(prefixRegEx) ? prefixRegEx.exec(_chats)[0] : "!";
 			const cmd = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''.slice(1).trim().split(/ +/).shift().toLowerCase()
-			const prefix = /^[°•π÷×¶∆£¢€¥®™✓=|~zZ+×_*!#$%^&./\\©^]/.test(cmd) ? cmd.match(/^[°•π÷×¶∆£¢€¥®™✓=|~zZ+×_\ \!#$,|`÷?;:%xyz%^&./\\©^]/gi) : '.'
-            body = (type === 'conversation' && mek.message.conversation.startsWith(prefix)) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption.startsWith(prefix) ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption.startsWith(prefix) ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text.startsWith(prefix) ? mek.message.extendedTextMessage.text : ''
+            body = type === "conversation" && mek.message.conversation.startsWith(prefix) ? mek.message.conversation : type == "imageMessage" && mek.message.imageMessage.caption.startsWith(prefix) ? mek.message.imageMessage.caption : type == "videoMessage" && mek.message.videoMessage.caption.startsWith(prefix) ? mek.message.videoMessage.caption : type == "extendedTextMessage" && mek.message.extendedTextMessage.text.startsWith(prefix) ? mek.message.extendedTextMessage.text : "";
 			budy = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : ''
 			var pes = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''
 			const messagesC = pes.slice(0).trim().split(/ +/).shift().toLowerCase()
-			const command = body.slice(1).trim().split(/ +/).shift().toLowerCase()
-			chats = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : ''
+			let chats = _chats.match(prefixRegEx) ? _chats.split(prefixRegEx).find((v) => v === _chats.replace(prefixRegEx, "")) : _chats;
+		    let command = chats.split(/ +/g)[0];
+			chatsL = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : ''
 			var tas = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''
 			const mesejAnti = tas.slice(0).trim().split(/ +/).shift().toLowerCase()
-			const args = body.trim().split(/ +/).slice(1)
-			const isCmd = body.startsWith(prefix)
+			const args = _chats.trim().split(/ +/).slice(1);
+		    const isCmd = _chats.match(prefixRegEx) ? prefixRegEx.exec(_chats)["input"] : _chats;
 			const tescuk = ["0@s.whatsapp.net"]
 			const totalchat = await patrick.chats.all()
 			const isGroup = from.endsWith('@g.us')
@@ -514,11 +559,14 @@ const sleep = async (ms) => {
 			const isWelcome = isGroup ? welcome.includes(from) : false
 			const isNsfw = isGroup ? nsfw.includes(from) : false 
             const isAntiVirtex = isGroup ? antivirtex.includes(from) : false 
+            const isAntiviewonce = isGroup ? antiviewonce.includes(from) : false 
+            const isAntihidetag = isGroup ? antihidetag.includes(from) : false 
             const isAntiSpam = isGroup ? stc.includes(from) : false
 			const isSimi = isGroup ? samih.includes(from) : false
 			const isAntiLink = isGroup ? antilink.includes(from) : false
 			const isBadWord = isGroup ? badword.includes(from) : false
 			const isBanned = ban.includes(sender)
+			const m = simple.smsg(patrick, mek);
 			const isMedia = (type === 'imageMessage' || type === 'videoMessage')
 			const isQuotedImage = type === 'extendedTextMessage' && content.includes('imageMessage')
 			const isQuotedVideo = type === 'extendedTextMessage' && content.includes('videoMessage')
@@ -732,7 +780,7 @@ switch (waktoo) {
 }
 var tampilUcapan = '' + waktoo;
 
-var ase = new Date();
+/* var ase = new Date();
 var waktoonyabro = ase.getHours();
 switch (waktoonyabro) {
 	case 0: // Time In Indonesia WIB 7
@@ -809,8 +857,26 @@ switch (waktoonyabro) {
 		break;
 }
 var ucapanFakereply = '' + waktoonyabro;
-const time2 = moment().tz('Asia/Jakarta').format('HH:mm:ss')
-
+*/
+        const time2 = moment().tz('Asia/Jakarta').format('DD/MM | HH:mm:ss')
+        if (time2 < "24:59:00") {
+			var ucapanFakereply = "Selamat malam";
+		}
+		if (time2 < "19:00:00") {
+			var ucapanFakereply = "Selamat petang";
+		}
+		if (time2 < "18:00:00") {
+			var ucapanFakereply = "Selamat sore";
+		}
+		if (time2 < "15:00:00") {
+			var ucapanFakereply = "Selamat siang";
+		}
+		if (time2 < "11:00:00") {
+			var ucapanFakereply = "Selamat pagi";
+		}
+		if (time2 < "05:00:00") {
+			var ucapanFakereply = "Selamat malam";
+		}
 const fakestatus = (teks) => {
 	patrick.sendMessage(from, teks, text, {
 		quoted: {
@@ -921,6 +987,23 @@ const fgclink = {
 		}
 	}
 }
+const replyWithFakeLink = (teks) => {
+    patrick.sendMessage(from, teks, text,{ 
+        contextInfo :{
+            text: 'hi',
+           "forwardingScore": 1000000000,
+            isForwarded: false,
+            sendEphemeral: false,
+            "externalAdReply": {
+                "title": `Whatsapp-BOT\nS e n. (@021senkuu_) •Instagram photos and Videos`,
+                "body": "",
+                "previewType": "PHOTO",
+                "thumbnailUrl": "https://telegra.ph/file/bbb5eca08130920edbcb4.jpg",
+                "thumbnail": "./lib/image/logo.jpeg",
+                "sourceUrl": ``
+         }, mentionedJid:[sender]}, quoted : mek})
+}
+
 const fakevn = {
 	key: {
 		fromMe: false,
@@ -955,82 +1038,139 @@ const wit = moment.tz('Asia/Jayapura').format('HH:mm:ss')
 const wib = moment.tz('Asia/Jakarta').format('HH:mm:ss')
 const dater = new Date().toLocaleDateString()
 
-const sendStickerFromUrl = async(to, url) => {
-			console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Downloading sticker...'))
-				var names = getRandom('.webp')
-				var namea = getRandom('.png')
-				var download = function (uri, filename, callback) {
-					request.head(uri, function (err, res, body) {
-						request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-					});
-				};
-				download(url, namea, async function () {
-					let filess = namea
-					let asw = names
-					require('./lib/exif.js')
-					exec(`ffmpeg -i ${filess} -vcodec libwebp -filter:v fps=fps=20 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 512:512 ${asw}`, (err) => {
-					exec(`webpmux -set exif ./src/sticker/data.exif ${asw} -o ${asw}`, async (error) => {
-					let media = fs.readFileSync(asw)
-					senku.sendMessage(to, media, sticker)
-					console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Succes send sticker...'))
-					fs.unlinkSync(asw)
-					fs.unlinkSync(filess)
-					});
-					});
-				});
+const sendButImage = async (id, text1, desc1, gam1, but = [], options = {}) => {
+	kma = gam1
+	mhan = await patrick.prepareMessage(from, kma, image)
+	const buttonMessages = {
+		imageMessage: mhan.message.imageMessage,
+		contentText: text1,
+		footerText: desc1,
+		buttons: but,
+		headerType: 4,
+	}
+	patrick.sendMessage(id, buttonMessages, MessageType.buttonsMessage, options)
+}
+const sendButMessage = (id, text1, desc1, but = [], options = {}) => {
+	const buttonMessage = {
+		contentText: text1,
+		footerText: desc1,
+		buttons: but,
+		headerType: 1,
+	};
+	patrick.sendMessage(id, buttonMessage, MessageType.buttonsMessage, options);
+};
+const descButton = `Halo anda belum terdaftar di database PatrickBot\nKlik Verify atau Ketik ${prefix}verify untuk mendaftar!`
+const footerButton = `◉ Hari: ${tampilHari}\n◉ Tanggal | Jam: ${time}\n`
+const sendStickerFromUrl = async (to, url) => {
+	console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Downloading sticker...'))
+	var names = getRandom('.webp')
+	var namea = getRandom('.png')
+	var download = function(uri, filename, callback) {
+		request.head(uri, function(err, res, body) {
+			request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+		});
+	};
+	download(url, namea, async function() {
+		let filess = namea
+		let asw = names
+		require('./lib/exif.js')
+		exec(`ffmpeg -i ${filess} -vcodec libwebp -filter:v fps=fps=20 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 512:512 ${asw}`, (err) => {
+			exec(`webpmux -set exif ./sticker/data.exif ${asw} -o ${asw}`, async (error) => {
+				let media = fs.readFileSync(asw)
+				patrick.sendMessage(to, media, sticker)
+				console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Succes send sticker...'))
+				fs.unlinkSync(asw)
+				fs.unlinkSync(filess)
+			});
+		});
+	});
+}
+
+function upload (media)  {
+    return new Promise(async (resolve, reject) => {
+    try { 
+    	const fetch = require('node-fetch')
+    	const { fromBuffer } = require('file-type')
+        let { ext } = await fromBuffer(media)
+        console.log('Uploading image to server telegra.ph')
+        let form = new FormData()
+        form.append('file', media, 'tmp.' + ext)
+        await fetch('https://telegra.ph/upload', {
+            method: 'POST',
+            body: form
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.error) return reject(res.error)
+            resolve('https://telegra.ph' + res[0].src)
+        })
+        .catch(err => reject(err))
+    } catch (e) {
+        return console.log(e)
+    }
+})
+}
+
+const sendStickerUrl = async (to, url) => {
+	console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Downloading sticker...'))
+	var names = getRandom('.webp')
+	var namea = getRandom('.png')
+	var download = function(uri, filename, callback) {
+		request.head(uri, function(err, res, body) {
+			request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+		});
+	};
+	download(url, namea, async function() {
+		let filess = namea
+		let asw = names
+		require('./lib/exif.js')
+		exec(`ffmpeg -i ${filess} -vcodec libwebp -filter:v fps=fps=20 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 512:512 ${asw}`, (err) => {
+			exec(`webpmux -set exif ./sticker/data.exif ${asw} -o ${asw}`, async (error) => {
+				let media = fs.readFileSync(asw)
+				patrick.sendMessage(from, media, sticker, {
+					quoted: sen
+				})
+				console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Succes send sticker...'))
+			});
+		});
+	});
+}
+
+const sendMediaURL = async (to, url, text = "", mids = []) => {
+	if (mids.length > 0) {
+		text = normalizeMention(to, text, mids)
+	}
+	const fn = Date.now() / 10000;
+	const filename = fn.toString()
+	let mime = ""
+	var download = function(uri, filename, callback) {
+		request.head(uri, function(err, res, body) {
+			mime = res.headers['content-type']
+			request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+		});
+	};
+	download(url, filename, async function() {
+		console.log('done');
+		let media = fs.readFileSync(filename)
+		let type = mime.split("/")[0] + "Message"
+		if (mime === "image/gif") {
+			type = MessageType.video
+			mime = Mimetype.gif
+		}
+		if (mime.split("/")[0] === "audio") {
+			mime = Mimetype.mp4Audio
+		}
+		patrick.sendMessage(to, media, type, {
+			quoted: mek,
+			mimetype: mime,
+			caption: text,
+			contextInfo: {
+				"mentionedJid": mids
 			}
+		})
 
-const sendStickerUrl = async(to, url) => {
-console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Downloading sticker...'))
-var names = getRandom('.webp')
-var namea = getRandom('.png')
-var download = function (uri, filename, callback) {
-request.head(uri, function (err, res, body) {
-request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-});
-};
-download(url, namea, async function () {
-let filess = namea
-let asw = names
-require('./lib/exif.js')
-exec(`ffmpeg -i ${filess} -vcodec libwebp -filter:v fps=fps=20 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 512:512 ${asw}`, (err) => {
-exec(`webpmux -set exif ./sticker/data.exif ${asw} -o ${asw}`, async (error) => {
-let media = fs.readFileSync(asw)
-senku.sendMessage(from, media, sticker, {quoted: sen})
-console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Succes send sticker...'))  
-});
-});
-});
-}
-
-const sendMediaURL = async(to, url, text="", mids=[]) =>{
-if(mids.length > 0){
-text = normalizeMention(to, text, mids)
-}
-const fn = Date.now() / 10000;
-const filename = fn.toString()
-let mime = ""
-var download = function (uri, filename, callback) {
-request.head(uri, function (err, res, body) {
-mime = res.headers['content-type']
-request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-});
-};
-download(url, filename, async function () {
-console.log('done');
-let media = fs.readFileSync(filename)
-let type = mime.split("/")[0]+"Message"
-if(mime === "image/gif"){
-type = MessageType.video
-mime = Mimetype.gif
-}
-if(mime.split("/")[0] === "audio"){
-mime = Mimetype.mp4Audio
-}
-patrick.sendMessage(to, media, type, { quoted: mek, mimetype: mime, caption: text,contextInfo: {"mentionedJid": mids}})
-		    
-fs.unlinkSync(filename)
-});
+		fs.unlinkSync(filename)
+	});
 }
 
 var per = '*[▒▒▒▒▒▒▒▒▒▒] 0%*'
@@ -1280,7 +1420,9 @@ if (isRegistered && isGroup) {
 	}
 }
 
-if (budy.includes("://chat.whatsapp.com/")) {
+if (budy.includes("://chat.whatsapp.com/")) { 
+            getLink = await patrick.groupInviteCode(from) 
+	        if (budy.includes(`${getLink}`)) return reply('Kamu telah mengirim linkgrup ini\nPatrickBot tidak akan kick!')
 			if (!isGroup) return
 			if (!isAntiLink) return
 			if (isGroupAdmins) return reply('Admin Grup Mah Bebas:D')
@@ -1304,6 +1446,22 @@ if (budy.includes("://chat.whatsapp.com/")) {
 				patrick.updatePresence(from, Presence.composing)
 			}, 0)
 		}
+		
+if (isGroup && isAntiviewonce && m.mtype == "viewOnceMessage") {
+	reply(`@${sender.split("@")[0]} Terdeteksi mengirim gambar/video viewonce!`);
+	var msg = {
+		...mek
+	};
+	msg.mek = mek.message.viewOnceMessage.message;
+	msg.mek[Object.keys(msg.mek)[0]].viewOnce = false;
+	patrick.copyNForward(m.chat, msg);
+}
+
+	if (isGroup && isAntihidetag && m.message[m.mtype]?.contextInfo?.mentionedJid?.length == groupMembers.length) {
+		console.log(color("[ANTI-HIDETAG]", "red"), color(`@${sender.split("@")[0]} mengirim pesan hidetag`, "white"));
+		reply(`@${sender.split("@")[0]} Terdeteksi mengirim pesan hidetag!!`);
+		kick(from, sender);
+	}
 
     if (txt.length > 14000) {
 	if (!isGroup) return
@@ -1352,7 +1510,8 @@ if (isGroup) {
 	}
 }
             q2 = Object.keys(mek.message)[0] == "listResponseMessage" ? mek.message.listResponseMessage.singleSelectReply.selectedRowId: ""
-            rspndbutton = (type == 'listResponseMessage') ? mek.message.listResponseMessage.selectedDisplayText : '' || isCmd
+            button = (type == 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedDisplayText : ''
+            rspndbutton = (type == 'listResponseMessage') ? mek.message.listResponseMessage.title: ''
             //====================== Enable Feature Group ====================\\
 		    if (rspndbutton == 'Anti Badword') {
 			if (!isGroup) return reply(ind.groupo())
@@ -1409,18 +1568,25 @@ if (isGroup) {
 			reply('❬ *SUKSES* ❭ *MENGAKTIFKAN FITUR SIMI DI GROUP INI*')
 			} 
             if (rspndbutton == 'NSFW Mode') {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
             if (isNsfw) return reply('Fitur NSFW Sudah aktif!')
 			nsfw.push(from)
 			fs.writeFileSync('./database/json/nsfw.json', JSON.stringify(nsfw))
 			reply('❬ *SUKSES* ❭ *MENGAKTIFKAN FITUR NSFW DI GROUP INI*')
 			} 
-            if (rspndbutton == 'Leveling Mode') {
-			if (!isRegistered) return reply(ind.noregis())
-            if (isLevelingOn) return reply('Fitur Leveling Sudah aktif!')
-			_leveling.push(from)
-			fs.writeFileSync('./database/json/leveling.json', JSON.stringify(_leveling))
-			reply('❬ *SUKSES* ❭ *MENGAKTIFKAN FITUR LEVELING DI GROUP INI*')
+            if (rspndbutton == 'Anti ViewOnce') {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+            if (isAntiviewonce) return reply('Fitur AntiviewOnce Sudah aktif!')
+			antiviewonce.push(from)
+			fs.writeFileSync('./database/json/antiviewonce.json', JSON.stringify(antiviewonce))
+			reply('❬ *SUKSES* ❭ *MENGAKTIFKAN FITUR ANTI VIEWONCE DI GROUP INI*')
+		    } else  
+		    if (rspndbutton == 'Anti Hidetag') {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+            if (isAntihidetag) return reply('Fitur Antihidetag Sudah aktif!')
+			antihidetag.push(from)
+			fs.writeFileSync('./database/json/antihidetag.json', JSON.stringify(antihidetag))
+			reply('❬ *SUKSES* ❭ *MENGAKTIFKAN FITUR ANTI HIDETAG DI GROUP INI*')
 		    } else  
 		    //====================== Disable Feature Group ====================\\
 		    if (rspndbutton == 'Disable Anti Badword') {
@@ -1466,11 +1632,17 @@ if (isGroup) {
 			fs.writeFileSync('./database/json/nsfw.json', JSON.stringify(nsfw))
 			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR NSFW DI GROUP INI*')
 			} else
-		    if (rspndbutton == 'Disable Leveling') {
-		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
-			_leveling.splice(from, 1)
-			fs.writeFileSync('./database/json/leveling.json', JSON.stringify(_leveling))
+		    if (rspndbutton == 'Disable Anti View Once') {
+		    if (!isAntiviewonce) return reply('Fitur Leveling Belum aktif!')
+			antiviewonce.splice(from, 1)
+			fs.writeFileSync('./database/json/antiviewonce.json', JSON.stringify(antiviewonce))
 			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR LEVELING DI GROUP INI*')
+		    } else 
+		    if (rspndbutton == 'Disable Anti Hidetag') {
+		    if (!isAntihidetag) return reply('Fitur Anti Hidetag Belum aktif!')
+			antihidetag.splice(from, 1)
+			fs.writeFileSync('./database/json/antihidetag.json', JSON.stringify(antihidetag))
+			reply('❬ *SUKSES* ❭ *MENONAKTIFKAN FITUR ANTI HIDETAG DI GROUP INI*')
 		    } else
 		    if (rspndbutton == 'Read Docs') {
 		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
@@ -1485,7 +1657,7 @@ if (isGroup) {
 		    } else 
 		    //======== Anime =======\\
 		    if (rspndbutton == 'KDU / Kdu Image') {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			data = fs.readFileSync('./lib/husbu.js');
 			jsonData = JSON.parse(data);
@@ -1496,7 +1668,7 @@ if (isGroup) {
 		    } else 
 		    if (rspndbutton == 'Femdom Image') {
 		    try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			axios.get(`https://nekos.life/api/v2/img/femdom`).then((res) => {
 			imageToBase64(res.data.url).then((response) => {
@@ -1511,7 +1683,7 @@ if (isGroup) {
 		    } else 
 		    if (rspndbutton == 'Walpaper Anime') {
 		    try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			axios.get(`https://nekos.life/api/v2/img/wallpaper`).then((res) => {
 			imageToBase64(res.data.url).then((response) => {
@@ -1526,7 +1698,7 @@ if (isGroup) {
             } else 
 		    if (rspndbutton == 'Kawai Image') {
 		    try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			axios.get(`https://nekos.life/api/v2/img/kemonomimi`).then((res) => {
 			imageToBase64(res.data.url).then((response) => {
@@ -1541,7 +1713,7 @@ if (isGroup) {
             } else 
 		    if (rspndbutton == 'Kemono Mimi Image') {
 		    try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			axios.get(`https://nekos.life/api/v2/img/kemonomimi`).then((res) => {
 			imageToBase64(res.data.url).then((response) => {
@@ -1556,7 +1728,7 @@ if (isGroup) {
 		    } else 
 		    if (rspndbutton == 'Kuni Image') {
 		    try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			axios.get(`https://nekos.life/api/v2/img/kuni`).then((res) => {
 			imageToBase64(res.data.url).then((response) => {
@@ -1571,7 +1743,7 @@ if (isGroup) {
 		    } else 
 		    if (rspndbutton == 'Neko Image') {
 		    try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			axios.get(`https://nekos.life/api/v2/img/meow`).then((res) => {
 			imageToBase64(res.data.url).then((response) => {
@@ -1586,7 +1758,7 @@ if (isGroup) {
             } else 
 		    if (rspndbutton == 'Holo Image') {
 		    try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			axios.get(`https://nekos.life/api/v2/img/holo`).then((res) => {
 			imageToBase64(res.data.url).then((response) => {
@@ -1604,22 +1776,26 @@ if (isGroup) {
 			patrick.sendMessage(from, `*RULES BAGI PENGGUNA BOT*\n    \n➣ Tolong Gunakan Delay Jangan Terlalu Dispam Saat Menggunakan Bot.\n➣ Call/VC Bot Auto Banned.\n➣ Jangan Call/VC Bot Kalau Tidak aktif.\n➣ Bot Online 24 Jam tapi kadang Disconnect.\n\n*Konsekuensi Bila Melanggar Rules*\nBot Akan Mem-Banned Kamu dan Memblokir kamu.\n\nRules ini untuk kenyamanan semua yang memakai\nbot ini \n1. Jangan terlalu spam bot. \nSanksi: *WARN/SOFT BLOCK* = Tidak Direspon selama 5 detik!\n\n2. Jangan telepon bot.\nSanksi: *SOFT BLOCK* = Block!\n\n3. Jangan mengeksploitasi bot.\nSanksi: *PERMANENT BLOCK* = Banned + Block!\n\nJika sudah dipahami rules-nya, silakan ketik *${prefix}menu* untuk memulai!\nJika Ada yang error ketik *${prefix}report [Bug]`)
 		    } else 
             //=================== Menu Nya =============\\ 
-            if (rspndbutton == '▶ Owner Menu ◀') {
+            if (rspndbutton == '▨ Owner Menu ▨') {
             if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true) 
             await patrickhay(ind.owner(prefix), MessageType.text, tescuk, `${ucapanFakereply}`) 
             } else 
-            if (rspndbutton == '▶ Maker Menu ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Premium Menu ▨') {
+            if (!isPrem) return reply(ind.premon())
+            await patrickhay(ind.premium(prefix), MessageType.text, tescuk, `${ucapanFakereply}`) 
+            } else 
+            if (rspndbutton == '▨ Maker Menu ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.maker(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == '▶ Fun Menu ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Fun Menu ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.fun(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else 
-            if (rspndbutton == '▶ Game Menu ◀') { 
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Game Menu ▨') { 
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
             let vovo = patrick.prepareMessageFromContent(from, {
             "listMessage": {
@@ -1666,35 +1842,35 @@ Boleh Dong Follow Insta: _pa7rick :)`,
                waitForAck: true
             })
             } else 
-            if (rspndbutton == '▶ Kerang Menu ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Kerang Menu ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.kerang(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == '▶ Download Menu ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Download Menu ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.download(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == '▶ Group Menu ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Group Menu ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (!isGroup) return reply(ind.groupo())
 		    await patrickhay(ind.group(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else 
-            if (rspndbutton == '▶ Search Menu ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Search Menu ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.search(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == '▶ Berita Menu ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Berita Menu ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.berita(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == '▶ Anime Menu ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Anime Menu ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
-		    if (!isRegistered) return reply(ind.noregis()) 
+		    if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]); 
 		    let pope = patrick.prepareMessageFromContent(from, {
             "listMessage": {
             "title": '*Anime Menu*',
@@ -1743,24 +1919,24 @@ Boleh Dong Follow Insta: _pa7rick :)`,
                waitForAck: true
             })
             } else  
-            if (rspndbutton == '▶ Islam Menu ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Islam Menu ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.islam(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else 
-            if (rspndbutton == '▶ Cloud Storage ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Cloud Storage ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.cloud(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else  
-            if (rspndbutton == '▶ Menu Lainnya ◀') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (rspndbutton == '▨ Menu Lainnya ▨') {
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    await patrickhay(ind.other(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else 
             //======================= GAME MENU =========================\\
             if (rspndbutton == 'Family 100') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    if (isLimit(sender)) return reply(limitend(pushname))
             if (game.isfam(from, family100)) return reply(`Masih ada soal yang belum di selesaikan`)
@@ -1779,7 +1955,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
             limitAdd(sender)
             } else 
             if (rspndbutton == 'Math') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    if (isLimit(sender)) return reply(limitend(pushname))
             if (game.isMath(from, math)) return reply(`Masih ada soal yang belum di selesaikan`)
@@ -1792,7 +1968,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
             limitAdd(sender)
             } else  
             if (rspndbutton == 'Tebak Gambar') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    if (isLimit(sender)) return reply(limitend(pushname))
             if (game.isTebakGambar(from, tebakgambar)) return reply(`Masih ada soal yang belum di selesaikan`)
@@ -1803,7 +1979,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
             limitAdd(sender)
             } else 
             if (rspndbutton == 'Siapakah Aku?') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    if (isLimit(sender)) return reply(limitend(pushname))
             if (game.isSiapakah(from, siapakah)) return reply(`Masih ada soal yang belum di selesaikan`)
@@ -1814,7 +1990,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
             limitAdd(sender)
             } else 
             if (rspndbutton == 'Teka Teki') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    if (isLimit(sender)) return reply(limitend(pushname))
             if (game.isTek(from, tekateki)) return reply(`Masih ada soal yang belum di selesaikan`)
@@ -1825,7 +2001,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
             limitAdd(sender)
             } else 
             if (rspndbutton == 'Susun Kata') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    if (isLimit(sender)) return reply(limitend(pushname))
             if (game.isSK(from, susunkata)) return reply(`Masih ada soal yang belum di selesaikan`)
@@ -1836,7 +2012,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
             limitAdd(sender)
             } else 
             if (rspndbutton == 'Asah Otak') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    if (isLimit(sender)) return reply(limitend(pushname))
             if (game.isAO(from, asahotak)) return reply(`Masih ada soal yang belum di selesaikan`)
@@ -1847,15 +2023,15 @@ Boleh Dong Follow Insta: _pa7rick :)`,
             limitAdd(sender)
             } else
             if (rspndbutton == 'Tebak Angka') {
-            if (!isRegistered) return reply(ind.noregis())
+            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		    if (isBanned) return reply(ind.baned())
 		    if (isLimit(sender)) return reply(limitend(pushname))
             if (game.isMath(from, math)) return reply(`Masih ada soal yang belum di selesaikan`)
-            gamewaktuts = 5
+            gamewaktuts = 30
             angkaBot = `${Math.floor(Math.random() * 10)}`
             reply(`*Tebak Angka*\n\nPilih Angka  Dari 1-10\nContoh: 4\nWaktu : ${gamewaktuts}s`)
             let anoehs = angkaBot.toLowerCase()
-            game.addangka(from, anoehs, gamewaktuts, tebakangka)
+            game.addAngka(from, anoehs, gamewaktuts, tebakangka)
             limitAdd(sender)
             } else 
             if (rspndbutton == 'MP3') {
@@ -1889,11 +2065,10 @@ Boleh Dong Follow Insta: _pa7rick :)`,
             reply(ind.stikga())
             }
          } 
-        
             
        if (isGroup && isBadWord && !isGroupAdmins) {
        for (let kasar of badword) {
-       if (chats.toLowerCase().includes(kasar)) {
+       if (budy.toLowerCase().includes(kasar)) {
        if (isCountKasar(sender, senbadword)) {
        if (!isBotGroupAdmins) return reply(`Kamu beruntung karena bot bukan admin`)
           reply(`*Anti Badword!!*\n\nSepertinya kamu sudah berkata kasar lebih dari 5x sekaligus dalam 5 menit, maaf kamu akan di kick`)
@@ -1907,7 +2082,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
            reply(`Kamu terdeteksi berkata kasar\nJika kamu berkata kasar *lebih dari 5x* sekaligus dalam 5 menit\nkamu akan dikick\n*Kamu sudah berkata kasar*\n*${ksrcount}x*`)
            await sleep(300000)
            delCountKsr(sender, senbadword)
-           console.log('Succes Delete Badword From' + sender)
+           console.log('Succes Delete Badword From ' + sender)
           }
         }
       }
@@ -1930,7 +2105,7 @@ Boleh Dong Follow Insta: _pa7rick :)`,
            reply(`Kamu terdeteksi mengirim sticker\nJika kamu mengirim sticker *lebih dari 10x* sekaligus dalam 4 menit\nkamu akan dikick\n*Kamu sudah mengirim*\n*${stccount} Sticker!*/4 Menit`)
            await sleep(240000)
            delCountStc(sender, sensticker)
-           console.log('Succes Delete Sticker From' + sender)
+           console.log('Succes Delete Sticker From ' + sender)
           }
         }
       }
@@ -1959,7 +2134,7 @@ await reply(m)
         game.cekWaktuSK(patrick, susunkata)
         game.cekWaktuAO(patrick, asahotak)
         if (game.isTebakGambar(from, tebakgambar) && isRegistered){
-            if (chats.toLowerCase().includes(game.getJawabanTG(from, tebakgambar))){
+            if (budy.toLowerCase().includes(game.getJawabanTG(from, tebakgambar))){
                 var htgm = randomNomor(100)
                 addKoinUser(sender, htgm)
                 await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanTG(from, tebakgambar)}\n*Hadiah :* ${htgm}\n\nIngin bermain lagi? kirim *${prefix}tebakgambar*`)
@@ -1967,7 +2142,7 @@ await reply(m)
             }
         }
         if (game.isMath(from, math) && isRegistered){
-            if (chats.toLowerCase().includes(game.getJawabanMath(from, math))){
+            if (budy.toLowerCase().includes(game.getJawabanMath(from, math))){
                 var htgmm = randomNomor(100)
                 addKoinUser(sender, htgmm)
                 await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanMath(from, math)}\n*Hadiah :* ${htgmm}\n\nIngin bermain lagi? kirim *${prefix}math*`)
@@ -1975,7 +2150,7 @@ await reply(m)
             }
         } 
         if (game.isSiapakah(from, siapakah) && isRegistered){
-            if (chats.toLowerCase().includes(game.getJawabanSPK(from, siapakah))){
+            if (budy.toLowerCase().includes(game.getJawabanSPK(from, siapakah))){
                 var htgms = randomNomor(100)
                 addKoinUser(sender, htgms)
                 await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanSPK(from, siapakah)}\n*Hadiah :* ${htgms}\n\nIngin bermain lagi? kirim *${prefix}tebaksiapa*`)
@@ -1983,7 +2158,7 @@ await reply(m)
             }
         }         
         if (game.isTek(from, tekateki) && isRegistered){
-            if (chats.toLowerCase().includes(game.getJawabanTek(from, tekateki))){
+            if (budy.toLowerCase().includes(game.getJawabanTek(from, tekateki))){
                 var htggm = randomNomor(100)
                 addKoinUser(sender, htggm)
                 await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanTek(from, tekateki)}\n*Hadiah :* ${htggm}\n\nIngin bermain lagi? kirim *${prefix}tebaksiapa*`)
@@ -1991,7 +2166,7 @@ await reply(m)
             }
         }  
         if (game.isSK(from, susunkata) && isRegistered){
-            if (chats.toLowerCase().includes(game.getJawabanSK(from, susunkata))){
+            if (budy.toLowerCase().includes(game.getJawabanSK(from, susunkata))){
                 var httgms = randomNomor(100)
                 addKoinUser(sender, httgms)
                 await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanSK(from, susunkata)}\n*Hadiah :* ${httgms}\n\nIngin bermain lagi? kirim *${prefix}susunkata*`)
@@ -1999,7 +2174,7 @@ await reply(m)
             }
         } 
         if (game.isAO(from, asahotak) && isRegistered){
-            if (chats.toLowerCase().includes(game.getJawabanAO(from, asahotak))){
+            if (budy.toLowerCase().includes(game.getJawabanAO(from, asahotak))){
                 var htgmms = randomNomor(100)
                 addKoinUser(sender, htgms)
                 await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanAO(from, asahotak)}\n*Hadiah :* ${htgmms}\n\nIngin bermain lagi? kirim *${prefix}tebaksiapa*`)
@@ -2008,20 +2183,17 @@ await reply(m)
         } 
         
         if (game.isAngka(from, tebakangka) && isRegistered){
-            if (chats.toLowerCase().includes(game.getJawabanAngka(from, tebakangka))){
+            if (budy.toLowerCase().includes(game.getJawabanAngka(from, tebakangka))){
                 var htgms = randomNomor(12)
                 addKoinUser(sender, htgms)
                 await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanAngka(from, tebakangka)}\n*Hadiah :* ${htgms}\n\nIngin bermain lagi? kirim *${prefix}tebakangka*`)
                 tebakangka.splice(game.getAngkaPosi(from, tebakangka), 1)
-            } else {
-            reply(`Yah Jawaban Anda Gagal!, Jawabannya ${game.getJawabanAngka(from, tebakangka)}`)
-            tebakangka.splice(game.getAngkaPosi(from, siapakah), 1)
-            }
+            } 
         }
         if (game.isfam(from, family100) && isRegistered){
             var anjuy = game.getjawaban100(from, family100)
             for (let i of anjuy){
-                if (chats.toLowerCase().includes(i)){
+                if (budy.toLowerCase().includes(i)){
                     var htgmi = Math.floor(Math.random() * 20) + 1
                     addKoinUser(sender, htgmi)
                     await reply(`*Jawaban benar*\n*Jawaban :* ${i}\n*Hadiah :* ${htgmi}\n*Jawaban yang blum tertebak :* ${anjuy.length - 1}`)
@@ -2047,30 +2219,62 @@ if (typeof Math_js.evaluate(extsoal) !== "number") {
 
 /******************* Color & Detector Media PatrickBot  *******************/
 colors = ['red', 'white', 'black', 'blue', 'yellow', 'green']
-if (isCmd && antiSpam.isFiltered(from) && !isGroup) {
-	console.log(color('[ Spam ]', 'red'), color(time, 'yellow'), color(`${command} [${args.length}]`), 'from', color(pushname))
-	return reply(`${a}Hello ${pushname}, Beri Jeda PatrickBot 2 Detik${a}\n*Note:* 2 Detik/command`)
-}
-if (isCmd && antiSpam.isFiltered(from) && isGroup) {
-	console.log(color('[ Spam ]', 'red'), color(time, 'yellow'), color(`${command} [${args.length}]`), 'from', color(pushname), 'in', color(groupName))
-	return reply(`${a}Hello ${pushname}, Beri Jeda PatrickBot 2 Detik${a}\n*Note:* 2 Detik/command`)
-}
-if (isCmd && !isOwner) antiSpam.addFilter(from)
 
 if (!isGroup && isCmd) console.log('\x1b[1;31m~\x1b[1;37m>', [time], '[\x1b[1;32mInPrivate\x1b[1;37m]=', color([command]), 'from', color(sender.split('@')[0]), 'args :', color(args.length))
 if (isCmd && isGroup) console.log('\x1b[1;31m~\x1b[1;37m>', [time], '[\x1b[1;32mInGroup\x1b[1;37m]=', color([command]), 'from', color(sender.split('@')[0]), 'in', color(groupName), 'args :', color(args.length))
 if (isCmd) cmdadd()
 switch (command) {
-	//==========================================BATES NGAB==========================================\\
-	/* case 'help':
+	//==========================================BATES NGAB==========================================\\ 
 	    case 'menu':
 		if (isBanned) return reply(ind.baned())
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+		if (isLimit(sender)) return reply(ind.limitend(pushname, prefix)) 
+		const uangkiem = checkATMuser(sender)
+		const lvliem = getLevelingLevel(sender)
+		menlu = 
+`Hello World, ${botName} is here
+Created By @_pa7rick
+
+${a} ❏ Nama : ${pushname}${a}
+${a} ❏ User :${a} ${premi}
+${a} ❏ Balance : $${uangkiem}${a}
+${a} ❏ Level : ${lvliem}${a}
+
+  ❏  Time: ${time2}
+  ❏  Runtime : ${kyun(process.uptime())}
+  ❏  Total Hit : ${pepolu}`
+		sendButImage(from, menlu, `${footerButton}\nJika button tidak keliatan\nketik ${prefix}help`, fs.readFileSync("./lib/image/logo.jpeg"), 
+        [{
+			buttonId: `${prefix}help`,
+			buttonText: {
+				displayText: `▨ MENU ▨`,
+			},
+			type: 1,
+		},
+        {
+			buttonId: `${prefix}owner`,
+			buttonText: {
+				displayText: `▨ CREATOR ▨`,
+			},
+			type: 1,
+		},
+		{
+			buttonId: `${prefix}profile`,
+			buttonText: {
+				displayText: `▨ PROFILE ▨`,
+			},
+			type: 1,
+		},
+		]);
+		break;
+	 /*   case 'help':
+		if (isBanned) return reply(ind.baned())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isLimit(sender)) return reply(ind.limitend(pushname, prefix))
 		me = patrick.user
 		const requXp = 5000 * (Math.pow(2, getLevelingLevel(sender)) - 1)
-		const uangki = checkATMuser(sender)
-		const lvli = getLevelingLevel(sender)
+		const uangkim = checkATMuser(sender)
+		const lvlim = getLevelingLevel(sender)
 		if (!isGroup) {
 			const menunya =
 				`Hello World, ${botName} is here           ${emojiUser}
@@ -2078,10 +2282,10 @@ Created By @_pa7rick
 
 ${a} ❏ Nama : ${pushname}${a}
 ${a} ❏ User :${a} ${premi}
-${a} ❏ Balance : $${uangki}${a}
-${a} ❏ Level : ${lvli}${a}
+${a} ❏ Balance : $${uangkim}${a}
+${a} ❏ Level : ${lvlim}${a}
 
-  ❏  Time: ${tampilJam}
+  ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
    
@@ -2121,10 +2325,10 @@ Created By @_pa7rick
 
 ${a} ❏ Nama : ${pushname}${a}
 ${a} ❏ User :${a} ${premi}
-${a} ❏ Balance : $${uangki}${a}
+${a} ❏ Balance : $${uangkim}${a}
 ${a} ❏ Level : ${lvli}${a}
 
-  ❏  Time: ${tampilJam}
+  ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
 
@@ -2163,13 +2367,13 @@ ${a}│ ❏ ${prefix}ownermenu
 			await patrickhay(menunon, MessageType.text, tescuk, `${ucapanFakereply}`)
 		}
 		break */
-		case 'help':
-	    case 'menu':
+	    case 'help':
 		if (isBanned) return reply(ind.baned())
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isLimit(sender)) return reply(ind.limitend(pushname, prefix))
+		lott = `${isGroup ? `\n${a}Ketik${a} *${prefix}infogrup*\n${a}Untuk mengetahui\nFitur aktif pada grup ini!${a}` : ''}`
 		const uangki = checkATMuser(sender)
-		const lvli = getLevelingLevel(sender)
+		const lvlom = getLevelingLevel(sender)
 		if (!isGroup) {
 			let pope = patrick.prepareMessageFromContent(from, {
             "listMessage": {
@@ -2181,9 +2385,9 @@ Created By @_pa7rick
 ${a} ❏ Nama : ${pushname}${a}
 ${a} ❏ User :${a} ${premi}
 ${a} ❏ Balance : $${uangki}${a}
-${a} ❏ Level : ${lvli}${a}
+${a} ❏ Level : ${lvlom}${a}
 
-  ❏  Time: ${tampilJam}
+  ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
 
@@ -2202,94 +2406,87 @@ ${a} ❏ Level : ${lvli}${a}
         "listType": 'SINGLE_SELECT',
         "sections": [
          {
-			"title": "Pilih Salah Satu!",
-			"rows": [
-					{
-						"title": "▶ Owner Menu ◀",
-						"description": "\n\n This Is Feature For Show Owner Menu!",
-						"rowId": "0"
-			}]}, {
 			  "title": "◉ Menu ke-1",
 			  "rows": [
 					{
-						"title": "▶ Maker Menu ◀",
+						"title": "▨ Maker Menu ▨",
 						"description": "\n\n This Is Feature For Show Maker Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-2",
 			  "rows": [
 					{
-						"title": "▶ Fun Menu ◀",
+						"title": "▨ Fun Menu ▨",
 						"description": "\n\n This Is Feature For Show Fun Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-3",
 			  "rows": [
 					{
-						"title": "▶ Game Menu ◀",
+						"title": "▨ Game Menu ▨",
 						"description": "\n\n This Is Feature For Show Game Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-4",
 			  "rows": [
 					{
-						"title": "▶ Kerang Menu ◀",
+						"title": "▨ Kerang Menu ▨",
 						"description": "\n\n This Is Feature For Show Kerang Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-5",
 			  "rows": [
 					{
-						"title": "▶ Download Menu ◀",
+						"title": "▨ Download Menu ▨",
 						"description": "\n\n This Is Feature For Show Download Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-6",
 			  "rows": [
 					{
-						"title": "▶ Group Menu ◀",
+						"title": "▨ Group Menu ▨",
 						"description": "\n\n This Is Feature For Show Group Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-7",
 			  "rows": [
 					{
-						"title": "▶ Search Menu ◀",
+						"title": "▨ Search Menu ▨",
 						"description": "\n\nThis Is Feature For Show Search Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-8",
 			  "rows": [
 					{
-						"title": "▶ Berita Menu ◀",
+						"title": "▨ Berita Menu ▨",
 						"description": "\n\nThis Is Feature For Show Berita Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-9",
 			  "rows": [
 					{
-						"title": "▶ Anime Menu ◀",
+						"title": "▨ Anime Menu ▨",
 						"description": "\n\nThis Is Feature For Show Anime Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-10",
 			  "rows": [
 					{
-						"title": "▶ Islam Menu ◀",
+						"title": "▨ Islam Menu ▨",
 						"description": "\n\nThis Is Feature For Show Islam Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-11",
 			  "rows": [
 					{
-						"title": "▶ Cloud Storage ◀",
+						"title": "▨ Cloud Storage ▨",
 						"description": "\n\nThis Is Feature For Show Cloud Storage!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-12",
 			  "rows": [
 					{
-						"title": "▶ Menu Lainnya ◀",
+						"title": "▨ Menu Lainnya ▨",
 						"description": "\n\nThis Is Feature For Show Other Menu!",
 						"rowId": "0"
                 }]
@@ -2311,9 +2508,9 @@ Created By @_pa7rick
 ${a} ❏ Nama : ${pushname}${a}
 ${a} ❏ User :${a} ${premi}
 ${a} ❏ Balance : $${uangki}${a}
-${a} ❏ Level : ${lvli}${a}
+${a} ❏ Level : ${lvlom}${a}
 
-  ❏  Time: ${tampilJam}
+  ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
   
@@ -2335,94 +2532,87 @@ Fitur aktif pada grup ini!${a}
         "listType": 'SINGLE_SELECT',
         "sections": [
          {
-			"title": "Pilih Salah Satu!",
-			"rows": [
-					{
-						"title": "▶ Owner Menu ◀",
-						"description": "\n\n This Is Feature For Show Owner Menu!",
-						"rowId": "0"
-			}]}, {
 			  "title": "◉ Menu ke-1",
 			  "rows": [
 					{
-						"title": "▶ Maker Menu ◀",
+						"title": "▨ Maker Menu ▨",
 						"description": "\n\n This Is Feature For Show Maker Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-2",
 			  "rows": [
 					{
-						"title": "▶ Fun Menu ◀",
+						"title": "▨ Fun Menu ▨",
 						"description": "\n\n This Is Feature For Show Fun Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-3",
 			  "rows": [
 					{
-						"title": "▶ Game Menu ◀",
+						"title": "▨ Game Menu ▨",
 						"description": "\n\n This Is Feature For Show Game Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-4",
 			  "rows": [
 					{
-						"title": "▶ Kerang Menu ◀",
+						"title": "▨ Kerang Menu ▨",
 						"description": "\n\n This Is Feature For Show Kerang Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-5",
 			  "rows": [
 					{
-						"title": "▶ Download Menu ◀",
+						"title": "▨ Download Menu ▨",
 						"description": "\n\n This Is Feature For Show Download Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-6",
 			  "rows": [
 					{
-						"title": "▶ Group Menu ◀",
+						"title": "▨ Group Menu ▨",
 						"description": "\n\n This Is Feature For Show Group Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-7",
 			  "rows": [
 					{
-						"title": "▶ Search Menu ◀",
+						"title": "▨ Search Menu ▨",
 						"description": "\n\nThis Is Feature For Show Search Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-8",
 			  "rows": [
 					{
-						"title": "▶ Berita Menu ◀",
+						"title": "▨ Berita Menu ▨",
 						"description": "\n\nThis Is Feature For Show Berita Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-9",
 			  "rows": [
 					{
-						"title": "▶ Anime Menu ◀",
+						"title": "▨ Anime Menu ▨",
 						"description": "\n\nThis Is Feature For Show Anime Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-10",
 			  "rows": [
 					{
-						"title": "▶ Islam Menu ◀",
+						"title": "▨ Islam Menu ▨",
 						"description": "\n\nThis Is Feature For Show Islam Menu!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-11",
 			  "rows": [
 					{
-						"title": "▶ Cloud Storage ◀",
+						"title": "▨ Cloud Storage ▨",
 						"description": "\n\nThis Is Feature For Show Cloud Storage!",
 						"rowId": "0"
 			}]}, {
 			  "title": "◉ Menu ke-12",
 			  "rows": [
 					{
-						"title": "▶ Menu Lainnya ◀",
+						"title": "▨ Menu Lainnya ▨",
 						"description": "\n\nThis Is Feature For Show Other Menu!",
 						"rowId": "0"
                 }]
@@ -2432,11 +2622,271 @@ Fitur aktif pada grup ini!${a}
             patrick.relayWAMessage(dide, {
                waitForAck: true
             })
+		} else 
+		if (isOwner) {
+			let pope = patrick.prepareMessageFromContent(from, {
+            "listMessage": {
+            "title": '*🄿🄰🅃🅁🄸🄲🄺🄱🄾🅃 🄼🄴🄽🅄*',
+            "description": 
+`Hello World, ${botName} is here
+Created By @_pa7rick
+
+${a} ❏ Nama : ${pushname}${a}
+${a} ❏ User :${a} ${premi}
+${a} ❏ Balance : $${uangki}${a}
+${a} ❏ Level : ${lvlom}${a}
+
+  ❏  Time: ${time2}
+  ❏  Runtime : ${kyun(process.uptime())}
+  ❏  Total Hit : ${pepolu}
+${lott}
+*Pilih Salah satu dibawah ini!*
+*Follow Instagram _pa7rick :)*
+*Jangan Dispam!!!*
+
+❏ ${prefix}info
+❏ ${prefix}donasi
+❏ ${prefix}owner
+❏ ${prefix}profile
+          
+       ~ ${botName} 2021`,
+        "footerText": 'PatrickBot Created by _pa7rick',
+        "buttonText": 'Click Disini || Click Here',
+        "listType": 'SINGLE_SELECT',
+        "sections": [
+         {
+			"title": "◉ Menu Owner",
+			"rows": [
+					{
+						"title": "▨ Owner Menu ▨",
+						"description": "\n\n This Is Feature For Show Owner Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-1",
+			  "rows": [
+					{
+						"title": "▨ Maker Menu ▨",
+						"description": "\n\n This Is Feature For Show Maker Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-2",
+			  "rows": [
+					{
+						"title": "▨ Fun Menu ▨",
+						"description": "\n\n This Is Feature For Show Fun Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-3",
+			  "rows": [
+					{
+						"title": "▨ Game Menu ▨",
+						"description": "\n\n This Is Feature For Show Game Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-4",
+			  "rows": [
+					{
+						"title": "▨ Kerang Menu ▨",
+						"description": "\n\n This Is Feature For Show Kerang Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-5",
+			  "rows": [
+					{
+						"title": "▨ Download Menu ▨",
+						"description": "\n\n This Is Feature For Show Download Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-6",
+			  "rows": [
+					{
+						"title": "▨ Group Menu ▨",
+						"description": "\n\n This Is Feature For Show Group Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-7",
+			  "rows": [
+					{
+						"title": "▨ Search Menu ▨",
+						"description": "\n\nThis Is Feature For Show Search Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-8",
+			  "rows": [
+					{
+						"title": "▨ Berita Menu ▨",
+						"description": "\n\nThis Is Feature For Show Berita Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-9",
+			  "rows": [
+					{
+						"title": "▨ Anime Menu ▨",
+						"description": "\n\nThis Is Feature For Show Anime Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-10",
+			  "rows": [
+					{
+						"title": "▨ Islam Menu ▨",
+						"description": "\n\nThis Is Feature For Show Islam Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-11",
+			  "rows": [
+					{
+						"title": "▨ Cloud Storage ▨",
+						"description": "\n\nThis Is Feature For Show Cloud Storage!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-12",
+			  "rows": [
+					{
+						"title": "▨ Menu Lainnya ▨",
+						"description": "\n\nThis Is Feature For Show Other Menu!",
+						"rowId": "0"
+                }]
+              }]
+             }
+            }, {});
+            patrick.relayWAMessage(pope, {
+               waitForAck: true
+            })
+		} else 
+		if (isPrem) {
+			let pope = patrick.prepareMessageFromContent(from, {
+            "listMessage": {
+            "title": '*🄿🄰🅃🅁🄸🄲🄺🄱🄾🅃 🄼🄴🄽🅄*',
+            "description": 
+`Hello World, ${botName} is here
+Created By @_pa7rick
+
+${a} ❏ Nama : ${pushname}${a}
+${a} ❏ User :${a} ${premi}
+${a} ❏ Balance : $${uangki}${a}
+${a} ❏ Level : ${lvlom}${a}
+
+  ❏  Time: ${time2}
+  ❏  Runtime : ${kyun(process.uptime())}
+  ❏  Total Hit : ${pepolu}
+${lott}
+*Pilih Salah satu dibawah ini!*
+*Follow Instagram _pa7rick :)*
+*Jangan Dispam!!!*
+
+❏ ${prefix}info
+❏ ${prefix}donasi
+❏ ${prefix}owner
+❏ ${prefix}profile
+          
+       ~ ${botName} 2021`,
+        "footerText": 'PatrickBot Created by _pa7rick',
+        "buttonText": 'Click Disini || Click Here',
+        "listType": 'SINGLE_SELECT',
+        "sections": [
+         {
+			"title": "◉ Menu Premium",
+			"rows": [
+					{
+						"title": "▨ Premium Menu ▨",
+						"description": "\n\nThis Is Feature For Show Premium Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-1",
+			  "rows": [
+					{
+						"title": "▨ Maker Menu ▨",
+						"description": "\n\nThis Is Feature For Show Maker Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-2",
+			  "rows": [
+					{
+						"title": "▨ Fun Menu ▨",
+						"description": "\n\nThis Is Feature For Show Fun Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-3",
+			  "rows": [
+					{
+						"title": "▨ Game Menu ▨",
+						"description": "\n\nThis Is Feature For Show Game Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-4",
+			  "rows": [
+					{
+						"title": "▨ Kerang Menu ▨",
+						"description": "\n\n This Is Feature For Show Kerang Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-5",
+			  "rows": [
+					{
+						"title": "▨ Download Menu ▨",
+						"description": "\n\nThis Is Feature For Show Download Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-6",
+			  "rows": [
+					{
+						"title": "▨ Group Menu ▨",
+						"description": "\n\nThis Is Feature For Show Group Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-7",
+			  "rows": [
+					{
+						"title": "▨ Search Menu ▨",
+						"description": "\n\nThis Is Feature For Show Search Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-8",
+			  "rows": [
+					{
+						"title": "▨ Berita Menu ▨",
+						"description": "\n\nThis Is Feature For Show Berita Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-9",
+			  "rows": [
+					{
+						"title": "▨ Anime Menu ▨",
+						"description": "\n\nThis Is Feature For Show Anime Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-10",
+			  "rows": [
+					{
+						"title": "▨ Islam Menu ▨",
+						"description": "\n\nThis Is Feature For Show Islam Menu!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-11",
+			  "rows": [
+					{
+						"title": "▨ Cloud Storage ▨",
+						"description": "\n\nThis Is Feature For Show Cloud Storage!",
+						"rowId": "0"
+			}]}, {
+			  "title": "◉ Menu ke-12",
+			  "rows": [
+					{
+						"title": "▨ Menu Lainnya ▨",
+						"description": "\n\nThis Is Feature For Show Other Menu!",
+						"rowId": "0"
+                }]
+              }]
+             }
+            }, {});
+            patrick.relayWAMessage(pope, {
+               waitForAck: true
+            })
 		}
 		break
 	    case 'groupinfo':
 	    case 'infogrup':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (!isGroup) return reply(ind.groupo())
 		try {
@@ -2447,7 +2897,7 @@ Fitur aktif pada grup ini!${a}
 		teksnya =
 `> *Name :* ${groupName}
 > *ID Grup :* ${from}
-> *Dibuat :* ${moment(`${groupMetadata.creation}` * 1000).tz('Asia/Jakarta').format('DD/MM/YYYY HH:mm:ss')}
+> *Dibuat :* ${moment(`${groupMetadata.creation}` * 1000).tz('Asia/Jakarta').format('DD MM YYYY | HH:mm:ss')}
 > *Owner Grup :* @${groupMetadata.owner.split('@')[0]}
 > *Jumlah Admin :* ${groupAdmins.length}
 > *Jumlah Peserta :* ${groupMembers.length}
@@ -2480,7 +2930,7 @@ Fitur aktif pada grup ini!${a}
 		//==========================================BATES NGAB==========================================\\
 		//=============APIKEY ALL==============\\    
 	    case 'artinama':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return reply(`Example: ${prefix + command} Patrick`)
@@ -2493,7 +2943,7 @@ Fitur aktif pada grup ini!${a}
 	    case 'nulis':
 	    case 'tulis':
 		patrick.updatePresence(from, Presence.composing)
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return reply(`Example: ${prefix + command} ${pushname}`)
@@ -2509,7 +2959,7 @@ Fitur aktif pada grup ini!${a}
 		//==========================================BATES NGAB==========================================\\
 		//=============IN MENU==============\\
 		case 'reedem':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isPrem) return reply('Fitur ini khusus free member!')
 		if (args[0] == `${codeReedem}`) {
 		mente = `${sender.split('@','')}@s.whatsapp.net`
@@ -2526,13 +2976,16 @@ Fitur aktif pada grup ini!${a}
         }
 		break 
 		case 'buycode':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isPrem) return reply('Fitur ini khusus free member!')
 		if (checkATMuser(sender) <= uang5) return reply(`Balance mu tidak cukup!\nHarga: $${uang5}`)
 		if (checkATMuser(sender) >= uang5) {
 			reply(`*Code ini bersifat PRIVATE*\n*Code mu* ${codeReedem}\nSilahkan ketik ${prefix}reedem untuk menukarnya!`)
 			confirmATM(sender, uang4)
 		}
+		break 
+		case 'tesssss':
+		replyWithFakeLink('yaya')
 		break
 	    case 'join':
 	    if (!isGroup) return reply(ind.groupo())
@@ -2549,7 +3002,7 @@ Fitur aktif pada grup ini!${a}
 		break
 	    case 'info':
 		if (isBanned) return reply(ind.baned())
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		let c = []
 		let geed = []
 		for (mem of totalchat) {
@@ -2595,11 +3048,11 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		//==========================================BATES NGAB==========================================\\
 		//=============Premium MENU==============\\
 	    case 'premiummenu':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		await patrickhay(ind.premium(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break 
 		case 'groupsearch':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (!isPrem) return reply(ind.premon())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return reply(`Example: ${prefix + command} Grup PatrickBot`)
@@ -2614,7 +3067,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'swm':
 	    case 'stickerwm':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (!isPrem) return reply(ind.premon())
 		if (type === 'imageMessage' || isQuotedImage) {
@@ -2636,7 +3089,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 	    case 'take':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (!isPrem) return reply(ind.premon())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (!isQuotedSticker) return reply(`Example: ${prefix + command} PatrickBot|Pa7rick`)
@@ -2657,7 +3110,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 	    case 'hidetag20':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (!isGroupAdmins) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (!isPrem) return reply(ind.premon())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
@@ -2708,21 +3161,16 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		case "addcmd":
         case "setcmd":
         if (isQuotedSticker) {
-          if (!q)
-            return reply(`Penggunaan : ${command} cmdnya dan tag stickernya`);
-          var kodenya =
-            mek.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage.fileSha256.toString(
-              "base64"
-            );
+        if (!q) return reply(`Penggunaan : ${command} cmdnya dan tag stickernya`)
+          var kodenya = mek.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage.fileSha256.toString("base64")
           addCmd(kodenya, q);
           fakestatus("Done!");
         } else {
-          reply("tag stickenya");
+          reply(`Penggunaan : ${command} cmdnya dan tag stickernya`);
         }
         break;
         case "delcmd":
-        if (!isQuotedSticker)
-          return reply(`Penggunaan : ${command} tagsticker`);
+        if (!isQuotedSticker) return reply(`Penggunaan : ${command} tagsticker`);
           var kodenya =
           mek.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage.fileSha256.toString(
             "base64"
@@ -2730,7 +3178,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
         _scommand.splice(getCommandPosition(kodenya), 1);
         fs.writeFileSync("./database/json/scommand.json", JSON.stringify(_scommand));
         fakestatus("Done!");
-        break;
+        break; 
         case "listcmd":
         teksnyee = `\`\`\`「 LIST STICKER CMD 」\`\`\``;
         cemde = [];
@@ -2742,17 +3190,17 @@ ${a}>  Total Premium User : ${prem.length}${a}
         break;
 	    case 'readall':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
-		var chats = await patrick.chats.all()
+		var chatis = await patrick.chats.all()
 		chats.map(async ({
 			jid
 		}) => {
 			await patrick.chatRead(jid)
 		})
-		rdl = `${a}Berhasil membaca ${chats.length} Chat !${a}`
+		rdl = `${a}Berhasil membaca ${chatis.length} Chat !${a}`
 		await patrick.sendMessage(from, rdl, MessageType.text, {
 			quoted: fgclink
 		})
-		console.log(chats.length)
+		console.log(chatis.length)
 		break
 	    case 'resetlimit':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
@@ -2763,7 +3211,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		fakestatus('Berhasil, mereset semua limit!')
 		break
 	    case 'receive':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (!q.includes('|')) return reply(ind.wrongf())
 		const tujuanfe = q.substring(0, q.indexOf('|') - 1)
@@ -2942,7 +3390,29 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		reply('Success Menghapu BAD WORD!')
 		break
 		//==========================================BATES NGAB==========================================\\
-		//=============MAKER MENU=============\\
+		//=============MAKER MENU=============\\ 
+		case "triggered":
+		case "glass":
+		case "gay": 
+		case "jail":
+		case "comrade":
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+		if (isBanned) return reply(ind.baned())
+		if (isLimit(sender)) return reply(ind.limitend(pushname))
+		if ((isMedia && !mek.message.videoMessage || isQuotedImage) && args.length == 0) {
+			getqu = isQuotedImage ? JSON.parse(JSON.stringify(mek).replace('quotedM','m')).message.extendedTextMessage.contextInfo : mek 
+			reply(ind.wait)
+			hasilq = await patrick.downloadAndSaveMediaMessage(getqu)
+			var imgbb = require('imgbb-uploader')
+            anu = await imgbb("68cb5bee517bce4f74b0e910a5d96346", hasilq)
+            teks = `${anu.display_url}`
+			anull = await getBuffer(`https://some-random-api.ml/canvas/glass?avatar=${teks}`)
+			patrick.sendMessage(from, anull, image, { quoted: freply })
+		} else {
+			reply('Gunakan foto!')
+		}
+		await limitAdd(sender) 
+		break 
 	    case 'csgo':
 	    case 'honey':
 	    case 'silk':
@@ -2954,7 +3424,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 	    case 'slide':
 	    case 'party':
 		try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (isBanned) return reply(ind.baned())
 			if (args.length < 1) return reply(`teksnya mana bruh?\ncontoh ${prefix + command} ${pushname}`)
@@ -2974,7 +3444,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'hartatahta':
 		try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (isBanned) return reply(ind.baned())
 			if (args.length < 1) return reply(`teksnya mana bruh?\ncontoh ${prefix + command} ${pushname}`)
@@ -3000,7 +3470,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 	    case 'cloud':
 	    case 'steel':
 		try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (isBanned) return reply(ind.baned())
 			if (args.length < 1) return reply(`teksnya mana bruh?\ncontoh ${prefix + command} ${pushname}`)
@@ -3035,7 +3505,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 	    case 'greenneon':
 	    case 'breakwall':
 		try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (isBanned) return reply(ind.baned())
 			if (args.length < 1) return reply(`teksnya mana bruh?\ncontoh ${prefix + command} ${pushname}|ganz`)
@@ -3052,7 +3522,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'rainbowshine':
 		try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (isBanned) return reply(ind.baned())
 			if (args.length < 1) return reply(`teksnya mana bruh?\ncontoh ${prefix + command} ${pushname}|ganz`)
@@ -3070,7 +3540,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'styletext':
 		try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (isBanned) return reply(ind.baned())
 			if (args.length < 1) return reply(`teksnya mana bruh?\ncontoh ${prefix + command} PatrickGans`)
@@ -3088,7 +3558,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		}
 		break
 	    case 'attp':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return reply(`Example: ${prefix + command} PatrickGans`)
@@ -3098,7 +3568,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		})
 		break
 	    case 'ttp':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return reply(`Example: ${prefix + command} PatrickGans`)
@@ -3108,7 +3578,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		})
 		break
 	    case 'qrcode':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		const tex = encodeURIComponent(body.slice(8))
@@ -3123,7 +3593,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'quotemaker':
 	    case 'makequote':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		var gh = body.slice(12)
@@ -3164,7 +3634,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 			displayname: nama,
 			vcard: vcart
 		}, MessageType.contact)
-		break
+		break 
 	    case 'sendkontag':
 		const pepek = body.slice(12)
 		const adan = pepek.split("|")[0]
@@ -3187,7 +3657,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break 
 		case 'darkjoke':
 		case 'estetik':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
         if (isBanned) return reply(ind.baned())
         if (isLimit(sender)) return reply(ind.limitend())
 		reply(ind.wait())
@@ -3197,7 +3667,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 		case 'ppcouple':
 		case 'couple':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
         if (isBanned) return reply(ind.baned())
         if (isLimit(sender)) return reply(ind.limitend())
 		reply(ind.wait())
@@ -3209,7 +3679,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 		case 'artimimpi':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return reply(`Example: ${prefix + command} Patrick`)
@@ -3222,7 +3692,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 		case 'dadu':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		ranp = getRandom('.png')
@@ -3241,7 +3711,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 		case 'timer':
 		if (isBanned) return reply(ind.baned())
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args[1] == "detik") {
 			var timer = args[0] + "000"
@@ -3257,7 +3727,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		}, timer)
 		break 
 		case 'memeindo':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(limitend(pushname))
 		reply(ind.wait())
@@ -3270,7 +3740,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 	    case 'kapankah':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		kapankah = body.slice(1)
@@ -3309,7 +3779,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		reply(`Berhasil menghapus sesi tictactoe di grup ini`)
 		break
 	    case 'bisakah':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		bisakah = body.slice(1)
@@ -3321,7 +3791,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break 
 		case 'tqto':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		patrick.sendMessage(from, ' Script Created by MhankBarBar\nRecode By Me: @_pa7rick\n   Masih Belajar Bang :)\n\n  Thanks For:\n  @adiwajshing/baileys\n  MhankBarBar\n   LeysCoders\n   NPM\n   Affis Junianto\n   ArugaZ\n   Penyedia Api\n   Tobz\n   Zahirr\n    Arifi Razzaq\n   Manik \n\nThanks For All Creator Bot\nThanks For All Creator ApiKey', text, {
 			quoted: mek
@@ -3329,7 +3799,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 	    case 'apakah':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		apakah = body.slice(1)
@@ -3341,7 +3811,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 	    case 'rate':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		rate = body.slice(1)
@@ -3364,8 +3834,9 @@ ${a}>  Total Premium User : ${prem.length}${a}
 	    case 'vnolep':
 	    case 'vjahat':
 	    case 'vbaik':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
+		if (!isGroup) return reply(ind.groupo())
 		membr = []
 		const noll = groupMembers
 		const dissinni = noll[Math.floor(Math.random() * noll.length)]
@@ -3397,7 +3868,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 	    case 'nolep':
 	    case 'jahat':
 	    case 'baik':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		membr = []
 		const nus = groupMembers
@@ -3409,7 +3880,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		mentions(teks, membr, true)
 		break
 	    case 'truth':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		const trut = ['Pernah suka sama siapa aja? berapa lama?', 'Kalau boleh atau kalau mau, di gc/luar gc siapa yang akan kamu jadikan sahabat?(boleh beda/sma jenis)', 'apa ketakutan terbesar kamu?', 'pernah suka sama orang dan merasa orang itu suka sama kamu juga?', 'Siapa nama mantan pacar teman mu yang pernah kamu sukai diam diam?', 'pernah gak nyuri uang nyokap atau bokap? Alesanya?', 'hal yang bikin seneng pas lu lagi sedih apa', 'pernah cinta bertepuk sebelah tangan? kalo pernah sama siapa? rasanya gimana brou?', 'pernah jadi selingkuhan orang?', 'hal yang paling ditakutin', 'siapa orang yang paling berpengaruh kepada kehidupanmu', 'hal membanggakan apa yang kamu dapatkan di tahun ini', 'siapa orang yang bisa membuatmu sange', 'siapa orang yang pernah buatmu sange', '(bgi yg muslim) pernah ga solat seharian?', 'Siapa yang paling mendekati tipe pasangan idealmu di sini', 'suka mabar(main bareng)sama siapa?', 'pernah nolak orang? alasannya kenapa?', 'Sebutkan kejadian yang bikin kamu sakit hati yang masih di inget', 'pencapaian yang udah didapet apa aja ditahun ini?', 'kebiasaan terburuk lo pas di sekolah apa?']
@@ -3422,7 +3893,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 	    case 'dare':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		const dare = ['Kirim pesan ke mantan kamu dan bilang "aku masih suka sama kamu', 'telfon crush/pacar sekarang dan ss ke pemain', 'pap ke salah satu anggota grup', 'Bilang "KAMU CANTIK BANGET NGGAK BOHONG" ke cowo', 'ss recent call whatsapp', 'drop emot "🦄💨" setiap ngetik di gc/pc selama 1 hari', 'kirim voice note bilang can i call u baby?', 'drop kutipan lagu/quote, terus tag member yang cocok buat kutipan itu', 'pake foto sule sampe 3 hari', 'ketik pake bahasa daerah 24 jam', 'ganti nama menjadi "gue anak lucinta luna" selama 5 jam', 'chat ke kontak wa urutan sesuai %batre kamu, terus bilang ke dia "i lucky to hv you', 'prank chat mantan dan bilang " i love u, pgn balikan', 'record voice baca surah al-kautsar', 'bilang "i hv crush on you, mau jadi pacarku gak?" ke lawan jenis yang terakhir bgt kamu chat (serah di wa/tele), tunggu dia bales, kalo udah ss drop ke sini', 'sebutkan tipe pacar mu!', 'snap/post foto pacar/crush', 'teriak gajelas lalu kirim pake vn kesini', 'pap mukamu lalu kirim ke salah satu temanmu', 'kirim fotomu dengan caption, aku anak pungut', 'teriak pake kata kasar sambil vn trus kirim kesini', 'teriak " anjimm gabutt anjimmm " di depan rumah mu', 'ganti nama jadi " BOWO " selama 24 jam', 'Pura pura kerasukan, contoh : kerasukan maung, kerasukan belalang, kerasukan kulkas, dll']
@@ -3435,7 +3906,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 	    case 'hobby':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		hobby = body.slice(1)
@@ -3448,7 +3919,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'asupan':
 		patrick.updatePresence(from, Presence.composing)
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		data = fs.readFileSync('./lib/asupan.js');
 		jsonData = JSON.parse(data);
 		randIndex = Math.floor(Math.random() * jsonData.length);
@@ -3462,7 +3933,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		//==========================================BATES NGAB==========================================\\
 		//=============GROUP MENU==============\\
 	    case 'groupmenu':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		await patrickhay(ind.group(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break
 	    case 'caripesan':
@@ -3586,7 +4057,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		mentions(teks, groupAdmins, true)
 		break
 	    case 'tagme':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (!isGroup) return reply(ind.groupo())
 		var waw = mek.participant
@@ -3601,7 +4072,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		})
 		break
 	    case 'hidetag':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (!isGroupAdmins) return reply(ind.groupo())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (!isGroup) return reply(ind.groupo())
@@ -3625,12 +4096,12 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		//==========================================BATES NGAB==========================================\\
 		//=============ISLAM MENU==============\\
 	    case 'islammenu':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		await patrickhay(ind.islam(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break 
 		case 'quran':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		anu = await fetchJson(`https://api.banghasan.com/quran/format/json/acak`, {
@@ -3645,7 +4116,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		//==========================================BATES NGAB==========================================\\
 		//=============GAME MENU==============\\
 	    case 'buylimit':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		reply(ind.wait())
 		payout = body.slice(10)
@@ -3660,7 +4131,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		}
 		break 
 	    case 'quotes2':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		quotes = body.slice(1)
@@ -3672,7 +4143,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		await limitAdd(sender)
 		break
 	    case 'listsurah':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		patrick.sendMessage(from, listsurah(), text, tescuk, `${ucapanFakereply}`)
 		break
@@ -3697,7 +4168,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 			reply(ind.admin())
 		break
 	    case 'transfer':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (!q.includes('|')) return reply(ind.wrongf())
 		const tujuan = q.substring(0, q.indexOf('|') - 1)
@@ -3717,7 +4188,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		if (isBanned) return reply(ind.baned())
 		if (!isGroup) return reply(ind.groupo())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		jds = []
 		const jdii = groupMembers
 		const koss = groupMembers
@@ -3729,7 +4200,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		mentions(teks, jds, true)
 		await limitAdd(sender)
 		break
-	    case 'verify':
+	/*    case 'verify':
 	    case 'daftar':
 		if (isRegistered) return reply(ind.rediregis())
 		const serialUser = createSerial(20)
@@ -3755,9 +4226,21 @@ ${a}❏ Nama : ${pushname}
 				'mentionedJid': [sender]
 			}
 		})
+		break */
+		case 'verify':
+	    case 'daftar':
+		if (isRegistered) return 
+		meeen = `${sender.replace('@s.whatsapp.net','')}@s.whatsapp.net`
+		console.log('Registered PatrickBot By: ' + sender + '\nCode Verification: ' + codeVerification)
+		textoing = `*Code Verification PatrickBot*\nHalo ${pushname}\nKode Verifikasimu: ${codeVerification}\nKetik *${codeVerification}* Sekali Di Chat Pribadi Bot untuk mendaftar!!`
+        var optios = {
+            text: textoing
+        }
+		patrick.sendMessage(`${meeen}`, optios, text, {quoted: mek})
+		if (isGroup) return reply('*Anda masih belum terdaftar!, KETIK Kode Verifikasi Yang dikirim bot SEKALI LAGI di Chat Pribadi Bot untuk mendaftar!!')
 		break
 	    case 'listonline':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isOwner || isGroupAdmins) {
 			let ido = args && /\d+\-\d+@g.us/.test(args[0]) ? args[0] : from
@@ -3773,7 +4256,7 @@ ${a}❏ Nama : ${pushname}
 		break
 	    case 'report':
 	    case 'laporbug':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		const teks1 = `*ＲＥＰＯＲＴ*\n> From : @${sender.split("@s.whatsapp.net")[0]}\n> Pesan : ${q}`
 		var options = {
 			text: teks1,
@@ -3786,12 +4269,12 @@ ${a}❏ Nama : ${pushname}
 		break
 	    case 'ping':
 	    case 'speed':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		await patrick.sendMessage(from, `Ping!!!!\nSpeed: ${processTime(time, moment())} _Second_`)
 		break
 	    case 'quotesislami':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (isBanned) return reply(ind.baned())
 		const islami = ['Hal yang paling manis adalah ketika seseorang menyebutkan nama kamu di tahajjud mereka.', 'Ya Allah panggillah diriku dan orang tuaku ke baitullah dalam keadaan sehat walafiat.', 'Ya Allah semoga seseorang yang engkau jodohkan denganku adalah seseorang yang saat ini sedang aku perjuangkan.', 'Allah tidak pernah tidur. Semua pasti akan di balas kelak. Orang-orang jahat yang sekarang bisa tertawa karena banyak uang, berkuasa, tapi besok-besok mereka semua di balas seadil-adilnya.', 'Jangan putus asa, Allah tidak akan mengecewakan hambanya yang ingin memperbaiki diri.', 'Percayalah orang yang menasehatimu untuk sholat adalah dia yang paling mencintaimu.', 'Bukannya Allah tidak tahu sedihmu, Tapi Allah tahu kalau kamu itu kuat.', 'Bacalah Al-Quran, Ia akan menenangkan hatimu meskipun engkau tidak memahami artinya.', 'Saat kita sakit hati sama omongan orang, saat itu juga sebenarnya Allah ngajarin kita buat jaga omongan kita ke orang lain. Sederhana bukan?', 'Di dunia ini orang paling baik pun bisa dicela, dan bahkan orang paling jahat sekalipun bisa di bela.', 'Al-Quran adalah teman yang tidak akan mengecewakan kamu di dunia dan akhirat.', 'Cara Allah menjawab doa hambanya : Iyaa.. aku beri untukmu sekarang. Tunggu, aku ingin melihat dulu perjuanganmu. Tidak, aku punya yang lebih baik untukmu.', 'Dan Allah tidak akan mengadzab mereka selama mereka mau Memohon ampun kepada-Nya. [Al-Anfaal, 8:33]', 'Kesabaran itu ada dua macam : Sabar atas sesuatu yang tidak kamu ingin. Sabar menahan diri dari sesuatu yang kamu ingini. -Ali bin Abi Thalib', 'Ambillah kebenaran, jika kamu telah mendengarnya. Karena sungguh di atas kebenaran ada cahaya. (HR. Abu Daud)', 'Sholatlah agar hatimu tenang, Istighfarlah agar kecewamu hilang, Berdoalah agar bahagiamu segera datang.', 'Surga itu mahal.. Akan tetapi orang miskin tetap mampu membelinya, Karena harganya bukan pada Harta melainkan Taqwa.', 'Ya Allah... Perbaikilah lisanku, Perbaikilah hatiku, Perbaikilah akhlakku, Perbaikilah hidupku, Aamiin..', 'Semoga hari ini Allah memudahkan setiap urusan kita, melapangkan hati kita serta meringankan langkah kita, dalam kebaikan kita Aamiin.', 'Peganglah aku, bacalah aku setiap hari, karena aku akan menjadi penerang didalam kuburmu nanti. #Al-Quran', 'Kematian..Kamu terlalu banyak bercanda. Hingga sampai kamu lupa, kematian mungkin tidak menunggumu selesai tertawa.', 'Jangan khawatirkan rizkimu, karena Allah telah menjaminnya untukmu, namun khawatirkanlah amalanmu, karena Allah tidak menjamin surga-Nya untukmu..', 'Wahai orang-orang yang beriman! Ingatlah kepada Allah, Dengan mengingat (nama-Nya) sebanyak-banyaknya dan bertasbihlah kepada-nya pada waktu pagi dan petang.', 'Aku sangat ingin menjadi pemburu surga. Namun aku lupa bahwa aku juga buronan neraka.', 'Karena aku percaya apapun yang menjadi milikku akan tetap menjadi milikku. Sejauh apapun dia (mencoba) pergi. Sejauh apapun usaha orang lain ingin merebutnya dariku. Aku hanya perlu percaya pada Allah bahwa yang menjadi milikku tidak akan pernah menjadi milik orang lain.', 'Andai hidayah itu seperti buah yang bisa kubeli, maka akan kubeli berkeranjang-keranjang untuk aku bagikan kepada orang-orang yang aku cintai.', 'Bila kamu tidak melihatku di syurga. Tolong tanya kepada Allah dimana aku, Tolonglah aku ketika itu..', 'Hanya Allah yang mengerti bagaimana sulitnya menahan sabar tanpa harus bercerita panjang lebar.', 'Letakkan hpmu lalu ambil air wudhu, shalatlah kamu, Allah menunggu curhatan darimu.', 'Maafin aku Ya Allah Gara gara aku mencintai dia tapi tidak pasti, sampai aku lupa mencintai mu juga.', 'Akan ada saatnya setelah salam dari sholatku, tanganmu yang pertama kali kusentuh.', 'Mungkin maksud Tuhan mempertemukan kamu dengannya adalah, sekedar mengingatkan bahwa tidak semua yang kamu inginkan bisa kamu dapatkan.', 'Percayalah Seorang wanita yang mencintai Allah. Allah akan berikan lelaki terbaik untuk menjaganya.', 'Berterimakasihlah kepada tuhan, Yang memberimu hidup dan kehidupan.', 'Mungkin kamu hanya harus sedikit peka untuk menyadari petunjuk dari Tuhan atas doa-doamu.']
@@ -3802,9 +4285,12 @@ ${a}❏ Nama : ${pushname}
 			caption: '*Quotes Islami*\n\n' + isl
 		})
 		await limitAdd(sender)
+		break 
+		case 'rules':
+		mentions(`*Rules For User PatrickBot*\n\n▣ Tolong Gunakan Delay Jangan Terlalu Dispam Saat Menggunakan Bot.\n▣ Jangan Call/VC Bot Kalau Tidak aktif.\n▣ PatrickBot Online 24 Jam tapi kadang Disconnect.\n\nRules ini untuk kenyamanan semua yang memakai bot ini\n1. Jangan terlalu spam bot.\nSanksi: *WARN/SOFT BLOCK* = Tidak Direspon selama 5 detik!\n\n2. Jangan telepon bot.\nSanksi: *SOFT BLOCK* = Block!\n\n3. Jangan mengeksploitasi bot.\nSanksi: *PERMANENT BLOCK* = Banned + Block!\n\nJika sudah dipahami rules-nya, silakan ketik *${prefix}menu* untuk memulai!\nJika Ada yang error ketik *${prefix}report bug\n\nPatrickBot Created by @6288989029718 & @0`, [`6288989029718@s.whatsapp.net`, `0@s.whatsapp.net`], true)
 		break
 	    case 'quotesnasehat':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (isBanned) return reply(ind.baned())
 		const nasehat = ['Jangan pernah mengabaikan apapun yang terjadi, suatu saat akan sadar dan menyesal, ingat tuhan akan selalu memberikan penyesalan terakhir ...', 'Ingat iya.. Perilaku mu bisa mengubah perasaan seseorang.', 'Setia itu bukan yang selalu ada, namun saat tak bersama dia tahu hatinya milik siapa.', 'Kamu perlu belajar satu hal : "Menghargai seriusnya seseorang."', 'Jangan cari yang sempurna, Sempurnakan saja yang ada.', 'Ketika seseorang menghina kamu, itu adalah sebuah pujian bahwa selama ini mereka menghabiskan banyak waktu untuk memikirkan kamu, bahkan ketika kamu tidak memikirkan mereka.', 'Yang terbaik tidak akan hilang. Jika dia hilang maka dia bukanlah yang terbaik.', 'Percayalah. Suatu hari nanti pasti akan ada seseorang yang bangga memilikimu.', 'Tidak ada karya yang pernah dibuat oleh seorang seniman yang malas.', 'Jika seseorang memberimu perhatian jangan pernah mengabaikannya karena suatu saat perhatian sekecil itu kamu rindukan saat kamu kesepian.', 'Bersyukurlah.. Untuk segala apapun yang engkau miliki saat ini, sebab nikmat itu akan bertambah ketika kamu dapat mensyukuri apa yang telah diberi saat ini. #Buat diri ini jangan banyak mengeluh yah.', 'Ada perbedaan antara menyerah dan tau kapan kamu merasa cukup dalam berusaha.', 'Jangan sampai kesenanganmu menyusahkan orang lain. Jangan pula kesusahanmu menyenangkan orang lain.', 'Semakin banyak kamu memberi, semakin banyak pula yang akan kembali padamu.', 'Jangan pernah bandingkan akhir kesuksesan orang lain dengan pertengahan prosesmu.', 'Lakukan apa yang kamu bisa, dengan apa kamu miliki, dimanapun kamu berada.', 'Hidup memang bukan balapan, tetapi kamu memang perlu untuk terus bergerak maju.', 'NIKMATI HIDUPMU, LUPAKAN UMURMU.', 'Sebaik-baiknya permintaan maaf adalah membaiknya tingkah laku.', 'Belajarlah memahami bahwa tidak semua keinginan bisa terpenuhi, barangkali itu adalah obat yang terbaik untuk mencegah kecewa dan sakit hati.', 'Kamu akan menemukan yang terbaik, ketika kamu sudah berhenti membanding-bandingkan.', 'Jangan menilai orang dari masa lalunya karena kita semua sudah tidak hidup disana. Semua orang bisa berubah, biarkan mereka membuktikannya.', 'Jika dia tidak merasakan kehadiranmu, buat dia merasakan kepergianmu.', 'Orang pintar mampu memecahkan masalah. Orang bijak mampu menghindarinya.', 'Bersikap tidak lagi peduli lebih baik dari pada balas dendam.', 'Tegas akan diri sendiri, buang pikiran negatif dan lakukan yang baik. Kegelisahan hanya milik mereka yang putus asa.', 'Jangan pikirkan kegagalan kemarin, hari ini sudah lain, sukses pasti diraih selama semangat masih menyengat.', 'Memaafkanmu bukan berarti memberimu kesempatan sekali lagi.', 'Berubah menjadi lebih baik adalah pilihan. Tapi, merasa paling baik adalah kesalahan.', 'Jangan pernah bandingkan dirimu dengan orang lain, tapi bandingkanlah dengan dirimu yang lalu, apakah hari ini sudah lebih baik?', 'Ketahuilah orang yang paling sering memberi nasihat kepadamu, itulah orang yang paling mencintai kamu.', 'Jangan pernah berhenti belajar, karena hidup tidak pernah berhenti mengajarkan.', 'Salah satu tanda dirimu tidak berakhlak adalah main HP ketika ada orang yang berbicara.', 'Raihlah kesuksesan yang tidak seseorangpun berfikir kamu bisa meraihnya. Buktikan pada mereka kalau kamu bisa!', 'Kesalahan adalah bukti nyata kalau kamu pernah mencoba. Jangan takut salah. Takutlah untuk melakukan kesalahan-kesalahan yang sama dua kalinya.', 'Cepat atau lambat bukan masalah. Selama kamu tetap bergerak maju, tidak ada akhirnya kamu akan tetap sampai tidak ada tujuan.', 'Jika kamu tidak bisa membahagiakan orang lain, Setidaknya janganlah kamu tambah dukanya.', 'Teruslah berusaha sampai temanmu berkata kepadamu "Sombong iya sekarang."', 'Ketika kamu melakukan sebuah kesalahan, Akuilah dan jangan ragu untuk meminta maaf. Tidak pernah ada satupun orang dalam sejarah yang mati tersedak karena menelan gengsinya sendiri.', 'Syukuri yang menyayangimu, Maafkan yang menyakitimu.', 'Tunjukkan keburukanmu, lalu lihat siapa yang bertahan.', 'Kamu boleh lelah, tetapi tidak boleh menyerah untuk selamanya.', 'Jangan pernah lupa bilang "Terima Kasih." Jangan pernah gengsi bilang "Maaf." Jangan pernah jadi terlalu sombong untuk bilang "Tolong."', 'Masa lalu tidak bisa berubah, diubah, dilupakan, ataupun di hapus. Masa lalu hanya bisa di terima', 'Kita ini.. sangat pintar menghakimi, Namun bodoh dalam memperbaiki diri.', 'Tidak peduli seberapa baiknya kamu, Kebaikan tidak akan berarti apa-apa jika kamu memberikan kepada orang yang salah.', 'Orang sabar selalu menang, Orang tamak selalu rugi, Orang marah selalu kalah, Orang baik selalu diuji.', 'Carilah tempat dimana kamu bisa dihargai, Bukan dibutuhkan. Karena banyak orang mencarimu hanya saat butuh saja, Hingga lupa bagaimana cara menghargaimu.', 'Melupakan orang yang melukaimu adalah hadiahmu untuk mereka. Memaafkan orang yang melukaimu adalah hadiahmu untuk dirimu sendiri.', 'Maafkan orang yang menyakitimu... Bukan karena mereka pantas di maafkan, Tapi karena kamu harus berbahagia.', 'Tetaplah kuat, Tetaplah positif, Buatlah mereka bertanya-tanya bagaimana kamu masih tetap bisa tersenyum.', 'Jangan meninggalkan yang pasti demi yang mungkin. Sebab semua kemungkinan, belum tentu menjadi kepastian.', 'Seseorang pernah berkata padaku, Merelakan bukan berarti menyerah, Tapi tidak bisa dipaksakan.', 'Ikuti alurnya, Nikmati prosesnya, Tuhan tau kapan kita harus bahagia.', 'Usia hanyalah angka, Hanya mereka yang terus berusaha yang berhasil.', 'Jangan pernah meremehkan siapapun! Karena sukses adalah balas dendam Terbaik.', 'Pria sejati.. Harus menyelesaikan apa yang sudah dimulai.', 'Jika kau ingin terbang, Kau harus melepaskan hal-hal yang membuatmu berat.', 'Siapapun yang meremehkan mu hari ini, Suatu saat harus kamu lewati.', 'Jangan Mencintai terlalu mudah, Jangan Percaya terlalu cepat, Jangan Berhenti terlalu dini, Jangan Berharap terlalu tinggi, Jangan Bicara terlalu banyak.', 'Jadilah orang baik tapi jangan biarkan orang lain mengambil keuntungan dari mu. Ketahuilah kapan kamu harus bilang tidak.', 'Sahabat sejati adalah mereka tau semua kelemahan mu, Tapi tidak menggunakan nya untuk menjatuhkan mu.', 'Ada tiga hal yang harus dimiliki dalam hidup yaitu : Perubahan, Pilihan dan Prinsip.', 'Orang bodoh mengira dirinya bijak. orang bijak tau dirinya bodoh.', 'Jatuh cintalah seperlunya.. Kemudian patah hatilah secukupnya. Karena semua ada porsinya, Karena semua ada masanya.', 'Kita tidak pernah tau jalan hidup seseorang.. Maka ada baiknya jika kita tidak menghakiminya atas keputusan dalam hidupnya.', 'Jangan pernah menyesal mengenal seseorang dalam hidupmu, Orang baik akan memberi mu Kebahagiaan, Orang jahat akan memberi mu Pengalaman, Bahkan seburuk-buruk manusia akan memberi mu Pelajaran.', 'Jangan menilai kedewasaan dari usia seseorang, Karena itu bukan jaminan.']
@@ -3817,7 +4303,7 @@ ${a}❏ Nama : ${pushname}
 		await limitAdd(sender)
 		break
 	    case 'quotesmotivasi':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (isBanned) return reply(ind.baned())
 		const motiv = ['Nilai sebuah tindakan terletak dalam usaha menyelesaikan sampai tuntas', 'Kebaikan adalah seorang yang matanya penuh perhatian, serta tangannya yang penuh manfaat', 'Hiduplah seperti kamu akan mati besok, dan berbahagialah seperti kamu akan hidup selamanya', 'Kita tidak usah saling menyalahkan, agar dimasa depan tak ada yang menuntut akan kesalahan', 'Ketika semua hal tidak sejalan dengan anda, ingatlah bahwa sebuah pesawat terbang melawan angin, bukan dengan mengikuti angin', 'Belajarlah menikmati apa yang kamu miliki, itu akan membuat hidupmu lebih bernilai', 'Selalu ada kegelapan yang tergelap sebelum terbitnya fajar', 'Sahabat itu seperti bintang, tak selalu Nampak tetapi selalu ada dihati', 'Sibuk bukanlah jaminan karir karena hasil jauh lebih didengar orang', 'semua kemajuan tidak akan ada tanpa kesalahan, kesalahan adalah bagian dari kemajuan selama diakui dan diperbaiki', 'Sukses meninggalkan jejak, gagal meninggalkan pelajaran, diam meninggalkan penyesalan', 'Keraguan bersahabat dekat dengan kegagalan', 'uang tidak merusak seseorang, keserakahan lah yang merusak manusia', 'Kepercayaan tidak bisa dibeli, tapi kepercayaan bisa dipelihara', 'Impian, target, kemauan dan tujuan semuanya sia-sia tanpa tindakan', 'usia bisa berbohong tapi kedewasaan tidak', 'Ada yang lebih berharga dari uang dan emas yaitu waktu', 'Tidak ada yang gagal mereka hanya berhenti terlalu cepat', 'Terasa sakit selalu hampir tidak ada rasanya setelah apa yang kita perjuangkan tercapai', 'Seseorang tidak bisa sukses seringkali karena kurangnya keberanian untuk mencobaterasa sakit selalu hampir tidak ada rasanya setelah apa yang kita perjuangkan tercapai', 'Bicaralah secukupnya, lakukanlah semampunya. Jangan melakukan sebaliknya', 'Ada saatnya penundaan memberikan keuntungan terutama saat terlalu emosi untuk mengambil keputusan', 'jangan takut karena masalah yang anda hadapi tidak lebih besar dari jalan keluarnya, Allah siapkan bagi andaAda saatnya penundaan memberikan keuntungan terutama saat terlalu emosi untuk mengambil keputusan', 'Kadang cara terbaik untuk Memanfaatkan peluang adalah dengan mengatakan tidak pada peluang baru dan fokus mengembangkan apa yang sudah ada di tanganjangan takut karena masalah yang anda hadapi tidak lebih besar dari jalan keluarnya, Allah siapkan bagi andaAda saatnya penundaan memberikan keuntungan terutama saat terlalu emosi untuk mengambil keputusan', 'atasan hanya memberikan tugas berat pada karyawan terbaik, Allah hanya memberikan ujian pada pada manusia terbaikKadang cara terbaik untuk Memanfaatkan peluang adalah dengan mengatakan tidak pada peluang baru dan fokus mengembangkan apa yang sudah ada di tanganjangan takut karena masalah yang anda hadapi tidak lebih besar dari jalan keluarnya, Allah siapkan bagi andaAda saatnya penundaan memberikan keuntungan terutama saat terlalu emosi untuk mengambil keputusan', 'berusaha dan gagal Ternyata jauh lebih melegakan daripada pasrah melihat ke kanan dengan tangan terlipat', 'lewat kesulitan lah manusia belajar, lewatnya kenyamanan lah manusia Terlena', 'Saat kita merasa hebat kita baru saja kehilangan separuh pangkat kita karena lengah untuk terus belajar', 'hidup seseorang telah ditebak, tapi Nasib orang malas mudah untuk ditebak', 'Orang pintar itu biasa orang hebat itu luar biasa tapi orang berani lah pemenangnyahidup seseorang telah ditebak, tapi Nasib orang malas mudah untuk ditebak', 'Orang hebat membicarakan ide, orang menengah membicarakan pengalaman, orang lemah membicarakan orang lainOrang pintar itu biasa orang hebat itu luar biasa tapi orang berani lah pemenangnyahidup seseorang telah ditebak, tapi Nasib orang malas mudah untuk ditebak', 'Anda tidak akan mengubah kehidupan sampai anda mengubah Apa yang anda lakukan setiap hari', 'bertahan saja tidak cukup anda perlu bereaksi terhadap tekanan dan merubah keadaan', 'masa depan kita tergantung pada apa yang kita lakukan pada saat ini. Maka jangan sia-siakan waktumu sekarang', 'Nilai manusia ditentukan bukan dari apa yang diperoleh melainkan apa yang telah diberikan', 'Malas adalah kemenangan saat ini dan kekalahan di masa nanti', 'sebuah masalah merupakan kesempatan bagi anda untuk mengeluarkan kemampuan terbaik anda', 'Kematian tidak dapat mengubur perbuatan baik seseorang', 'Asal percaya dengan sungguh-sungguh apapun keyakinan Anda dapat menjadi kenyataan', 'Jika ada hari buruk maka pasti akan hari ada hari baik tugas kita adalah terus bergerak majuAsal percaya dengan sungguh-sungguh apapun keyakinan Anda dapat menjadi kenyataan', 'Mengeluh adalah cara paling buruk dalam menyelesaikan masalah', 'Tetap Bertahan dan setia pada tujuan saat menghadapi Hambatan adalah kunci kesuksesan', 'Tidak perlu keahlian khusus untuk mencari musuh, tapi perlu kesetiaan untuk mempertahankan teman', 'Orang tua bukan hanya punya kekuatan untuk menatap juga untuk mengalah', 'Keuletan adalah tanda jadi kesuksesan', 'cepat atau lambat mereka yang menang adalah mereka yang berfikir dan yakin bahwa mereka bisa', 'Jaga terus Api Harapan Anda seperti menjaga hidup anda sendiri', 'Saat semua jalan tertutup. Buatlah jalan dan berserahlah kepada Allah', 'lari dari masalah bukanlah penyelesaian masalah, hadapi dan Belajarlah dari masalah itu', 'Rezeki itu ditangan Allah yang kita lakukan hanya berusaha semaksimal mungkin dan menyerahkan hasilnya kepada yang kuasa', 'Sukses dimulai dengan melakukan apa yang harus dilakukan', 'rasa syukur membuat kita tidak pernah merasa kekurangan', 'goal hanya sekedar goal kalau kita tidak mempunyai alasan yang kuat Mengapa kita harus mencapainya', 'Apapun yang terjadi Yakinlah bahwa Allah menginginkan kita akan jadi lebih baik karena Kejadian ini', 'orang yang paling Bahagia bukanlah orang yang punya hal-hal terbaik tapi orang yang bisa menjadikan hal-hal yang ia punya menjadi yang terbaikApapun yang terjadi Yakinlah bahwa Allah menginginkan kita akan jadi lebih baik karena Kejadian ini', 'Respon kita terhadap masalah menentukan kualitas berita fokus pada solusi', 'Semua yang terlalu sedikit dan terlalu banyak tidak akan membawa kebaikan', 'Tidak semua usaha kita dibayar oleh manusia, tapi Allah akan membayarnya kelak', 'Tidak ada harga untuk waktu, tetapi waktu sangat berharga', 'Sukses seringkali datang pada mereka yang berani bertindak dan jarang menghampiri pada mereka yang dikalahkan ketakutan', 'Katakan bisa pasti bisa dengan penuh keyakinan otak kita akan segera mencari solusi', 'Orang yang tidak belajar dari kegagalan adalah orang yang gagal sesungguhnya', 'Segala sesuatu masalah yang menimpa Anda tidak akan pernah melatih kekuatan anda untuk menyelesaikannya', 'Saat orang lain melakukan impianmu itu berarti mereka belum mampu melihat sejauh anda melihat', 'Allah tidak pernah terlambat ia akan menunjukkan kuasanya, pada detik terakhir sekalipun', 'Bukan banyaknya panah yang menentukan kemenangan tapi tajam panah dan tujuannya yang menentukan', 'Mengeluh itu sisi lain dari pemborosan, pemborosan waktu dan energy', 'Pikiran negatif sangat berkuasa bila diberi kesempatan, jadi jangan memberinya kesempatan', 'Cinta akan membuat kita menjadi orang terkaya di dunia, oleh karena itu mulailah mencintai', 'Cemas yang berlebihan tidak akan mengubah apapun kecuali merusak diri sendiri', 'Hidup ini sederhana terkadang pikiran manusia yang membuatnya rumit', 'Siapa yang bisa menerima kelemahannya sesungguhnya baru saja menambah satu kelebihan pada dirinya', 'Ada saatnya dimana kekalahan rasa manis yaitu Saat anda sudah melakukan yang terbaik', 'Menabung itu hanya untuk mempertahankan kekayaan, untuk meningkatkannya berinvestasilah', 'Jika selamanya anda bermain aman, selamanya juga Anda di tempat yang sama', 'Lari dari masalah akan membuat masalah menjadi lebih besar, menghadapinya akan membuat anda menjadi lebih besar', 'Yang menyedihkan bukanlah bidikan yang meleset tapi bidikan tanpa target', 'Hati yang sedang panas menumpulkan logika dinginkan terlebih dahulu sebelum mengambil keputusan', 'bila ingin hasil yang besar jangan kerjakan hal yang mudah saja', 'Jangan biarkan impianmu dijajah oleh pendapat orang lain', 'Mulailah dengan yang kecil, Kerjakanlah dengan cara yang besar adalah dengan cara yang benar', 'Pengaruh perkataan orang kepada anda 100% adalah atas izin anda sendiri', 'Bekerjalah dengan ikhlas karena bekerja tanpa paksaan akan memberi hasil maksimal', 'Suka belajar, suka jualan, hidup hemat, beli aset suka, sedekah adalah 5 resep Makmur', 'Lebih baik menjadi raja tikus daripada ekor naga', 'Kerja keras dan kerja cerdas dapat memastikan keberhasilan dan sedekah dapat memudahkannya', 'Sakit dalam perjuangan itu hanya berlangsung sementara, namun jika anda menyerah rasa sakit itu akan terasa selamanya', 'Kegagalan terbesar adalah ketika tidak berani mencoba', 'Langkah pertama yang diperlukan untuk mendapatkan hal yang anda inginkan adalah memutuskan apa yang anda inginkan', 'Jangan takut menghadapi masa depan, hadapi dan perjuangkanlah', 'Dahulukan Allah dalam setiap langkah hidupmu maka semuanya akan ditambahkan kepadamu', 'Kesulitan adalah hujan terbaik untuk menunjukkan kualitas diri yang sebenarnya', 'Kesalahan dan kegagalan adalah guru terbaik jika kita mau jujur mengakui dan belajar darinya', 'Diam belum tentu menyelesaikan masalah tapi setidaknya tidak membesarkan masalah', 'Pemenang sejati selalu memberikan 100% upayanya, bahkan ketika tidak seorang pun melihatnya', 'Memaafkan orang lain bagai Menyiram air Bara dendam di hati baik untuk kesehatan kita', 'Jenius adalah 1 inspirasi dan 99 keringat tidak ada yang dapat menggantikan kerja keras', 'Disiplin memang tidak mudah tapi tanpa kedisiplinan hidup anda akan jauh lebih sulit', 'Orang yang berhenti belajar akan menjadi pemilik masa lalu, orang yang terus belajar akan menjadi pemilik masa depan', 'Hujan tidak hanya datang sendirian Ia datang bersama kesejukan, hal buruk tidak datang sendirian ia datang bersama pembelajaran', 'Menang atau kalah lakukanlah dengan jujur', 'Lihatlah tantangan sebagai ujian dan lihatlah masalah Sebagai teguran', 'Lihat ke atas agar terinspirasi lihat ke bawah agar bersyukur', 'Untuk meraih apa yang benar-benar anda inginkan fokus saja tidak cukup. Anda harus memiliki rasa lapar untuk meraihnya', '90% dari kegagalan berasal dari orang-orang yang memiliki kebiasaan membuat alasan-alasan', 'Allah tidak membenci orang malas, tapi Allah mengizinkan orang rajin mengambil rezeki orang malas', 'Keajaiban itu nyata bagi mereka yang yakin berserah diri dan bekerja keras', 'Orang optimis dapat melihat peluang dalam masalah, orang pesimis akan melihat masalah dalam peluangKeajaiban itu nyata bagi mereka yang yakin berserah diri dan bekerja keras', 'Kualitas pikiran anda menentukan kualitas kehidupan anda', 'Bersyukur adalah cara ampuh untuk meraih energi yang dahsyat, Sudahkah anda bersyukur hari ini', 'Jangan mengharapkan sesuatu yang luar biasa jika anda hanya mau melakukan hal yang biasa saja', 'Kebahagiaan dimulai dengan ketulusan', '1000 perkataan dan pengetahuan tidak berarti tanpa adanya satu tindakan yang nyata', 'Tangkap peluang, kerjakan, selesaikan', 'Ketika situasi di sekolah Anda tidak menyenangkan. Di saat itulah sebenarnya karakter anda sedang dibentuk', 'Seorang pemberani bukan orang yang tidak mempunyai rasa takut. Tapi orang yang mampu berjalan diatas rasa takutnya', 'dalam takut yang tampak adalah hambatan, dalam yakin yang tampak adalah kesempatan', 'Tidak ada kata gagal yang ada hanya sukses atau perlu belajar lagi sampai berhasil', 'Menjadi tua itu pasti menjadi dewasa itu pilihan', 'Kehidupan yang besar dimulai dari mimpi yang besar', 'Tragedi dalam kehidupan ini bukanlah yang berakhir terlalu cepat, tetapi kita menunggu terlalu lama untuk memulainya', 'Takut akan kegagalan seharusnya tidak menjadi alasan untuk tidak mencoba sesuatu', 'Hari ini adalah hari pertama dalam hidup anda. Buatlah hari ini menjadi hari yang terbaik sepanjang hidup anda dan semoga hari esok matahari bersinar dengan terang', 'Saya berpikir bahwa ada suatu hal yang lebih penting daripada sekedar percaya, tindakan Dunia ini penuh dengan pemimpi ,tidaklah banyak orang yang berani maju ke depan dan Mulai mengambil langkah pasti untuk mewujudkan visi mereka', 'Anda tidak dapat mengubah masa lalu anda dan janganlah terlalu khawatir dengan hari esok .Hari ini adalah hari yang dapat mengubah masa depan Anda', 'Allah, aku tahu bahwa saat aku kehilangan sesuatu engkau sedang mempersiapkan hal yang lebih baik untukkuAnda tidak dapat mengubah masa lalu anda dan janganlah terlalu khawatir dengan hari esok .Hari ini adalah hari yang dapat mengubah masa depan Anda', 'Pergilah sejauh mungkin dan ketika anda tiba di sana anda akan melihat lebih jauh lagiAllah, aku tahu bahwa saat aku kehilangan sesuatu engkau sedang mempersiapkan hal yang lebih baik untukkuAnda tidak dapat mengubah masa lalu anda dan janganlah terlalu khawatir dengan hari esok .Hari ini adalah hari yang dapat mengubah masa depan Anda', 'Menangis dapat melepaskan tambahan hormon stress, itulah mengapa kita sehabis menangis merasa lebih baikPergilah sejauh mungkin dan ketika anda tiba di sana anda akan melihat lebih jauh lagiAllah, aku tahu bahwa saat aku kehilangan sesuatu engkau sedang mempersiapkan hal yang lebih baik untukkuAnda tidak dapat mengubah masa lalu anda dan janganlah terlalu khawatir dengan hari esok .Hari ini adalah hari yang dapat mengubah masa depan Anda', 'Ketika cinta itu dipertahankan kamu akan tau siapa yang lebih menghargai tentang sebuah hubungan', 'Dalam hidup ini banyak orang tahu apa yang harus dilakukan, tetapi hanya sedikit yang melakukan apa yang ia ketahui. Mengetahui tidaklah cukup, Anda harus mengambil tindakan', 'Berilah perhatian lebih ke orang yang kamu sayangi, itu yang mereka butuhkan', 'Satu ons tindakan sama berharganya dengan satu ton teori', 'Kita mungkin terpisah sejak lama ketika tak mampu belajar untuk lebih dewasa', 'Sayangilah dia walau tidak sesempurna seperti yang kau inginkan', 'Kecantikan akan mengundang perhatian sikap santun memikat Kalbu', 'Mengetahui tidaklah cukup kita harus melakukannya, keinginan tak cukup hanya dengan berangan kita harus melakukannya', 'Kesalahan adalah bukti bahwa kamu sedang mencoba', 'Betapapun jauhnya air mengalir ia takkan pernah lupa hulunya', 'Lebih baik sendiri daripada bersama dengan orang yang salahBetapapun jauhnya air mengalir ia takkan pernah lupa hulunya', 'Lakukan sesuatu hari ini yang akan membuat dirimu berterima kasih di hari-hari mendatang', 'Waktu yang memutuskan Dengan siapa kamu akan berjumpa', 'Hati yang memutuskan siapa yang kamu inginkan dalam hidup ini', 'Dengan sikap yang akan menentukan siapa yang akan bertahan dalam hidupmu', 'Menjadi dewasa dan bijak diawali dengan menjadi muda dan bodoh', 'Lakukanlah apa yang paling kamu takutkan dalam hidupmu', 'Bekerjalah seolah kamu tak butuh uang, Cintailah seolah Kamu takkan Tersakiti dan menarilah seakan tak ada yang melihatmu', 'Jika hari ini sudah sempurna maka Apalah arti hari esok', 'Bintang pun tak kan bersinar tanpa kegelapan', 'Suatu saat aku akan menjadi tempat yang akan selalu kau rindu', 'Guru terbaik kamu adalah kesalahan terakhir yang kamu lakukan', 'Diam adalah respon terbaik untuk orang bodoh', 'Jangan pernah membuat keputusan yang permanen untuk perasaan yang sementara', 'Jika Allah yang menjadi alasan anda untuk hidup maka takkan pernah ada alasan untuk menyerah', 'Kegagalan ada bukan untuk ditakuti tetapi untuk dipelajari', 'Anda saat ini adalah hasil dari pengalaman anda', 'Keberuntungan adalah saat kesempatan datang, anda telah matang dengan segala persiapan', 'Jangan Menunggu hari yang terbaik untuk melangkah karena setiap hari sangatlah berharga', 'Keputusan yang baik diperoleh dari pengalaman, dan pengalaman didapat dari keputusan yang buruk', 'Setiap waktu yang anda lewati dengan sia-sia hanya menjauhkan anda dan semakin jauh dari kata sukses', 'Realitas kehidupan Anda adalah deskripsi dari jiwa dan pikiran anda', 'Berani mengambil keputusan maka anda telah melangkah 10 kali lebih cepat untuk sukses', 'Allah masih mencintai anda jika masih banyak cobaan dan tantangan hidup yang datang menghampiri anda. Allah percaya bahwa anda mampu melaluinya, maka jagalah kepercayaan itu', 'Ketika orang mengatakan anda sudah berubah sebenarnya itu hanya karena anda berhenti melakukan apa yang mereka ingin anda lakukan', 'Jangan menukar apa yang sangat anda inginkan untuk apa yang Anda ingin untuk saat ini', 'Orang-orang yang mengikuti keramaian biasanya tersesat di dalamnya', 'Orang tua saya bekerja terlalu keras untuk saya bukan supaya saya tidak hanya menjadi orang biasa tetapi menjadi orang luar biasa', 'Anda menghalangi impian anda ketika anda mengizinkan ketakutan Anda tumbuh lebih besar dari keyakinan anda', 'Sang juara percaya kepada dirinya sendiri bahkan ketika orang lain tidak percaya', 'Hanya mereka yang berani mengambil resiko yang jauh pasti dapat menemukan Seberapa jauh seseorang dapat pergi', 'Tunjukkan teman Anda, saya akan menunjukkan masa depan Anda', 'Beberapa orang ingin sesuatu terjadi, beberapa orang berharap itu akan terjadi, yang lain mewujudkannya jadi kenyataan', 'Jika anda menghabiskan waktu untuk mencoba menjadi baik dalam segala hal, Anda tidak akan pernah menjadi hebat dalam apapun', 'Sebuah perjalanan ribuan mil dimulai dari langkah kecil', 'Apa yang akan Anda kerjakan, Ketika anda tahu anda tidak mungkin gagal', 'Ketika kita memiliki satu sama lain, kita Memiliki segalanya', 'Kebesaran sebenarnya dapat ditemukan dalam hal hal kecil yang terkadang kita lewatkan', 'Bekerja keraslah, Bermimpilah lebih besar dan jadilah yang terbaik', 'Apa yang kita pikirkan menentukan apa yang akan terjadi pada kita. Jadi jika kita ingin mengubah hidup kita, kita perlu sedikit mengubah pikiran kita.', 'Seseorang yang berani membuang satu jam waktunya tidak mengetahui nilai dari kehidupan.', 'Saya memiliki filosofi yang sederhana: isi apa yang kosong, kosongkan apa yang terlalu penuh.', 'Hidup adalah cermin dan akan merefleksikan kembali kepada para pemikir mengenai apa yang mereka pikirkan.', 'Anda di sini hanya untuk persinggahan yang singkat. Jangan terburu, jangan khawatir. Yakinlah bahwa Anda menghirup wangi bunga sepanjang perjalanan.Hidup adalah cermin dan akan merefleksikan kembali kepada para pemikir mengenai apa yang mereka pikirkan.', 'Hidup adalah serangkaian perubahan yang alami dan spontan. Jangan tolak mereka karena itu hanya membuat penyesalan dan duka. Biarkan realita menjadi realita. Biarkan sesuatu mengalir dengan alami ke manapun mereka suka.', 'Hidup yang baik adalah hidup yang diinspirasi oleh cinta dan dipandu oleh ilmu pengetahuan.', 'Kenyataannya, Anda tidak tahu apa yang akan terjadi besok. Hidup adalah pengendaraan yang gila dan tidak ada yang menjaminnya.', 'Hidup adalah mimpi bagi mereka yang bijaksana, permainan bagi mereka yang bodoh, komedi bagi mereka yang kaya, dan tragedi bagi mereka yang miskin', 'Hidup itu bukan soal menemukan diri Anda sendiri, hidup itu membuat diri Anda sendiri.', 'Hal yang paling penting adalah menikmati hidupmu, menjadi bahagia, apapun yang terjadi.', 'Hidup itu sederhana, kita yang membuatnya sulit.']
@@ -3831,7 +4317,7 @@ ${a}❏ Nama : ${pushname}
 		break
 	    case 'level':
 	    case 'level':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.banon())
 		if (!isLevelingOn) return reply(ind.lvlnoon())
 		if (!isGroup) return reply(ind.groupo())
@@ -3844,7 +4330,7 @@ ${a}❏ Nama : ${pushname}
 		break
 	    case 'leaderboard':
 	    case 'lb':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (!isGroup) return reply(ind.groupo())
 		_level.sort((a, b) => (a.xp < b.xp) ? 1 : -1)
@@ -3880,7 +4366,7 @@ ${a}❏ Nama : ${pushname}
 		break
 	    case 'banlist':
 	    case 'listban':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		const benn = JSON.parse(fs.readFileSync('./database/json/banned.json'))
 		teks = '*==[ List Ban ]==*\n'
 		for (let benn of ban) {
@@ -3895,7 +4381,7 @@ ${a}❏ Nama : ${pushname}
 		})
 		break
 	    case 'tts':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return patrick.sendMessage(from, 'Diperlukan kode bahasa!!', text, {
@@ -3951,7 +4437,7 @@ ${a}❏ Nama : ${pushname}
 		//==========================================BATES NGAB==========================================\\
 		//=============NO GROUP==============\\
 	    case 'mutual':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isGroup) return reply('Command ini tidak bisa digunakan di dalam grup!')
 		anug = getRegisteredRandomId(_registered).replace('@s.whatsapp.net', '')
@@ -3960,7 +4446,7 @@ ${a}❏ Nama : ${pushname}
 		await reply(`Partner found: 🙉\n*${prefix}next* — find a new partner`)
 		break
 	    case 'next':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isGroup) return reply('Command ini tidak bisa digunakan di dalam grup!')
 		anug = getRegisteredRandomId(_registered).replace('@s.whatsapp.net', '')
@@ -3972,7 +4458,7 @@ ${a}❏ Nama : ${pushname}
 		//=============AKSESIBILITAS MENU==============\\
 		case 'enable':
 		if (isBanned) return reply(ind.baned())
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		let pi = patrick.prepareMessageFromContent(from, {
         "listMessage": {
         "title": '*Feature Group*',
@@ -4011,6 +4497,12 @@ ${a}❏ Nama : ${pushname}
                 "title": `Anti Spam (Sticker)`,
                 "rowId": '0'
             }, {
+                "title": `Anti ViewOnce`,
+                "rowId": '0'
+            }, {
+                "title": `Anti Hidetag`,
+                "rowId": '0'
+            }, {
                 "title": `Welcome`,
                 "rowId": '0'
             }, {
@@ -4019,10 +4511,7 @@ ${a}❏ Nama : ${pushname}
             }, {
                 "title": `NSFW Mode`,
                 "rowId": '0'
-            }, {
-                "title": `Leveling Mode`,
-                "rowId": '0'
-               }]
+              }]
             }]
            }
          }, {});
@@ -4032,7 +4521,7 @@ ${a}❏ Nama : ${pushname}
         break 
         case 'disable':
 		if (isBanned) return reply(ind.baned())
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		let po = patrick.prepareMessageFromContent(from, {
         "listMessage": {
         "title": '*Feature Group*',
@@ -4046,14 +4535,18 @@ ${a}❏ Nama : ${pushname}
 ╰── ${isAntiVirtex ? '*Aktif!*' : 'Belum Aktif!'}
 ❏ *Antibadword:*
 ╰── ${isBadWord ? '*Aktif!*' : 'Belum Aktif!'}
+❏ *Antihidetag:*
+╰── ${isAntihidetag ? '*Aktif!*' : 'Belum Aktif!'}
+❏ *AntiviewOnce:*
+╰── ${isAntiviewonce ? '*Aktif!*' : 'Belum Aktif!'}
+❏ *Antispam (Sticker):*
+╰── ${isAntiSpam ? '*Aktif!*' : 'Belum Aktif!'}
 ❏ *Welcome:*
 ╰── ${isWelcome ? '*Aktif!*' : 'Belum Aktif!'}
 ❏ *SimiSimi:*
 ╰── ${isSimi ? '*Aktif!*' : 'Belum Aktif!'}
 ❏ *Leveling:*
-╰── ${isLevelingOn ? '*Aktif!*' : 'Belum Aktif!'}
-❏ *Antispam (Sticker):*
-╰── ${isAntiSpam ? '*Aktif!*' : 'Belum Aktif!'}`,
+╰── ${isLevelingOn ? '*Aktif!*' : 'Belum Aktif!'}`,
         "buttonText": 'Click Disini || Click Here',
         "listType": 'SINGLE_SELECT',
         "sections": [{
@@ -4071,6 +4564,12 @@ ${a}❏ Nama : ${pushname}
                 "title": `Disable Anti Spam (Sticker)`,
                 "rowId": '0'
             }, {
+                "title": `Disable Anti Hidetag`,
+                "rowId": '0'
+            }, {
+                "title": `Disable Anti ViewOnce`,
+                "rowId": '0'
+            }, {
                 "title": `Disable Welcome`,
                 "rowId": '0'
             }, {
@@ -4079,10 +4578,7 @@ ${a}❏ Nama : ${pushname}
             }, {
                 "title": `Disable NSFW Mode`,
                 "rowId": '0'
-            }, {
-                "title": `Disable Leveling Mode`,
-                "rowId": '0'
-               }]
+              }]
             }]
            }
          }, {});
@@ -4092,13 +4588,13 @@ ${a}❏ Nama : ${pushname}
         break
 		//==search 
 		case 'searchmenu':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		await patrickhay(ind.search(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break
 		case 'jooxsearch':
 				//[❗] case by DappaGanz 
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.baned())
                 if (isLimit(sender)) return reply(ind.limitend())
                 judul = args.join(' ')
@@ -4112,7 +4608,7 @@ ${a}❏ Nama : ${pushname}
 				await limitAdd(sender)
 				break
 		case 'stickersearch':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (!q) return reply(`Example: ${prefix + command} Patrick`)
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
@@ -4132,7 +4628,7 @@ ${a}❏ Nama : ${pushname}
 		await limitAdd(sender)
 		break
 	    case 'googleimage':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (!q) return reply(`Example: ${prefix + command} Patrick`)
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
@@ -4145,7 +4641,7 @@ ${a}❏ Nama : ${pushname}
 		await limitAdd(sender)
 		break
 	    case 'pinterest':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (!q) return reply(`Example: ${prefix + command} Patrick`)
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
@@ -4161,7 +4657,7 @@ ${a}❏ Nama : ${pushname}
 	    case 'gsmarena':
 		try {
 			if (!q) return reply(`Example: ${prefix + command} Vivo Y15`)
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (isBanned) return reply('Maaf kamu sudah terbenned!')
 			anu = await fetchJson(`https://dapuhy-api.herokuapp.com/api/search/gsmarena2?query=${q}&apikey=${dappaApi}`)
@@ -4191,7 +4687,7 @@ ${a}❏ Nama : ${pushname}
 		}
 		break 
 		case 'ytsearch':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
         if (isBanned) return reply(ind.baned())
         if (isLimit(sender)) return reply(ind.limitend())
 		reply(ind.wait())
@@ -4207,7 +4703,7 @@ ${a}❏ Nama : ${pushname}
 		case 'aesthetic':
 		try {
 			if (isBanned) return reply(ind.baned())
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
@@ -4224,7 +4720,7 @@ ${a}❏ Nama : ${pushname}
 		break 
 		case 'shopee':
         	    //[❗] case by DappaGanz
-        	    if (!isRegistered) return reply(ind.noregis())
+        	    if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isLimit(sender)) return reply(ind.limitend())
                 if (isBanned) return reply(ind.banned())
                 if (args.length < 1) return reply(`apa yang mau dicari ngab?\ncontoh ${prefix + command} sepeda`)
@@ -4238,7 +4734,7 @@ ${a}❏ Nama : ${pushname}
         	    break
         	    case 'jalantikus':
                 //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.banned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				if (args.length < 1) return reply(`apa yang mau dicari ngab?\ncontoh ${prefix + command} whatsapp`)
@@ -4254,7 +4750,7 @@ ${a}❏ Nama : ${pushname}
 				break
 				case 'muihalal':
                 //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.banned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				if (args.length < 1) return reply(`apa yang mau dicari ngab?\ncontoh ${prefix + command} sabun`)
@@ -4270,7 +4766,7 @@ ${a}❏ Nama : ${pushname}
 				break
 				case 'thelazy':
                 //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.banned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				if (args.length < 1) return reply(`apa yang mau dicari ngab?\ncontoh ${prefix + command} game`)
@@ -4286,7 +4782,7 @@ ${a}❏ Nama : ${pushname}
 				break
 				case 'wattpad':
                 //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.banned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				if (args.length < 1) return reply(`apa yang mau dicari ngab?\ncontoh ${prefix + command} tere liye`)
@@ -4302,7 +4798,7 @@ ${a}❏ Nama : ${pushname}
 				break
 				case 'rexdl':
                 //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.banned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				if (args.length < 1) return reply(`apa yang mau dicari ngab?\ncontoh ${prefix + command} subway surf`)
@@ -4318,7 +4814,7 @@ ${a}❏ Nama : ${pushname}
 				break
 				case 'moddroid':
                 //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.banned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				if (args.length < 1) return reply(`apa yang mau dicari ngab?\ncontoh ${prefix + command} subway surf`)
@@ -4334,7 +4830,7 @@ ${a}❏ Nama : ${pushname}
 				break
 				case 'sfile':
                 //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.banned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				if (args.length < 1) return reply(`apa yang mau dicari ngab?\ncontoh ${prefix + command} config pubg`)
@@ -4350,12 +4846,12 @@ ${a}❏ Nama : ${pushname}
 				break
 		//=============Berita Menu===============\\
 		case 'beritamenu':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		await patrickhay(ind.berita(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break
 		case 'sindo':
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.baned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				reply(ind.wait())
@@ -4368,7 +4864,7 @@ ${a}❏ Nama : ${pushname}
 				await limitAdd(sender)
 				break
 				case 'sindo2':
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.baned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				reply(ind.wait())
@@ -4381,7 +4877,7 @@ ${a}❏ Nama : ${pushname}
 				await limitAdd(sender)
 				break
 				case 'okezone':
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.baned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				reply(ind.wait())
@@ -4394,7 +4890,7 @@ ${a}❏ Nama : ${pushname}
 				await limitAdd(sender)
 				break
 				case 'kompastv':
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.baned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				reply(ind.wait())
@@ -4407,7 +4903,7 @@ ${a}❏ Nama : ${pushname}
 				await limitAdd(sender)
 				break
 				case 'bbcnews':
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.baned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				reply(ind.wait())
@@ -4420,7 +4916,7 @@ ${a}❏ Nama : ${pushname}
 				await limitAdd(sender)
 				break
 				case 'beritanews':
-                if (!isRegistered) return reply(ind.noregis())
+                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isBanned) return reply(ind.baned())
                 if (isLimit(sender)) return reply(ind.limitend())
 				reply(ind.wait())
@@ -4435,7 +4931,7 @@ ${a}❏ Nama : ${pushname}
 		//==========================================BATES NGAB==========================================\\
 		//=============DOWNLOAD MENU==============\\
 	    case 'downloadmenu':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		await patrickhay(ind.download(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break
@@ -4443,7 +4939,7 @@ ${a}❏ Nama : ${pushname}
 		try {
 			if (!q) return reply(`Example: ${prefix + command} NGGYU`)
 			if (isBanned) return reply(ind.baned())
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
@@ -4472,7 +4968,7 @@ ${a}❏ Nama : ${pushname}
 		try {
 			if (!q) return reply(`Example: ${prefix + command} NGGYU`)
 			if (isBanned) return reply(ind.baned())
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
@@ -4501,45 +4997,45 @@ ${a}❏ Nama : ${pushname}
 		}
 		break
 		case 'ytplay':
-			if (!isGroup) return reply(ind.groupo())
-            if (!q) return reply('Mau cari apa diyoutube?')
-            reply(ind.wait())
-            datai = [];
-            try {
+		if (!isGroup) return reply(ind.groupo())
+        if (!q) return reply('Mau cari apa diyoutube?')
+        reply(ind.wait())
+        datai = [];
+        try {
             ysearch = await yts(q)
             hdata = ysearch.all
-            } catch(e) {
-               return reply('engror')
-            }
-            num = 1
-            for(let i= 0; i < hdata.length; i++) {
-            datai.push( {
-            "rows": [
-            {
+        } catch (e) {
+           return reply('engror')
+        }
+        num = 1
+        for(let i= 0; i < hdata.length; i++) {
+        datai.push( {
+        "rows": [
+        {
             "title": "MP3",
             description: `Title: ${hdata[i].title}`,
             "rowId": hdata[i].url
-            }, {
+        }, {
             "title": "MP4",
             description: `Title: ${hdata[i].title}`,
             "rowId": hdata[i].url
-            }], title: num})
-            num += 1
-            }
-            let paoa = patrick.prepareMessageFromContent(from, {
-            "listMessage":{
-            "title": "*YOUTUBE DOWNLOAD*",
-            "description": `Request By : ${pushname}\n*Hasil Pencarian : ${q}*\n*Download dengan klik tombol dibawah*`,
-            "buttonText": "Result",
-            "listType": "SINGLE_SELECT",
-            "sections": datai}}, {}) 
+        }], title: num })
+        num += 1
+        }
+        let paoa = patrick.prepareMessageFromContent(from, {
+       "listMessage":{
+       "title": "*Youtube Play (YTPLAY)*",
+       "description": `Request By : ${pushname}\n*Hasil Pencarian : ${q}*\n*Download dengan klik tombol dibawah*`,
+       "buttonText": "Result",
+       "listType": "SINGLE_SELECT",
+       "sections": datai}}, {}) 
         patrick.relayWAMessage(paoa, {waitForAck: true})
         break
 		case 'ytmp3':
 		try {
 			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
@@ -4573,7 +5069,7 @@ ${a}❏ Nama : ${pushname}
 		try {
 			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
@@ -4605,7 +5101,7 @@ ${a}❏ Nama : ${pushname}
 		try {
 			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
@@ -4639,7 +5135,7 @@ ${a}❏ Nama : ${pushname}
 		try {
 			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
@@ -4669,7 +5165,7 @@ ${a}❏ Nama : ${pushname}
 		break 
 	    case 'tiktokdownload':
 		try {
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (args.length < 1) return reply(`link mana broh?\ncontoh : ${prefix + command} https://vm.tiktok.com/ZSJkHUCwK/`) 
@@ -4687,7 +5183,7 @@ ${a}❏ Nama : ${pushname}
 		}
 		break
 	    case 'igvideo':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return reply(`link mana broh?\ncontoh : ${prefix + command} https://www.instagram.com/p/CNzcf8egt27/?igshid=1hbl53id19nqv`)
@@ -4701,7 +5197,7 @@ ${a}❏ Nama : ${pushname}
 		await limitAdd(sender)
 		break
 	    case 'igphoto':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return reply(`link mana broh?\ncontoh : ${prefix + command} https://www.instagram.com/p/CNzQL4cHm4n/?igshid=19n977531z5nz`)
@@ -4715,7 +5211,7 @@ ${a}❏ Nama : ${pushname}
 		await limitAdd(sender)
 		break 
 		case 'playstore':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if (args.length < 1) return reply(`text mana broh?\ncontoh : ${prefix + command} telegram`)
@@ -4741,56 +5237,63 @@ ${a}❏ Nama : ${pushname}
 		//==========================================BATES NGAB==========================================\\
 		//=============OTHER MENU==============\\
 	    case 'othermenu':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		await patrickhay(ind.other(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break 
 		case 'cloudmenu':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		await patrickhay(ind.cloud(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break 
+		case "img2url":
+		if (((isMedia && !mek.message.videoMessage) || isQuotedImage || isQuotedVideo) && args.length == 0) {
+			boij = isQuotedImage || isQuotedVideo ? JSON.parse(JSON.stringify(mek).replace("quotedM", "m")).message.extendedTextMessage.contextInfo : mek;
+			owgi = await patrick.downloadMediaMessage(boij);
+			res = await upload(owgi);
+			reply(res);
+		} else {
+			reply("kirim/reply gambar/video");
+		}
+		break;
 		case 'shortlink':
-                //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
-                if (isLimit(sender)) return reply(ind.limitend())
-                if (isBanned) return reply(ind.banned())
-                if (args.length < 1) return reply(`linknya mana su?\ncontoh ${prefix}shortlink https://google.com`)
-                link = body.slice(11)
-                reply(ind.wait())
-				anu = await fetchJson(`https://leyscoders-api.herokuapp.com/api/tinyurl?url=${link}&apikey=${leysApi}`)
-				teks = `SHORTLINK📊\n\nLink : ${link}\nHasil shortlink : ${anu.result}`
-				patrick.sendMessage(from, teks, text, {quoted: fkontak})
-				await limitAdd(sender)
-				break
-				case 'shortlink2':
-                //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
-                if (isLimit(sender)) return reply(ind.limitend())
-                if (isBanned) return reply(ind.banned())
-                if (args.length < 1) return reply(`linknya mana su?\ncontoh ${prefix}shortlink https://google.com`)
-                link = body.slice(12)
-                reply(ind.wait())
-				anu = await fetchJson(`https://leyscoders-api.herokuapp.com/api/cuttly?url=${link}&apikey=${leysApi}`)
-				teks = `SHORTLINK📊\n\nLink : ${link}\nHasil shortlink : ${anu.result.hasil}`
-				patrick.sendMessage(from, teks, text, {quoted: fkontak})
-				await limitAdd(sender)
-				break
-				case 'shortlink3':
-                //[❗] case by DappaGanz
-                if (!isRegistered) return reply(ind.noregis())
-                if (isLimit(sender)) return reply(ind.limitend())
-                if (isBanned) return reply(ind.banned())
-                if (args.length < 1) return reply(`linknya mana su?\ncontoh ${prefix}shortlink https://google.com`)
-                link = body.slice(12)
-                reply(ind.wait())
-				anu = await fetchJson(`https://leyscoders-api.herokuapp.com/api/shrturl?url=${link}&apikey=${leysApi}`)
-				teks = `SHORTLINK📊\n\nLink : ${link}\nHasil shortlink : ${anu.result}`
-				patrick.sendMessage(from, teks, text, {quoted: fkontak})
-				await limitAdd(sender)
-				break
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+        if (isLimit(sender)) return reply(ind.limitend())
+        if (isBanned) return reply(ind.banned())
+        if (args.length < 1) return reply(`linknya mana su?\ncontoh ${prefix}shortlink https://google.com`)
+        link = body.slice(11)
+        reply(ind.wait())
+		anu = await fetchJson(`https://leyscoders-api.herokuapp.com/api/tinyurl?url=${link}&apikey=${leysApi}`)
+		teks = `*ShortLink URL*\n▢ From : ${link}\n▢ To ShortLink : ${anu.result}`
+		patrick.sendMessage(from, teks, text, {quoted: fkontak})
+		await limitAdd(sender)
+		break
+		case 'shortlink2':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+        if (isLimit(sender)) return reply(ind.limitend())
+        if (isBanned) return reply(ind.banned())
+        if (args.length < 1) return reply(`linknya mana su?\ncontoh ${prefix}shortlink https://google.com`)
+        link = body.slice(12)
+        reply(ind.wait())
+		anu = await fetchJson(`https://leyscoders-api.herokuapp.com/api/cuttly?url=${link}&apikey=${leysApi}`)
+		teks = `*ShortLink URL*\n▢ From : ${link}\n▢ To ShortLink : ${anu.result}`
+		patrick.sendMessage(from, teks, text, {quoted: fkontak})
+		await limitAdd(sender)
+		break
+		case 'shortlink3':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+        if (isLimit(sender)) return reply(ind.limitend())
+        if (isBanned) return reply(ind.banned())
+        if (args.length < 1) return reply(`linknya mana su?\ncontoh ${prefix}shortlink https://google.com`)
+        link = body.slice(12)
+        reply(ind.wait())
+		anu = await fetchJson(`https://leyscoders-api.herokuapp.com/api/shrturl?url=${link}&apikey=${leysApi}`)
+		teks = `*ShortLink URL*\n▢ From : ${link}\n▢ To ShortLink : ${anu.result}`
+		patrick.sendMessage(from, teks, text, {quoted: fkontak})
+		await limitAdd(sender)
+		break
         case 'ssweb':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(limits.limitend(pushname))
 		if (args.length < 1) return reply('Urlnya mana gan?')
@@ -4806,7 +5309,7 @@ ${a}❏ Nama : ${pushname}
 	    case 'stiker':
 	    case 'sticker':
 	    case 's':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		await limitAdd(sender)
@@ -4901,7 +5404,7 @@ ${a}❏ Nama : ${pushname}
 		}
 		break
 	    case 'toimg':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (!isQuotedSticker) return reply('Reply/tag sticker !')
 		reply(ind.wait())
@@ -4921,7 +5424,7 @@ ${a}❏ Nama : ${pushname}
 		await limitAdd(sender)
 		break
 	    case 'tomp3':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		patrick.updatePresence(from, Presence.composing)
@@ -4943,7 +5446,7 @@ ${a}❏ Nama : ${pushname}
 		await limitAdd(sender)
 		break
 	    case 'slowmo':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		encmedia = JSON.parse(JSON.stringify(mek).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo
 		media = await patrick.downloadAndSaveMediaMessage(encmedia)
@@ -4961,7 +5464,7 @@ ${a}❏ Nama : ${pushname}
 		})
 		break
 	    case 'tupai':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		encmedia = JSON.parse(JSON.stringify(mek).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo
 		media = await patrick.downloadAndSaveMediaMessage(encmedia)
@@ -4979,7 +5482,7 @@ ${a}❏ Nama : ${pushname}
 		})
 		break
 	    case 'gemok':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		encmedia = JSON.parse(JSON.stringify(mek).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo
 		media = await patrick.downloadAndSaveMediaMessage(encmedia)
@@ -4997,7 +5500,7 @@ ${a}❏ Nama : ${pushname}
 		})
 		break
 	    case 'bass':
-		if (!isRegistered) return reply(ind.noregis())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		encmedia = JSON.parse(JSON.stringify(mek).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo
 		media = await patrick.downloadAndSaveMediaMessage(encmedia)
@@ -5015,7 +5518,7 @@ ${a}❏ Nama : ${pushname}
 		})
 		break
 		case 'brainly':
-				if (!isRegistered) return reply(ind.noregis())
+				if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 				if (isBanned) return reply(ind.baned())
 				if (isLimit(sender)) return reply(ind.limitend(pushname))
 				brien = body.slice(9)
@@ -5034,7 +5537,7 @@ ${a}❏ Nama : ${pushname}
 				break
            case 'profile':
 			if (isBanned) return reply(ind.baned())
-			if (!isRegistered) return reply(ind.noregis())
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isPrem) {
 const kanting = `${a}User: ${premi}
 Your Balance: ${checkATMuser(sender)}
@@ -5063,9 +5566,36 @@ Your Limit: ${letCount}/20${a}
 		//==========================================BATES NGAB==========================================\\
 		//==========================================BATES NGAB==========================================\\
 	default:
-	    if (body.startsWith(`${prefix}${command}` && isRegistered)) {
-        reply(`Maaf *${pushname}*, Command *${prefix}${command}* Tidak Terdaftar Di Dalam *${prefix}menu*!`)
-         }
+	    if (_chats.startsWith(`${codeVerification}`)) {
+		if (isRegistered) return
+		const serialUser = createSerial(20)
+		addRegisteredUser(sender)
+		addATM(sender)
+		addLevelingId(sender)
+		const kenver = `${a}╭──${a}「 *VERIFIKASI BERHASIL* 」
+${a}❏ Nama : ${pushname}
+❏ Nomor : wa.me/${sender.split("@")[0]}
+❏ Waktu Verify : ${time}
+❏ SN : ${serialUser}
+❏ Total Register : ${_registered.length}${a}
+╰─────「 *${botName}* 」`
+        const getVerification = Math.floor(Math.random(40) * 200) + 8000
+        codeVerification = `${getVerification}`
+        sendButMessage(from, `${kenver}`, `${footerButton}`, 
+        [{
+            buttonId: `${prefix}rules`, 
+            buttonText: { 
+                displayText: `▨ READ DOCS ▨`,
+            }, 
+            type: 1,
+        }, {
+            buttonId: `${prefix}menu`, 
+            buttonText: { 
+                displayText: `▨ MENU ▨`,
+            }, 
+            type: 1,
+        }]);
+		}
 		if (isGroup && !isCmd && isSimi && budy != undefined) {
 			console.log(budy)
 			muehe = await simih(budy)
@@ -5079,3 +5609,6 @@ Your Limit: ${letCount}/20${a}
 		}
 }
 })
+}
+
+starts()
