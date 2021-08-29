@@ -4712,7 +4712,7 @@ ${a}❏ Nama : ${pushname}
         if (isBanned) return reply(ind.baned())
         if (isLimit(sender)) return reply(ind.limitend())
 		reply(ind.wait())
-		anu = await fetchJson(`http://zekais-api.herokuapp.com/yts?query=alone`)
+		anu = await fetchJson(`http://zekais-api.herokuapp.com/yts?query=${q}`)
 		teks = '=================\n'
 		for (let i of anu.result) {
 		teks += `Judul: ${i.title}\nChannel: ${i.channel}\nDurasi: ${i.durasi}\nViews: ${i.views}\nLink : ${i.url}\n=================\n`
