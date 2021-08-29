@@ -5352,7 +5352,7 @@ ${a}❏ Nama : ${pushname}
 				.on('end', function() {
 					muach = getRandom('')
 					exif.create('Created By PatrickBot', '', `takestick_${muach}`)
-					exec(`webpmux -set exif ./sticker/data.exif ${ran} -o ${ran}`, async (error) => {
+					exec(`webpmux -set exif ./sticker/takestick_${muach}.exif ${ran} -o ${ran}`, async (error) => {
 						console.log('Finish')
 						if (error) return console.log(error) && reply('Error, Harap coba lagi nanti!')
 						patrick.sendMessage(from, fs.readFileSync(ran), sticker, {
