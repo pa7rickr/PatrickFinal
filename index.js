@@ -216,7 +216,8 @@ fake = 'AntiDelete aktif'
 shp = '⬡'
 initialLimit = setting.initialLimits
 memberLimit = setting.memberLimits
-codeVerification = 8838
+codeVerification = 8538
+codeVerification1 = 8178
 
 let tictactoe = []
 let tebakgambar = []
@@ -4225,18 +4226,39 @@ ${a}❏ Nama : ${pushname}
 				'mentionedJid': [sender]
 			}
 		})
-		break */
+		break */ 
 		case 'verify':
 	    case 'daftar':
 		if (isRegistered) return 
+		const codeMeme = [`${codeVerification}`, `${codeVerification1}`]
+		const codeMeme1 = [`${codeVerification}`, `${codeVerification1}`]
+		const gettNyaa = codeMeme[Math.floor(Math.random() * codeMeme.length)]
+		const gettNyaa1 = codeMeme1[Math.floor(Math.random() * codeMeme1.length)]
+		let gettNyaa2 = (gettNyaa1 == gettNyaa) ? codeMeme1[Math.floor(Math.random() * codeMeme1.length)] : gettNyaa1
 		meeen = `${sender.replace('@s.whatsapp.net','')}@s.whatsapp.net`
-		console.log('Registered PatrickBot By: ' + sender + '\nCode Verification: ' + codeVerification)
-		textoing = `*Code Verification PatrickBot*\nHalo ${pushname}\nKode Verifikasimu: ${codeVerification}\nKetik *${codeVerification}* Sekali Di Chat Pribadi Bot untuk mendaftar!!`
+		console.log('Code Verification: ' + codeVerification + 'From: ' + sender)
+		textoing = `${a}Your Code: ${codeVerification}\nThis Code is Private!!${a}`
         var optios = {
             text: textoing
         }
 		patrick.sendMessage(`${meeen}`, optios, text, {quoted: mek})
-		if (isGroup) return reply('*Anda masih belum terdaftar!, KETIK Kode Verifikasi Yang dikirim bot SEKALI LAGI di Chat Pribadi Bot untuk mendaftar!!')
+        sendButMessage(from, `Halo ${pushname}, Silahkan Klik Code yang tadi dikirim bot\nJika tidak ada code yang dikirim bot ketik saja codenya`, `Jika button tidak keliatan\nKetik dan Kirim Code disini`, 
+        [{
+			buttonId: `${gettNyaa}`,
+			buttonText: {
+				displayText: `${gettNyaa}`,
+			},
+			type: 1,
+		},
+        {
+			buttonId: `${gettNyaa2}`,
+			buttonText: {
+				displayText: `${gettNyaa2}`,
+			},
+			type: 1,
+		},
+		]);
+		if (isGroup) return reply(`${a}Check Your Code in Private Message for Register!!${a}`)
 		break
 	    case 'listonline':
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
@@ -5571,15 +5593,16 @@ Your Limit: ${letCount}/20${a}
 		addRegisteredUser(sender)
 		addATM(sender)
 		addLevelingId(sender)
-		const kenver = `${a}╭──${a}「 *VERIFIKASI BERHASIL* 」
-${a}❏ Nama : ${pushname}
+		const kenver = `${a}Succes, Registered in Database${a}
+${a}❏ Email : ${pushname}@bot.id
 ❏ Nomor : wa.me/${sender.split("@")[0]}
 ❏ Waktu Verify : ${time}
 ❏ SN : ${serialUser}
-❏ Total Register : ${_registered.length}${a}
-╰─────「 *${botName}* 」`
+❏ Total Register : ${_registered.length}${a}`
         const getVerification = Math.floor(Math.random(40) * 200) + 8000
         codeVerification = `${getVerification}`
+        const getVerification10 = Math.floor(Math.random(40) * 200) + 8000
+        codeVerification1 = `${getVerification10}`
         sendButMessage(from, `${kenver}`, `${footerButton}`, 
         [{
             buttonId: `${prefix}rules`, 
@@ -5591,6 +5614,21 @@ ${a}❏ Nama : ${pushname}
             buttonId: `${prefix}menu`, 
             buttonText: { 
                 displayText: `▨ MENU ▨`,
+            }, 
+            type: 1,
+        }]);
+		} 
+		if (_chats.startsWith(`${codeVerification1}`)) {
+		if (isRegistered) return 
+		const getVerification0 = Math.floor(Math.random(40) * 200) + 8000
+        codeVerification = `${getVerification0}`
+		const getVerification1 = Math.floor(Math.random(40) * 200) + 8000
+        codeVerification1 = `${getVerification1}`
+        sendButMessage(from, `${a}Failed Register, Wrong Code!!\nGagal Register, Code Salah!!${a}\n*Silahkan Verify Lagi!!*`, `Jika button tidak keliatan\nKetik ${prefix}verify`, 
+        [{
+            buttonId: `${prefix}verify`, 
+            buttonText: { 
+                displayText: `▨ VERIFY ▨`,
             }, 
             type: 1,
         }]);
