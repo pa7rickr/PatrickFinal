@@ -2222,6 +2222,7 @@ colors = ['red', 'white', 'black', 'blue', 'yellow', 'green']
 
 if (!isGroup && isCmd) console.log('\x1b[1;31m~\x1b[1;37m>', [time], '[\x1b[1;32mInPrivate\x1b[1;37m]=', color([command]), 'from', color(sender.split('@')[0]), 'args :', color(args.length))
 if (isCmd && isGroup) console.log('\x1b[1;31m~\x1b[1;37m>', [time], '[\x1b[1;32mInGroup\x1b[1;37m]=', color([command]), 'from', color(sender.split('@')[0]), 'in', color(groupName), 'args :', color(args.length))
+if (isCmd) patrick.chatRead(from)
 if (isCmd) cmdadd()
 switch (command) {
 	//==========================================BATES NGAB==========================================\\ 
@@ -5351,7 +5352,7 @@ ${a}❏ Nama : ${pushname}
 				.on('end', function() {
 					muach = getRandom('')
 					exif.create('Created By PatrickBot', '', `takestick_${muach}`)
-					exec(`webpmux -set exif ./sticker/${muach}.exif ${ran} -o ${ran}`, async (error) => {
+					exec(`webpmux -set exif ./sticker/data.exif ${ran} -o ${ran}`, async (error) => {
 						console.log('Finish')
 						if (error) return console.log(error) && reply('Error, Harap coba lagi nanti!')
 						patrick.sendMessage(from, fs.readFileSync(ran), sticker, {
