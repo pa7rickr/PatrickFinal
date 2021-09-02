@@ -1328,8 +1328,7 @@ if (isRegistered && isGroup) {
 }
         	
 if (isGroup) {
-	try {
-		if (!sender.includes('6288989029718')) return 
+	try { 
 		const getmemex = groupMembers.length
 		if (getmemex <= memberLimit) {
 			setTimeout(() => {
