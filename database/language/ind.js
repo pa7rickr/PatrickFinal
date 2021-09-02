@@ -70,8 +70,8 @@ exports.nsfwoff = () => {
 	return`*Maaf, Mode NSFW tidak diaktifkan di dalam group ini\nKetik #nsfw 1 untuk mengaktifkan*`
 }
 
-exports.bug = () => {
-	return`*Masalah telah di laporkan ke owner BOT, laporan palsu/main2 tidak akan ditanggapi*`
+exports.error = () => {
+	return`*Gagal!, Harap coba lagi nanti*`
 }
 
 exports.wrongf = () => {
@@ -115,6 +115,11 @@ ${c}  ❏ ${prefix}readall${c}
 
 exports.maker = (prefix) => {
 	return `◉ *Maker Menu*
+${c}  ❏ ${prefix}triggered${c}
+${c}  ❏ ${prefix}glass${c}
+${c}  ❏ ${prefix}gay${c} 
+${c}  ❏ ${prefix}jail${c}
+${c}  ❏ ${prefix}comrade${c}
 ${c}  ❏ ${prefix}csgo${c}
 ${c}  ❏ ${prefix}honey${c}
 ${c}  ❏ ${prefix}silk${c} 
@@ -328,6 +333,7 @@ ${c}  ❏ ${prefix}listimage${c}
 exports.other = (prefix) => {
 	return `◉ *Other Menu*
 ${c}  ❏ ${prefix}sticker${c} 
+${c}  ❏ ${prefix}img2url${c} 
 ${c}  ❏ ${prefix}tagstiker${c} 
 ${c}  ❏ ${prefix}nulis${c} 
 ${c}  ❏ ${prefix}swm${c} 
@@ -387,7 +393,7 @@ exports.levelup = (pushname, sender, getLevelingXp,  getLevel, getLevelingLevel,
 `}
  
 exports.limitend = (pushname) => {
-	return`*Maaf ${pushname} Limit Hari Ini Habis*\n*Beli Limit Untuk Mendapatkan Limit/ Naik Level*`
+	return`*Your limit is out today*\n*Please buy limit to get limit!*`
 }
 
 exports.limitcount = (isPrem, isAdmin, isOwner, limitCounts) => {
