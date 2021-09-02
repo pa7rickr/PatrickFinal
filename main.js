@@ -2,7 +2,6 @@ const lolcatjs = require('lolcatjs')
 const figlet = require('figlet')
 let { spawn } = require('child_process')
 let path = require('path')
-const keepAlive =require('./server.js')
 const CFonts  = require('cfonts')
 const fs = require('fs')
 lolcatjs.options.seed = Math.round(Math.random() * 1000);
@@ -45,5 +44,4 @@ function start() {
     }
   })
 }
-keepAlive()
 start()
