@@ -1,5 +1,6 @@
 ﻿const a = '```'
-const c = '```'
+const c = '*'
+const akyu = '*'
 /***
  * Script Created by MhankBarBar 
  * Recode By Me: @_pa7rick
@@ -54,6 +55,7 @@ const {
 	removeBackgroundFromImageFile
 } = require('remove.bg')
 const imageToBase64 = require('image-to-base64')
+const { smsg } = require('./lib/simple')
 const simple = require('./lib/simple')
 const moment = require("moment-timezone")
 const speed = require('performance-now')
@@ -69,6 +71,7 @@ const FormData = require("form-data");
 const Exif = require('./lib/exif')
 const exif = new Exif()
 const encodeUrl = require('encodeurl')
+const chalk = require('chalk')
 const tiktod = require('tiktok-scraper')
 const brainly = require('brainly-scraper')
 const ffmpeg = require('fluent-ffmpeg')
@@ -190,6 +193,7 @@ const {
 	leysApi,
 	xteamApi,
 	dappaApi,
+	zekaisApi,
 	keyprem,
 	gamewaktu
 } = setting
@@ -204,6 +208,7 @@ const vcard = 'BEGIN:VCARD\n' +
 
 const ownerNumber = [`${numberOwner}@s.whatsapp.net`]
 blocked = []
+autojoin = false
 
 codeReedem = 'XtiLjKqOp09Ii57e3'
 const uang1 = 1500
@@ -216,8 +221,10 @@ fake = 'AntiDelete aktif'
 shp = '⬡'
 initialLimit = setting.initialLimits
 memberLimit = setting.memberLimits
-codeVerification = 8538
-codeVerification1 = 8178
+codeVerification = 86522
+codeVerification1 = 76311
+codeVerification2 = 24432
+hit_today = []
 
 let tictactoe = []
 let tebakgambar = []
@@ -359,14 +366,27 @@ async function starts() {
 	 patrick.logger.level = 'warn'
 	 console.log(banner.string)
 	 patrick.on('qr', () => {
-		console.log(color('[','white'), color('!','red'), color(']','white'), color(' Scan QR code nya Cok >_<'))
+		console.log(color('[','white'), color('!','red'), color(']','white'), color(' Scan QR code nya'))
 	})
 	fs.existsSync('./session.json') &&  patrick.loadAuthInfo('./session.json')
 	 patrick.on('connecting', () => {
-		start('2', '')
+		start('2', ' Loading... For Connect!!')
 	})
 	 patrick.on('open', () => {
-		success('2', 'Sukses Connect Ke Whatsapp Web, Ketik .menu')
+		console.log(color('', 'white'), color('━━━━━━━━━━━━━━━━━━━━', 'green'), color(' Connect ', 'green'), color('━━━━━━━━━━━━━━━━━━━━', 'green'), color('', 'white'));
+        console.log(`\
+        `);
+        success('2', 'Sukses Connect Ke Whatsapp Web, Silahkan Ketik .menu')
+        console.log(color('', 'white'), bgcolor('Your Session Whatsapp Web Information', 'red'))
+        console.log(color('▣', 'white'), color('WA Version', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.wa_version));
+        console.log(color('▣', 'white'), color('OS Version', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.os_version));
+        console.log(color('▣', 'white'), color('Device', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.device_manufacturer));
+        console.log(color('▣', 'white'), color('Model', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.device_model));
+        console.log(color('▣', 'white'), color('OS Build Number', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.os_build_number));
+        console.log(bgcolor('Note: Script by Instagram _pa7rick', 'blue'));
+        console.log(`\
+        `);
+        console.log(color('', 'white'), color('━━━━━━━━━━━━━━━━━━━━', 'green'), color(' PatrickBot ', 'green'), color('━━━━━━━━━━━━━━━━━━━━', 'green'), color('', 'white'));
 	})
 	await patrick.connect({timeoutMs: 30*1000})
     fs.writeFileSync('./session.json', JSON.stringify( patrick.base64EncodedAuthInfo(), null, '\t'))
@@ -405,7 +425,7 @@ async function starts() {
 		shortgc = await axios.get(`https://tinyurl.com/api-create.php?url=${ppgc}`)
 		if (anu.action == 'add') {
 			teks = 
-`*Hello* *${ini_user.notify}*
+`*Halo* *${ini_user.notify}*
 Welcome To *${mdata.subject}*
 *> Nama:*
 *> Umur:*
@@ -473,44 +493,20 @@ const sleep = async (ms) => {
     patrick.on('CB:action,,call', async json => {
 	const callerId = json[2][0][1].from;
 	console.log('call dari ' + callerId)
-	patrick.sendMessage(callerId, 'Auto block system, dont call please', MessageType.text)
+	patrick.sendMessage(callerId, '*Auto block system, dont call please*\nUnblock chat wa.me/6288989029718', MessageType.text)
 	await sleep(4000)
 	await patrick.blockUser(callerId, 'add')
 })
-        patrick.on('message-delete', async (m) => {
-        if (m.key.remoteJid == 'status@broadcast') return
-        if (!m.key.fromMe && m.key.fromMe) return
-        if (antidel === false) return
-        m.message = (Object.keys(m.message)[0] === 'ephemeralMessage') ? m.message.ephemeralMessage.message : m.message
-        const jam = moment.tz('Asia/Jakarta').format('HH:mm:ss')
-        let d = new Date
-        let locale = 'id'
-        let gmt = new Date(0).getTime() - new Date('1 Januari 2021').getTime()
-        let weton = ['Pahing', 'Pon','Wage','Kliwon','Legi'][Math.floor(((d * 1) + gmt) / 84600000) % 5]
-        let week = d.toLocaleDateString(locale, { weekday: 'long' })
-        let calender = d.toLocaleDateString(locale, {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-        })
-        const type = Object.keys(m.message)[0]
-        patrick.sendMessage(m.key.remoteJid, 
-`━━━━⬣  𝘼𝙉𝙏𝙄 𝘿𝙀𝙇𝙀𝙏𝙀  ⬣━━━━
-
-    *Nama  : @${m.participant.split("@")[0]}*
-    *Jam  : ${jam} ${week} ${calender}*
-    *Type  : ${type}*
-
-━━━━⬣  𝘼𝙉𝙏𝙄 𝘿𝙀𝙇𝙀𝙏𝙀  ⬣━━━━`, MessageType.text, {quoted: m.message, contextInfo: {"mentionedJid": [m.participant]}})
-        patrick.copyNForward(m.key.remoteJid, m.message)
-        })
+     
         patrick.on('chat-update', async (mek) => {
 		try { 
 			if (!mek.hasNewMessage) return
             mek = mek.messages.all()[0]
 			if (!mek.message) return 
 			if (mek.key.fromMe) return
-			if (mek.key && mek.key.remoteJid == 'status@broadcast') return
+			if (mek.key && mek.key.remoteJid == 'status@broadcast') return 
+			const m = smsg(patrick, mek)
+			global.prefix
 			global.blocked
             const content = JSON.stringify(mek.message)
             const from = mek.key.remoteJid
@@ -531,6 +527,7 @@ const sleep = async (ms) => {
 			const messagesC = pes.slice(0).trim().split(/ +/).shift().toLowerCase()
 			let chats = _chats.match(prefixRegEx) ? _chats.split(prefixRegEx).find((v) => v === _chats.replace(prefixRegEx, "")) : _chats;
 		    let command = chats.split(/ +/g)[0];
+		    hit_today.push(command);
 			chatsL = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : ''
 			var tas = (type === 'conversation' && mek.message.conversation) ? mek.message.conversation : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : (type == 'extendedTextMessage') && mek.message.extendedTextMessage.text ? mek.message.extendedTextMessage.text : ''
 			const mesejAnti = tas.slice(0).trim().split(/ +/).shift().toLowerCase()
@@ -566,7 +563,6 @@ const sleep = async (ms) => {
 			const isAntiLink = isGroup ? antilink.includes(from) : false
 			const isBadWord = isGroup ? badword.includes(from) : false
 			const isBanned = ban.includes(sender)
-			const m = simple.smsg(patrick, mek);
 			const isMedia = (type === 'imageMessage' || type === 'videoMessage')
 			const isQuotedImage = type === 'extendedTextMessage' && content.includes('imageMessage')
 			const isQuotedVideo = type === 'extendedTextMessage' && content.includes('videoMessage')
@@ -592,10 +588,13 @@ const sleep = async (ms) => {
 		    }
 		    function monospace(string) {
             return '```' + string + '```'
-            }   
+            }    
+            function jsonformat(string) {
+            return JSON.stringify(string, null, 2)
+            }
             function randomNomor(angka){
             return Math.floor(Math.random() * angka) + 1
-           }
+            }
 		    const costum = (pesan, tipe, target, target2) => {
 			patrick.sendMessage(from, pesan, tipe, {quoted: { key: { fromMe: false, participant: `${target}`, ...(from ? { remoteJid: from } : {}) }, message: { conversation: `${target2}` }}})
 			}
@@ -701,181 +700,24 @@ switch (bulan1) {
 var tampilHari = '' + hari + ', ' + tanggal + ' ' + bulan1 + ' ' + tahun;
 var tampilJam = '' + jam + ':' + menit + ':' + detik + ' Wib';
 
-const sekarang = new Date().getTime();
-var ase = new Date();
-var waktoo = ase.getHours();
-switch (waktoo) {
-	case 0:
-		waktoo = '🕛 Waktu Tengah Malam';
-		break;
-	case 1:
-		waktoo = '🕐 Waktu Tengah Malam';
-		break;
-	case 2:
-		waktoo = '🕑 Waktu Dini Hari';
-		break;
-	case 3:
-		waktoo = '🕒 Waktu Dini Hari';
-		break;
-	case 4:
-		waktoo = '🕓 Waktu Subuh';
-		break;
-	case 5:
-		waktoo = '🕔 Waktu Subuh';
-		break;
-	case 6:
-		waktoo = `🕕 Selamat Pagi ${pushname}`;
-		break;
-	case 7:
-		waktoo = `🕖 Selamat Pagi ${pushname}`;
-		break;
-	case 8:
-		waktoo = `🕗 Selamat Pagi ${pushname}`;
-		break;
-	case 9:
-		waktoo = `🕘 Selamat Pagi ${pushname}`;
-		break;
-	case 10:
-		waktoo = `🕙 Selamat Pagi ${pushname}`;
-		break;
-	case 11:
-		waktoo = `🕚 Selamat Siang ${pushname}`;
-		break;
-	case 12:
-		waktoo = `🕛 Selamat Siang ${pushname}`;
-		break;
-	case 13:
-		waktoo = `🕐 Selamat Siang ${pushname}`;
-		break;
-	case 14:
-		waktoo = `🕑 Selamat Siang ${pushname}`;
-		break;
-	case 15:
-		waktoo = `🕒 Selamat Sore ${pushname}`;
-		break;
-	case 16:
-		waktoo = `🕓 Selamat Sore ${pushname}`;
-		break;
-	case 17:
-		waktoo = `🕔 Selamat Sore ${pushname}`;
-		break;
-	case 18:
-		waktoo = '🕕 Waktu Maghrib';
-		break;
-	case 19:
-		waktoo = '🕖 Waktu Isya';
-		break;
-	case 20:
-		waktoo = `🕗 Selamat Malam ${pushname}`;
-		break;
-	case 21:
-		waktoo = `🕘 Selamat Malam ${pushname}`;
-		break;
-	case 22:
-		waktoo = `🕙 Selamat Malam ${pushname}`;
-		break;
-	case 23:
-		waktoo = '🕚 Waktu Tengah Malam';
-		break;
-}
-var tampilUcapan = '' + waktoo;
-
-/* var ase = new Date();
-var waktoonyabro = ase.getHours();
-switch (waktoonyabro) {
-	case 0: // Time In Indonesia WIB 7
-		waktoonyabro = `🕛 *Selamat Pagi ${pushname}*`;
-		break;
-	case 1: // Time In Indonesia WIB 8
-		waktoonyabro = `🕐 *Selamat Pagi ${pushname}*`;
-		break;
-	case 2: // Time In Indonesia WIB 9
-		waktoonyabro = `🕑 *Selamat Pagi ${pushname}*`;
-		break;
-	case 3: // Time In Indonesia WIB 10
-		waktoonyabro = `🕒 *Selamat Pagi ${pushname}*`;
-		break;
-	case 4: // Time In Indonesia WIB 11
-		waktoonyabro = `🕓 *Selamat Pagi ${pushname}*`;
-		break;
-	case 5: // Time In Indonesia WIB 12
-		waktoonyabro = `🕔 *Selamat Siang ${pushname}*`;
-		break;
-	case 6: // Time In Indonesia WIB 13
-		waktoonyabro = `🕕 *Selamat Siang ${pushname}*`;
-		break;
-	case 7: // Time In Indonesia WIB 14
-		waktoonyabro = `🕖 *Selamat Siang ${pushname}*`;
-		break;
-	case 8: // Time In Indonesia WIB 15
-		waktoonyabro = `🕗 *Selamat Sore ${pushname}*`;
-		break;
-	case 9: // Time In Indonesia WIB 16
-		waktoonyabro = `🕘 *Selamat Sore ${pushname}*`;
-		break;
-	case 10: // Time In Indonesia WIB 17
-		waktoonyabro = `🕙 *Selamat Sore ${pushname}*`;
-		break;
-	case 11: // Time In Indonesia WIB 18
-		waktoonyabro = `🕚 *Selamat Petang ${pushname}*`;
-		break;
-	case 12: // Time In Indonesia WIB 19
-		waktoonyabro = `🕛 *Selamat Malam ${pushname}*`;
-		break;
-	case 13: // Time In Indonesia WIB 20
-		waktoonyabro = `🕐 *Selamat Malam ${pushname}*`;
-		break;
-	case 14: // Time In Indonesia WIB 21
-		waktoonyabro = `🕑 *Selamat Malam ${pushname}*`;
-		break;
-	case 15: // Time In Indonesia WIB 22
-		waktoonyabro = `🕒 *Selamat Malam ${pushname}*`;
-		break;
-	case 16: // Time In Indonesia WIB 23
-		waktoonyabro = `🕓 *Selamat Malam ${pushname}*`;
-		break;
-	case 17: // Time In Indonesia WIB 0
-		waktoonyabro = `🕔 *Selamat Malam ${pushname}*`;
-		break;
-	case 18: // Time In Indonesia WIB 1
-		waktoonyabro = `🕕 *Selamat Pagi ${pushname}*`;
-		break;
-	case 19: // Time In Indonesia WIB 2
-		waktoonyabro = `🕖 *Selamat Pagi ${pushname}*`;
-		break;
-	case 20: // Time In Indonesia WIB 3
-		waktoonyabro = `🕗 *Selamat Pagi ${pushname}*`;
-		break;
-	case 21: // Time In Indonesia WIB 4
-		waktoonyabro = `🕘 *Selamat Pagi ${pushname}*`;
-		break;
-	case 22: // Time In Indonesia WIB 5
-		waktoonyabro = `🕙 *Selamat Pagi ${pushname}*`;
-		break;
-	case 23: // Time In Indonesia WIB 6
-		waktoonyabro = `🕚 *Selamat Pagi ${pushname}*`;
-		break;
-}
-var ucapanFakereply = '' + waktoonyabro;
-*/
-        const time2 = moment().tz('Asia/Jakarta').format('DD/MM | HH:mm:ss')
+        const time2 = moment().tz('Asia/Jakarta').format('HH:mm:ss')
         if (time2 < "24:59:00") {
-			var ucapanFakereply = "Selamat malam";
+			var ucapanFakereply = `Selamat malam ${pushname}`;
 		}
 		if (time2 < "19:00:00") {
-			var ucapanFakereply = "Selamat petang";
+			var ucapanFakereply = `Selamat petang ${pushname}`;
 		}
 		if (time2 < "18:00:00") {
-			var ucapanFakereply = "Selamat sore";
+			var ucapanFakereply = `Selamat sore ${pushname}`;
 		}
 		if (time2 < "15:00:00") {
-			var ucapanFakereply = "Selamat siang";
+			var ucapanFakereply = `Selamat siang ${pushname}`;
 		}
 		if (time2 < "11:00:00") {
-			var ucapanFakereply = "Selamat pagi";
+			var ucapanFakereply = `Selamat pagi ${pushname}`;
 		}
 		if (time2 < "05:00:00") {
-			var ucapanFakereply = "Selamat malam";
+			var ucapanFakereply = `Selamat malam ${pushname}`;
 		}
 const fakestatus = (teks) => {
 	patrick.sendMessage(from, teks, text, {
@@ -1111,6 +953,19 @@ function upload (media)  {
 })
 }
 
+function formatDate(n, locale = 'id') {
+  let d = new Date(n)
+  return d.toLocaleDateString(locale, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'
+  })
+}
+
 const sendStickerUrl = async (to, url) => {
 	console.log(color(time, 'magenta'), color(moment.tz('Asia/Jakarta').format('HH:mm:ss'), "gold"), color('Downloading sticker...'))
 	var names = getRandom('.webp')
@@ -1172,7 +1027,6 @@ const sendMediaURL = async (to, url, text = "", mids = []) => {
 		fs.unlinkSync(filename)
 	});
 }
-
 var per = '*[▒▒▒▒▒▒▒▒▒▒] 0%*'
 const peri = 5000 * (Math.pow(2, getLevelingLevel(sender)) - 1)
 const perl = peri - getLevelingXp(sender)
@@ -1331,7 +1185,7 @@ if (isPrem || isOwner) {
 }
 
 expiredCheck(prem)
-if (isGroup && isRegistered && isLevelingOn) {
+if (isGroup && isRegistered) {
 	const currentLevel = getLevelingLevel(sender)
 	const checkId = getLevelingId(sender)
 	try {
@@ -1378,9 +1232,7 @@ const checkLimit = (sender) => {
 
 
 const isLimit = (sender) => {
-	if (isOwner && isPrem) {
-		return false;
-	}
+	if (isPrem) { return false}
 	let position = false
 	for (let i of _limit) {
 		if (i.id === sender) {
@@ -1420,7 +1272,7 @@ if (isRegistered && isGroup) {
 	}
 }
 
-if (budy.includes("://chat.whatsapp.com/")) { 
+            if (budy.includes("://chat.whatsapp.com/")) { 
             getLink = await patrick.groupInviteCode(from) 
 	        if (budy.includes(`${getLink}`)) return reply('Kamu telah mengirim linkgrup ini\nPatrickBot tidak akan kick!')
 			if (!isGroup) return
@@ -1447,22 +1299,16 @@ if (budy.includes("://chat.whatsapp.com/")) {
 			}, 0)
 		}
 		
-if (isGroup && isAntiviewonce && m.mtype == "viewOnceMessage") {
-	reply(`@${sender.split("@")[0]} Terdeteksi mengirim gambar/video viewonce!`);
-	var msg = {
-		...mek
-	};
-	msg.mek = mek.message.viewOnceMessage.message;
-	msg.mek[Object.keys(msg.mek)[0]].viewOnce = false;
-	patrick.copyNForward(m.chat, msg);
-}
-
-	if (isGroup && isAntihidetag && m.message[m.mtype]?.contextInfo?.mentionedJid?.length == groupMembers.length) {
-		console.log(color("[ANTI-HIDETAG]", "red"), color(`@${sender.split("@")[0]} mengirim pesan hidetag`, "white"));
-		reply(`@${sender.split("@")[0]} Terdeteksi mengirim pesan hidetag!!`);
-		kick(from, sender);
+    if (isGroup && isRegistered && autojoin === true) {
+        if (!budy.includes("://chat.whatsapp.com/")) return
+        var inviteCode = body.slice(6).split('https://chat.whatsapp.com/')[0]
+		if (!inviteCode) return reply('pastikan link sudah benar!')
+		var response = await patrick.acceptInvite(codeInvite);
+		console.log(response);
+		reply('Segera diproses, Harap tunggu sebentar!')
+		console.log(color("❏ Auto - Join ", "red"), color(`Link: ${budy}`, "white"))
 	}
-
+				
     if (txt.length > 14000) {
 	if (!isGroup) return
 	if (!isAntiVirtex) return
@@ -1483,6 +1329,7 @@ if (isGroup && isAntiviewonce && m.mtype == "viewOnceMessage") {
         	
 if (isGroup) {
 	try {
+		if (!sender.includes('6288989029718')) return 
 		const getmemex = groupMembers.length
 		if (getmemex <= memberLimit) {
 			setTimeout(() => {
@@ -1509,6 +1356,35 @@ if (isGroup) {
 		console.error(err)
 	}
 }
+           if (isGroup && m.mtype == 'viewOnceMessage'){
+           	try {
+                   var msg = {...mek}
+                   msg.message = mek.message.viewOnceMessage.message
+                   msg.message[Object.keys(msg.message)[0]].viewOnce = false
+                   reply('ViewOnce detected!')
+                   patrick.copyNForward(from, msg)
+               } catch (e) {
+                   console.log(e)
+               }
+            }
+            if (m.message && !m.key.fromMe && m.isBaileys && m.quoted && m.quoted.mtype === 'orderMessage' && !(m.quoted.token && m.quoted.orderId)) {
+            	try {
+                    m.reply('Troli Detected\n\n' + require('util').format(m.key))
+                    await patrick.modifyChat(m.chat, 'delete', {
+                        includeStarred: false
+                    })
+                } catch (e) {
+                	console.log(e)
+                }
+             } 
+             if (isGroup && m.message[m.mtype]?.contextInfo?.mentionedJid?.length == groupMembers.length) {
+             	try {
+			         console.log(color("> Anti-Hidetag", "yellow"), color(`@${sender.split("@")[0]} mengirim pesan hidetag`, "white"));
+			         reply(`@${sender.split("@")[0]} Terdeteksi mengirim pesan hidetag!!`);
+		         } catch (e) { 
+			         console.log(e)
+			     }
+			}
             q2 = Object.keys(mek.message)[0] == "listResponseMessage" ? mek.message.listResponseMessage.singleSelectReply.selectedRowId: ""
             button = (type == 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedDisplayText : ''
             rspndbutton = (type == 'listResponseMessage') ? mek.message.listResponseMessage.title: ''
@@ -1548,7 +1424,7 @@ if (isGroup) {
 			stc.push(from)
 			fs.writeFileSync('./database/json/stc.json', JSON.stringify(stc))
 			reply('❬ *SUKSES* ❭ *MENGAKTIFKAN FITUR ANTISPAM STICKER DI GROUP INI*')
-			patrick.sendMessage(from, `PERINGATAN\nJika bukan admin jangan spam sticker 5x sekaligus dalam 5 menit`, text)
+			patrick.sendMessage(from, `PERINGATAN\nJika bukan admin jangan spam sticker 10x sekaligus dalam 4 menit`, text)
 			} else
             if (rspndbutton == 'Welcome') {
             if (!isGroup) return reply(ind.groupo())
@@ -1656,7 +1532,7 @@ if (isGroup) {
 			patrick.sendMessage(from, `*RULES BAGI PENGGUNA BOT*\n    \n➣ Tolong Gunakan Delay Jangan Terlalunge-Spam Saat Menggunakan Bot.\n➣ Call/VC Bot Auto Banned.\n➣ Jangan Call/VC Bot Kalau Tidak aktif.\n➣ Bot Online 24 Jam tapi kadang Disconnect.\n\n*Konsekuensi Bila Melanggar Rules*\nBot Akan Mem-Banned Kamu dan Memblokir kamu.\n\nRules ini untuk kenyamanan semua yang memakai\nbot ini \n1. Jangan terlalu spam bot. \nSanksi: *WARN/SOFT BLOCK* = Tidak Direspon selama 5 detik!\n\n2. Jangan telepon bot.\nSanksi: *SOFT BLOCK* = Block!\n\n3. Jangan mengeksploitasi bot.\nSanksi: *PERMANENT BLOCK* = Banned + Block!\n\nJika sudah dipahami rules-nya, silakan ketik *${prefix}menu* untuk memulai!\nJika Ada yang error ketik *${prefix}report [Bug]`)
 		    } else 
 		    //======== Anime =======\\
-		    if (rspndbutton == 'KDU / Kdu Image') {
+		/*    if (rspndbutton == 'KDU / Kdu Image') {
 			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			data = fs.readFileSync('./lib/husbu.js');
@@ -1770,11 +1646,7 @@ if (isGroup) {
 			console.log(`Error :`, color(e, 'red'))
 			reply(ind.error())
 				}
-			} else 
-		    if (rspndbutton == 'Read Docs') {
-		    if (isLevelingOn) return reply('Fitur Leveling Belum aktif!')
-			patrick.sendMessage(from, `*RULES BAGI PENGGUNA BOT*\n    \n➣ Tolong Gunakan Delay Jangan Terlalu Dispam Saat Menggunakan Bot.\n➣ Call/VC Bot Auto Banned.\n➣ Jangan Call/VC Bot Kalau Tidak aktif.\n➣ Bot Online 24 Jam tapi kadang Disconnect.\n\n*Konsekuensi Bila Melanggar Rules*\nBot Akan Mem-Banned Kamu dan Memblokir kamu.\n\nRules ini untuk kenyamanan semua yang memakai\nbot ini \n1. Jangan terlalu spam bot. \nSanksi: *WARN/SOFT BLOCK* = Tidak Direspon selama 5 detik!\n\n2. Jangan telepon bot.\nSanksi: *SOFT BLOCK* = Block!\n\n3. Jangan mengeksploitasi bot.\nSanksi: *PERMANENT BLOCK* = Banned + Block!\n\nJika sudah dipahami rules-nya, silakan ketik *${prefix}menu* untuk memulai!\nJika Ada yang error ketik *${prefix}report [Bug]`)
-		    } else 
+			} else */
             //=================== Menu Nya =============\\ 
             if (rspndbutton == '▨ Owner Menu ▨') {
             if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true) 
@@ -1935,105 +1807,6 @@ Boleh Dong Follow Insta: _pa7rick :)`,
 		    await patrickhay(ind.other(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
             } else 
             //======================= GAME MENU =========================\\
-            if (rspndbutton == 'Family 100') {
-            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		    if (isBanned) return reply(ind.baned())
-		    if (isLimit(sender)) return reply(limitend(pushname))
-            if (game.isfam(from, family100)) return reply(`Masih ada soal yang belum di selesaikan`)
-            let anehaja = await fetchJson(`https://api.zeks.xyz/api/family100?apikey=${zeksApi}`)
-            getFamily = anehaja.data
-            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${getFamily.soal}\n*Total Jawaban :* ${getFamily.jawaban.array.length}\n\nWaktu : ${gamewaktu}s`)
-            let anoh = getFamily.jawaban.array
-            let rgfds = []
-            for (let i of anoh){
-            let fefs = i.split('/') ? i.split('/')[0] : i
-            let iuhbb = fefs.startsWith(' ') ? fefs.replace(' ','') : fefs
-            let axsf = iuhbb.endsWith(' ') ? iuhbb.replace(iuhbb.slice(-1), '') : iuhbb
-            rgfds.push(axsf.toLowerCase())
-            }
-            game.addfam(from, rgfds, gamewaktu, family100)
-            limitAdd(sender)
-            } else 
-            if (rspndbutton == 'Math') {
-            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		    if (isBanned) return reply(ind.baned())
-		    if (isLimit(sender)) return reply(limitend(pushname))
-            if (game.isMath(from, math)) return reply(`Masih ada soal yang belum di selesaikan`)
-            gamewaktus = 20
-            extsoal5 = `${extsoal}`
-            extanswer5 = `${extanswer}`
-            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${extsoal5}\n\nWaktu : ${gamewaktus}s`)
-            let anihs = extanswer5.toLowerCase()
-            game.addmath(from, anihs, gamewaktus, math)
-            limitAdd(sender)
-            } else  
-            if (rspndbutton == 'Tebak Gambar') {
-            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		    if (isBanned) return reply(ind.baned())
-		    if (isLimit(sender)) return reply(limitend(pushname))
-            if (game.isTebakGambar(from, tebakgambar)) return reply(`Masih ada soal yang belum di selesaikan`)
-            let aneaja = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/tebakgambar?apikey=${dappaApi}`)
-            sendFileFromUrl(from, aneaja.result.image, monospace(`Silahkan jawab soal berikut ini\n\nPetunjuk : ${aneaja.result.clue}\nWaktu : ${gamewaktu}s`), mek)
-            let anih = aneaja.result.jawaban.toLowerCase()
-            game.addgambar(from, anih, gamewaktu, tebakgambar)
-            limitAdd(sender)
-            } else 
-            if (rspndbutton == 'Siapakah Aku?') {
-            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		    if (isBanned) return reply(ind.baned())
-		    if (isLimit(sender)) return reply(limitend(pushname))
-            if (game.isSiapakah(from, siapakah)) return reply(`Masih ada soal yang belum di selesaikan`)
-            let anuh = await fetchJson(`https://api.zeks.xyz/api/siapa-aku?apikey=${zeksApi}`)
-            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.data.soal}\n\nWaktu : ${gamewaktu}s`)
-            let anihp = anuh.data.jawaban.toLowerCase()
-            game.addSPK(from, anihp, gamewaktu, siapakah)
-            limitAdd(sender)
-            } else 
-            if (rspndbutton == 'Teka Teki') {
-            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		    if (isBanned) return reply(ind.baned())
-		    if (isLimit(sender)) return reply(limitend(pushname))
-            if (game.isTek(from, tekateki)) return reply(`Masih ada soal yang belum di selesaikan`)
-            let anuh = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/tekateki?apikey=${dappaApi}`)
-            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.pertanyaan}\n\nWaktu : ${gamewaktu}s`)
-            let anohc = anuh.jawaban.toLowerCase()
-            game.addTek(from, anohc, gamewaktu, tekateki)
-            limitAdd(sender)
-            } else 
-            if (rspndbutton == 'Susun Kata') {
-            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		    if (isBanned) return reply(ind.baned())
-		    if (isLimit(sender)) return reply(limitend(pushname))
-            if (game.isSK(from, susunkata)) return reply(`Masih ada soal yang belum di selesaikan`)
-            let anuh = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/susunkata?apikey=${dappaApi}`)
-            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.acak}\n*Tipe :* ${anuh.tipe}\n\nWaktu : ${gamewaktu}s`)
-            let anicch = anuh.jawaban.toLowerCase()
-            game.addSK(from, anicch, gamewaktu, susunkata)
-            limitAdd(sender)
-            } else 
-            if (rspndbutton == 'Asah Otak') {
-            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		    if (isBanned) return reply(ind.baned())
-		    if (isLimit(sender)) return reply(limitend(pushname))
-            if (game.isAO(from, asahotak)) return reply(`Masih ada soal yang belum di selesaikan`)
-            let anuh = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/asahotak?apikey=${dappaApi}`)
-            reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.acak}\n\nWaktu : ${gamewaktu}s`)
-            let anncch = anuh.jawaban.toLowerCase()
-            game.addAO(from, anncch, gamewaktu, asahotak)
-            limitAdd(sender)
-            } else
-            if (rspndbutton == 'Tebak Angka') {
-            if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		    if (isBanned) return reply(ind.baned())
-		    if (isLimit(sender)) return reply(limitend(pushname))
-            if (game.isMath(from, math)) return reply(`Masih ada soal yang belum di selesaikan`)
-            gamewaktuts = 30
-            angkaBot = `${Math.floor(Math.random() * 10)}`
-            reply(`*Tebak Angka*\n\nPilih Angka  Dari 1-10\nContoh: 4\nWaktu : ${gamewaktuts}s`)
-            let anoehs = angkaBot.toLowerCase()
-            game.addAngka(from, anoehs, gamewaktuts, tebakangka)
-            limitAdd(sender)
-            } else 
             if (rspndbutton == 'MP3') {
             try{
             downm = await yta(q2)
@@ -2183,12 +1956,16 @@ await reply(m)
         } 
         
         if (game.isAngka(from, tebakangka) && isRegistered){
-            if (budy.toLowerCase().includes(game.getJawabanAngka(from, tebakangka))){
+            if (budy.toLowerCase().startsWith(game.getJawabanAngka(from, tebakangka))){
                 var htgms = randomNomor(12)
                 addKoinUser(sender, htgms)
                 await reply(`*Selamat jawaban kamu benar*\n*Jawaban :* ${game.getJawabanAngka(from, tebakangka)}\n*Hadiah :* ${htgms}\n\nIngin bermain lagi? kirim *${prefix}tebakangka*`)
                 tebakangka.splice(game.getAngkaPosi(from, tebakangka), 1)
-            } 
+            } else 
+            if (budy.toLowerCase()) {
+            reply(`Yah jawabanmu salah!, jawabannya ${game.getJawabanAngka(from, tebakangka)}`)
+            tebakangka.splice(game.getAngkaPosi(from, tebakangka), 1)
+            }
         }
         if (game.isfam(from, family100) && isRegistered){
             var anjuy = game.getjawaban100(from, family100)
@@ -2229,30 +2006,254 @@ switch (command) {
 	    case 'menu':
 		if (isBanned) return reply(ind.baned())
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		if (isLimit(sender)) return reply(ind.limitend(pushname, prefix)) 
-		const uangkiem = checkATMuser(sender)
-		const lvliem = getLevelingLevel(sender)
-		menlu = 
+		if (isLimit(sender)) return reply(ind.limitend(pushname, prefix))
+		const requXp = 5000 * (Math.pow(2, getLevelingLevel(sender)) - 1)
+		const uangkim = checkATMuser(sender)
+		const lvlim = getLevelingLevel(sender)
+		if (!isGroup) {
+			const menunya =
 `Hello World, ${botName} is here
 Created By @_pa7rick
 
 ${a} ❏ Nama : ${pushname}${a}
 ${a} ❏ User :${a} ${premi}
-${a} ❏ Balance : $${uangkiem}${a}
-${a} ❏ Level : ${lvliem}${a}
+${a} ❏ Balance : $${uangkim}${a}
+${a} ❏ Level : ${lvlim}${a}
 
   ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
-  ❏  Total Hit : ${pepolu}`
-		sendButImage(from, menlu, `${footerButton}\nJika button tidak keliatan\nketik ${prefix}help`, fs.readFileSync("./lib/image/logo.jpeg"), 
+  ❏  Total Hit : ${pepolu}
+  ❏  Total Hit Today : ${hit_today.length}
+
+╭────────────────
+◉ *Image Edit*
+ ${akyu}❏ ${prefix}triggered${akyu}
+ ${akyu}❏ ${prefix}glass${akyu}
+ ${akyu}❏ ${prefix}gay${akyu}
+ ${akyu}❏ ${prefix}jail${akyu}
+ ${akyu}❏ ${prefix}comrade${akyu}
+ ${akyu}❏ ${prefix}removebg${akyu}
+ ${akyu}❏ ${prefix}delete${akyu}
+ ${akyu}❏ ${prefix}airpods${akyu}
+ ${akyu}❏ ${prefix}ad${akyu}
+ ${akyu}❏ ${prefix}sepia${akyu}
+ ${akyu}❏ ${prefix}hacker${akyu}
+ ${akyu}❏ ${prefix}greyscale${akyu}
+ ${akyu}❏ ${prefix}continued${akyu}
+ ${akyu}❏ ${prefix}captcha${akyu}
+ ${akyu}❏ ${prefix}approve${akyu}
+ ${akyu}❏ ${prefix}what${akyu}
+ ${akyu}❏ ${prefix}linus${akyu}
+ ${akyu}❏ ${prefix}facepalm${akyu}
+ ${akyu}❏ ${prefix}discordblue${akyu}
+ ${akyu}❏ ${prefix}discordblack${akyu}
+ ${akyu}❏ ${prefix}bed${akyu}
+╭────────────────
+◉ *Maker Menu*
+ ${akyu}❏ ${prefix}csgo${akyu}
+ ${akyu}❏ ${prefix}honey${akyu}
+ ${akyu}❏ ${prefix}3dglue${akyu}
+ ${akyu}❏ ${prefix}lava${akyu}
+ ${akyu}❏ ${prefix}shinymetal${akyu}
+ ${akyu}❏ ${prefix}yellowjewelry${akyu}
+ ${akyu}❏ ${prefix}erodedmetal${akyu}
+ ${akyu}❏ ${prefix}bluegem${akyu}
+ ${akyu}❏ ${prefix}3dbox${akyu} 
+ ${akyu}❏ ${prefix}pornhub${akyu}
+ ${akyu}❏ ${prefix}glitch${akyu}
+ ${akyu}❏ ${prefix}8bit${akyu}
+ ${akyu}❏ ${prefix}marvelstudio${akyu}
+ ${akyu}❏ ${prefix}multicolor3d${akyu}
+ ${akyu}❏ ${prefix}realisticvintage${akyu}
+ ${akyu}❏ ${prefix}neon${akyu}
+ ${akyu}❏ ${prefix}silk${akyu} 
+ ${akyu}❏ ${prefix}warface${akyu}
+ ${akyu}❏ ${prefix}gradient${akyu}
+ ${akyu}❏ ${prefix}neon${akyu}
+ ${akyu}❏ ${prefix}matrix${akyu}
+ ${akyu}❏ ${prefix}butterfly${akyu}
+ ${akyu}❏ ${prefix}slide${akyu} 
+ ${akyu}❏ ${prefix}party${akyu}
+ ${akyu}❏ ${prefix}glowmetalic${akyu}
+ ${akyu}❏ ${prefix}rainbowshine${akyu}
+ ${akyu}❏ ${prefix}bokeh${akyu}
+ ${akyu}❏ ${prefix}hartatahta${akyu} 
+ ${akyu}❏ ${prefix}biscuit${akyu}
+ ${akyu}❏ ${prefix}3dunderwater${akyu} 
+ ${akyu}❏ ${prefix}3dglowing${akyu}
+ ${akyu}❏ ${prefix}bearlogo${akyu}
+ ${akyu}❏ ${prefix}cloud${akyu}
+ ${akyu}❏ ${prefix}steel${akyu}
+ ${akyu}❏ ${prefix}fruitjuice${akyu}
+ ${akyu}❏ ${prefix}icecold${akyu}
+ ${akyu}❏ ${prefix}marble${akyu}
+ ${akyu}❏ ${prefix}horror${akyu}
+ ${akyu}❏ ${prefix}wood${akyu}
+ ${akyu}❏ ${prefix}greenneon${akyu}
+ ${akyu}❏ ${prefix}breakwall${akyu}
+ ${akyu}❏ ${prefix}pubg${akyu} 
+ ${akyu}❏ ${prefix}flaming${akyu}
+ ${akyu}❏ ${prefix}naruto${akyu}
+ ${akyu}❏ ${prefix}brokenglass${akyu}
+ ${akyu}❏ ${prefix}glass${akyu}
+ ${akyu}❏ ${prefix}attp${akyu}
+ ${akyu}❏ ${prefix}makequote${akyu}
+ ${akyu}❏ ${prefix}ttp${akyu}
+ ${akyu}❏ ${prefix}ocr${akyu} 
+╭────────────────
+◉ *Game Menu*
+ ${akyu}❏ ${prefix}tebakgambar${akyu}
+ ${akyu}❏ ${prefix}tictactoe${akyu}
+ ${akyu}❏ ${prefix}math${akyu}
+ ${akyu}❏ ${prefix}siapakahaku${akyu}
+ ${akyu}❏ ${prefix}family100${akyu}
+ ${akyu}❏ ${prefix}asahotak${akyu}
+ ${akyu}❏ ${prefix}tekateki${akyu}
+ ${akyu}❏ ${prefix}susunkata${akyu}
+ ${akyu}❏ ${prefix}tebakangka${akyu}
+╭────────────────
+◉ *Random Image* ${a} [ SOON ] ${a}
+ ${akyu}❏ ${prefix}progamming${akyu}
+ ${akyu}❏ ${prefix}islamic${akyu}
+ ${akyu}❏ ${prefix}cyberspace${akyu}
+ ${akyu}❏ ${prefix}game${akyu}
+╭────────────────
+◉ *Kerang Menu*
+ ${akyu}❏ ${prefix}apakah${akyu}
+ ${akyu}❏ ${prefix}bisakah${akyu}
+ ${akyu}❏ ${prefix}kapankah${akyu}
+ ${akyu}❏ ${prefix}rate${akyu}
+ ${akyu}❏ ${prefix}ganteng${akyu}
+ ${akyu}❏ ${prefix}beban${akyu}
+ ${akyu}❏ ${prefix}cantik${akyu}
+ ${akyu}❏ ${prefix}jelek${akyu}
+ ${akyu}❏ ${prefix}nggagur${akyu}
+ ${akyu}❏ ${prefix}baik${akyu}
+ ${akyu}❏ ${prefix}jahat${akyu}
+ ${akyu}❏ ${prefix}nolep${akyu}
+ ${akyu}❏ ${prefix}wibu${akyu}
+ ${akyu}❏ ${prefix}hebat${akyu}
+ ${akyu}❏ ${prefix}pakboy${akyu}
+ ${akyu}❏ ${prefix}pakgirl${akyu}
+ ${akyu}❏ ${prefix}vganteng${akyu}
+ ${akyu}❏ ${prefix}vbeban${akyu}
+ ${akyu}❏ ${prefix}vcantik${akyu}
+ ${akyu}❏ ${prefix}vjelek${akyu}
+ ${akyu}❏ ${prefix}vbaik${akyu}
+ ${akyu}❏ ${prefix}vjahat${akyu}
+ ${akyu}❏ ${prefix}vnolep${akyu}
+ ${akyu}❏ ${prefix}vwibu${akyu}
+ ${akyu}❏ ${prefix}vhebat${akyu}
+ ${akyu}❏ ${prefix}vpakboy${akyu}
+ ${akyu}❏ ${prefix}vpakgirl${akyu}
+╭────────────────
+◉ *Fun Menu*
+ ${akyu}❏ ${prefix}tts${akyu}
+ ${akyu}❏ ${prefix}emoji${akyu}
+ ${akyu}❏ ${prefix}ppcouple${akyu}
+ ${akyu}❏ ${prefix}bpfont${akyu}
+ ${akyu}❏ ${prefix}truth${akyu}
+ ${akyu}❏ ${prefix}dare${akyu}
+ ${akyu}❏ ${prefix}leaderboard${akyu}
+ ${akyu}❏ ${prefix}hobby${akyu}
+ ${akyu}❏ ${prefix}memeindo${akyu}
+ ${akyu}❏ ${prefix}asupan${akyu}
+ ${akyu}❏ ${prefix}jadian${akyu}
+ ${akyu}❏ ${prefix}artinama${akyu}
+╭────────────────
+◉ *Berita Menu*
+ ${akyu}❏ ${prefix}sindo (internasional)${akyu}
+ ${akyu}❏ ${prefix}sindo2 (nasional)${akyu}
+ ${akyu}❏ ${prefix}okezone${akyu}
+ ${akyu}❏ ${prefix}kompastv${akyu}
+ ${akyu}❏ ${prefix}bbcnews${akyu}
+ ${akyu}❏ ${prefix}beritanews${akyu}
+╭────────────────
+◉ *Download Menu*
+ ${akyu}❏ ${prefix}ytplay${akyu}
+ ${akyu}❏ ${prefix}play${akyu}
+ ${akyu}❏ ${prefix}ytmp3${akyu}
+ ${akyu}❏ ${prefix}ytmp3v2${akyu}
+ ${akyu}❏ ${prefix}ytmp4${akyu}
+ ${akyu}❏ ${prefix}ytmp4v2${akyu}
+ ${akyu}❏ ${prefix}tiktokdownload${akyu}
+ ${akyu}❏ ${prefix}igvideo${akyu}
+ ${akyu}❏ ${prefix}igphoto${akyu}
+╭────────────────
+◉ *Search Menu*
+ ${akyu}❏ ${prefix}gsmarena${akyu}
+ ${akyu}❏ ${prefix}pinterest${akyu}
+ ${akyu}❏ ${prefix}googleimage${akyu}
+ ${akyu}❏ ${prefix}stickersearch${akyu}
+ ${akyu}❏ ${prefix}aesthetic${akyu}
+ ${akyu}❏ ${prefix}searchmusic${akyu}
+ ${akyu}❏ ${prefix}shopee${akyu}
+ ${akyu}❏ ${prefix}jalantikus${akyu}
+ ${akyu}❏ ${prefix}thelazy${akyu}
+ ${akyu}❏ ${prefix}wattpad${akyu}
+ ${akyu}❏ ${prefix}rexdl${akyu}
+ ${akyu}❏ ${prefix}moddroid${akyu}
+ ${akyu}❏ ${prefix}sfile${akyu}
+╭────────────────
+◉ *Islam Menu*
+ ${akyu}❏ ${prefix}quran${akyu}
+ ${akyu}❏ ${prefix}quotesislami${akyu}
+ ${akyu}❏ ${prefix}listsurah${akyu}
+╭────────────────
+◉ *Other Menu*
+ ${akyu}❏ ${prefix}sticker${akyu} 
+ ${akyu}❏ ${prefix}jadwaltv${akyu} 
+ ${akyu}❏ ${prefix}styletext${akyu} 
+ ${akyu}❏ ${prefix}img2url${akyu} 
+ ${akyu}❏ ${prefix}tagstiker${akyu} 
+ ${akyu}❏ ${prefix}nulis${akyu} 
+ ${akyu}❏ ${prefix}swm${akyu} 
+ ${akyu}❏ ${prefix}toimg${akyu}  
+ ${akyu}❏ ${prefix}ssweb${akyu}
+ ${akyu}❏ ${prefix}tomp3${akyu} 
+ ${akyu}❏ ${prefix}shortlink${akyu} 
+ ${akyu}❏ ${prefix}shortlink2${akyu} 
+ ${akyu}❏ ${prefix}shortlink3${akyu}  
+ ${akyu}❏ ${prefix}bass${akyu}  
+ ${akyu}❏ ${prefix}tupai${akyu}
+ ${akyu}❏ ${prefix}slowmo${akyu} 
+ ${akyu}❏ ${prefix}gemok${akyu}
+╭────────────────
+◉ *Anime Menu*
+ ${akyu}❏ ${prefix}kdu${akyu} 
+ ${akyu}❏ ${prefix}femdom${akyu}
+ ${akyu}❏ ${prefix}kemonimimi${akyu}
+ ${akyu}❏ ${prefix}kuni${akyu} 
+ ${akyu}❏ ${prefix}husbu2${akyu}  
+ ${akyu}❏ ${prefix}neko2${akyu}
+ ${akyu}❏ ${prefix}holo${akyu} 
+╭────────────────
+◉ *Owner Menu*
+ ${akyu}❏ ${prefix}receive${akyu}
+ ${akyu}❏ ${prefix}setppbot${akyu}
+ ${akyu}❏ ${prefix}bc${akyu}
+ ${akyu}❏ ${prefix}bcgc${akyu}
+ ${akyu}❏ ${prefix}setreply${akyu}
+ ${akyu}❏ ${prefix}setthumb${akyu}
+ ${akyu}❏ ${prefix}antidelete${akyu}
+ ${akyu}❏ ${prefix}setmemberlimit${akyu}
+ ${akyu}❏ ${prefix}setlimit${akyu}
+ ${akyu}❏ ${prefix}addprem${akyu}
+ ${akyu}❏ ${prefix}unprem${akyu}
+ ${akyu}❏ ${prefix}ban${akyu}
+ ${akyu}❏ ${prefix}unban${akyu}
+ ${akyu}❏ ${prefix}setprefix${akyu}
+ ${akyu}❏ ${prefix}clearall${akyu}
+ ${akyu}❏ ${prefix}block${akyu}
+ ${akyu}❏ ${prefix}unblock${akyu} 
+ ${akyu}❏ ${prefix}leave${akyu}
+ ${akyu}❏ ${prefix}clone${akyu}
+ ${akyu}❏ ${prefix}setppbot${akyu}
+ ${akyu}❏ ${prefix}readall${akyu}
+
+       ~ ${botName} 2021` 
+       sendButMessage(from, menunya, `${footerButton}`, 
         [{
-			buttonId: `${prefix}help`,
-			buttonText: {
-				displayText: `▨ MENU ▨`,
-			},
-			type: 1,
-		},
-        {
 			buttonId: `${prefix}owner`,
 			buttonText: {
 				displayText: `▨ CREATOR ▨`,
@@ -2267,18 +2268,10 @@ ${a} ❏ Level : ${lvliem}${a}
 			type: 1,
 		},
 		]);
-		break;
-	 /*   case 'help':
-		if (isBanned) return reply(ind.baned())
-		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-		if (isLimit(sender)) return reply(ind.limitend(pushname, prefix))
-		me = patrick.user
-		const requXp = 5000 * (Math.pow(2, getLevelingLevel(sender)) - 1)
-		const uangkim = checkATMuser(sender)
-		const lvlim = getLevelingLevel(sender)
-		if (!isGroup) {
-			const menunya =
-				`Hello World, ${botName} is here           ${emojiUser}
+		} else
+		if (isGroup) {
+			const menunon =
+`Hello World, ${botName} is here
 Created By @_pa7rick
 
 ${a} ❏ Nama : ${pushname}${a}
@@ -2289,85 +2282,275 @@ ${a} ❏ Level : ${lvlim}${a}
   ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
-   
-*▫️ Fitur Yg Sering Digunakan*
-   *- ${prefix}sticker*
-   *- ${prefix}play*
-   *- ${prefix}nulis*
+  ❏  Total Hit Today : ${hit_today.length}
 
-${a}╭────${a}「 *All Menu* 」
-${a}│ ❏ ${prefix}ownermenu
-│ ❏ ${prefix}makermenu
-│ ❏ ${prefix}funmenu
-│ ❏ ${prefix}gamemenu
-│ ❏ ${prefix}kerangmenu
-│ ❏ ${prefix}downloadmenu
-│ ❏ ${prefix}animemenu
-│ ❏ ${prefix}groupmenu
-│ ❏ ${prefix}searchmenu
-│ ❏ ${prefix}beritamenu
-│ ❏ ${prefix}islammenu
-│ ❏ ${prefix}cloudmenu
-│ ❏ ${prefix}othermenu
-╰───────────────${a}
+╭────────────────
+◉ *Group Menu*
+ ${akyu}❏ ${prefix}enable${akyu}
+ ${akyu}❏ ${prefix}disable${akyu} 
+ ${akyu}❏ ${prefix}group buka | tutup${akyu}
+ ${akyu}❏ ${prefix}add 62881xxxx${akyu}
+ ${akyu}❏ ${prefix}promote @tag${akyu}
+ ${akyu}❏ ${prefix}demote @tag${akyu}
+ ${akyu}❏ ${prefix}setname teks${akyu}
+ ${akyu}❏ ${prefix}setpp reply image${akyu}
+ ${akyu}❏ ${prefix}setdesc teks${akyu}
+ ${akyu}❏ ${prefix}groupinfo${akyu}
+ ${akyu}❏ ${prefix}linkgrup${akyu}
+ ${akyu}❏ ${prefix}tagall${akyu}
+ ${akyu}❏ ${prefix}hidetag${akyu}
+ ${akyu}❏ ${prefix}hidetag20${akyu}
+ ${akyu}❏ ${prefix}hidetag50${akyu}
+ ${akyu}❏ ${prefix}tagme${akyu}
+ ${akyu}❏ ${prefix}level${akyu}
+ ${akyu}❏ ${prefix}listonline${akyu}
+ ${akyu}❏ ${prefix}delete${akyu}
+ ${akyu}❏ ${prefix}caripesan${akyu}
+╭────────────────
+◉ *Image Edit*
+ ${akyu}❏ ${prefix}triggered${akyu}
+ ${akyu}❏ ${prefix}glass${akyu}
+ ${akyu}❏ ${prefix}gay${akyu}
+ ${akyu}❏ ${prefix}jail${akyu}
+ ${akyu}❏ ${prefix}comrade${akyu}
+ ${akyu}❏ ${prefix}removebg${akyu}
+ ${akyu}❏ ${prefix}delete${akyu}
+ ${akyu}❏ ${prefix}airpods${akyu}
+ ${akyu}❏ ${prefix}ad${akyu}
+ ${akyu}❏ ${prefix}sepia${akyu}
+ ${akyu}❏ ${prefix}hacker${akyu}
+ ${akyu}❏ ${prefix}greyscale${akyu}
+ ${akyu}❏ ${prefix}continued${akyu}
+ ${akyu}❏ ${prefix}captcha${akyu}
+ ${akyu}❏ ${prefix}approve${akyu}
+ ${akyu}❏ ${prefix}what${akyu}
+ ${akyu}❏ ${prefix}linus${akyu}
+ ${akyu}❏ ${prefix}facepalm${akyu}
+ ${akyu}❏ ${prefix}discordblue${akyu}
+ ${akyu}❏ ${prefix}discordblack${akyu}
+ ${akyu}❏ ${prefix}bed${akyu}
+╭────────────────
+◉ *Maker Menu*
+ ${akyu}❏ ${prefix}csgo${akyu}
+ ${akyu}❏ ${prefix}honey${akyu}
+ ${akyu}❏ ${prefix}3dglue${akyu}
+ ${akyu}❏ ${prefix}lava${akyu}
+ ${akyu}❏ ${prefix}shinymetal${akyu}
+ ${akyu}❏ ${prefix}yellowjewelry${akyu}
+ ${akyu}❏ ${prefix}erodedmetal${akyu}
+ ${akyu}❏ ${prefix}bluegem${akyu}
+ ${akyu}❏ ${prefix}3dbox${akyu} 
+ ${akyu}❏ ${prefix}pornhub${akyu}
+ ${akyu}❏ ${prefix}glitch${akyu}
+ ${akyu}❏ ${prefix}8bit${akyu}
+ ${akyu}❏ ${prefix}marvelstudio${akyu}
+ ${akyu}❏ ${prefix}multicolor3d${akyu}
+ ${akyu}❏ ${prefix}realisticvintage${akyu}
+ ${akyu}❏ ${prefix}neon${akyu}
+ ${akyu}❏ ${prefix}silk${akyu} 
+ ${akyu}❏ ${prefix}warface${akyu}
+ ${akyu}❏ ${prefix}gradient${akyu}
+ ${akyu}❏ ${prefix}neon${akyu}
+ ${akyu}❏ ${prefix}matrix${akyu}
+ ${akyu}❏ ${prefix}butterfly${akyu}
+ ${akyu}❏ ${prefix}slide${akyu} 
+ ${akyu}❏ ${prefix}party${akyu}
+ ${akyu}❏ ${prefix}glowmetalic${akyu}
+ ${akyu}❏ ${prefix}rainbowshine${akyu}
+ ${akyu}❏ ${prefix}bokeh${akyu}
+ ${akyu}❏ ${prefix}hartatahta${akyu} 
+ ${akyu}❏ ${prefix}biscuit${akyu}
+ ${akyu}❏ ${prefix}3dunderwater${akyu} 
+ ${akyu}❏ ${prefix}3dglowing${akyu}
+ ${akyu}❏ ${prefix}bearlogo${akyu}
+ ${akyu}❏ ${prefix}cloud${akyu}
+ ${akyu}❏ ${prefix}steel${akyu}
+ ${akyu}❏ ${prefix}fruitjuice${akyu}
+ ${akyu}❏ ${prefix}icecold${akyu}
+ ${akyu}❏ ${prefix}marble${akyu}
+ ${akyu}❏ ${prefix}horror${akyu}
+ ${akyu}❏ ${prefix}wood${akyu}
+ ${akyu}❏ ${prefix}greenneon${akyu}
+ ${akyu}❏ ${prefix}breakwall${akyu}
+ ${akyu}❏ ${prefix}pubg${akyu} 
+ ${akyu}❏ ${prefix}flaming${akyu}
+ ${akyu}❏ ${prefix}naruto${akyu}
+ ${akyu}❏ ${prefix}brokenglass${akyu}
+ ${akyu}❏ ${prefix}glass${akyu}
+ ${akyu}❏ ${prefix}attp${akyu}
+ ${akyu}❏ ${prefix}makequote${akyu}
+ ${akyu}❏ ${prefix}ttp${akyu}
+ ${akyu}❏ ${prefix}ocr${akyu} 
+╭────────────────
+◉ *Game Menu*
+ ${akyu}❏ ${prefix}tebakgambar${akyu}
+ ${akyu}❏ ${prefix}tictactoe${akyu}
+ ${akyu}❏ ${prefix}math${akyu}
+ ${akyu}❏ ${prefix}siapakahaku${akyu}
+ ${akyu}❏ ${prefix}family100${akyu}
+ ${akyu}❏ ${prefix}asahotak${akyu}
+ ${akyu}❏ ${prefix}tekateki${akyu}
+ ${akyu}❏ ${prefix}susunkata${akyu}
+ ${akyu}❏ ${prefix}tebakangka${akyu}
+╭────────────────
+◉ *Random Image* ${a} [ SOON ] ${a}
+ ${akyu}❏ ${prefix}progamming${akyu}
+ ${akyu}❏ ${prefix}islamic${akyu}
+ ${akyu}❏ ${prefix}cyberspace${akyu}
+ ${akyu}❏ ${prefix}game${akyu}
+╭────────────────
+◉ *Kerang Menu*
+ ${akyu}❏ ${prefix}apakah${akyu}
+ ${akyu}❏ ${prefix}bisakah${akyu}
+ ${akyu}❏ ${prefix}kapankah${akyu}
+ ${akyu}❏ ${prefix}rate${akyu}
+ ${akyu}❏ ${prefix}ganteng${akyu}
+ ${akyu}❏ ${prefix}beban${akyu}
+ ${akyu}❏ ${prefix}cantik${akyu}
+ ${akyu}❏ ${prefix}jelek${akyu}
+ ${akyu}❏ ${prefix}nggagur${akyu}
+ ${akyu}❏ ${prefix}baik${akyu}
+ ${akyu}❏ ${prefix}jahat${akyu}
+ ${akyu}❏ ${prefix}nolep${akyu}
+ ${akyu}❏ ${prefix}wibu${akyu}
+ ${akyu}❏ ${prefix}hebat${akyu}
+ ${akyu}❏ ${prefix}pakboy${akyu}
+ ${akyu}❏ ${prefix}pakgirl${akyu}
+ ${akyu}❏ ${prefix}vganteng${akyu}
+ ${akyu}❏ ${prefix}vbeban${akyu}
+ ${akyu}❏ ${prefix}vcantik${akyu}
+ ${akyu}❏ ${prefix}vjelek${akyu}
+ ${akyu}❏ ${prefix}vbaik${akyu}
+ ${akyu}❏ ${prefix}vjahat${akyu}
+ ${akyu}❏ ${prefix}vnolep${akyu}
+ ${akyu}❏ ${prefix}vwibu${akyu}
+ ${akyu}❏ ${prefix}vhebat${akyu}
+ ${akyu}❏ ${prefix}vpakboy${akyu}
+ ${akyu}❏ ${prefix}vpakgirl${akyu}
+╭────────────────
+◉ *Fun Menu*
+ ${akyu}❏ ${prefix}tts${akyu}
+ ${akyu}❏ ${prefix}ppcouple${akyu}
+ ${akyu}❏ ${prefix}emoji${akyu}
+ ${akyu}❏ ${prefix}bpfont${akyu}
+ ${akyu}❏ ${prefix}truth${akyu}
+ ${akyu}❏ ${prefix}dare${akyu}
+ ${akyu}❏ ${prefix}leaderboard${akyu}
+ ${akyu}❏ ${prefix}hobby${akyu}
+ ${akyu}❏ ${prefix}memeindo${akyu}
+ ${akyu}❏ ${prefix}asupan${akyu}
+ ${akyu}❏ ${prefix}jadian${akyu}
+ ${akyu}❏ ${prefix}artinama${akyu}
+╭────────────────
+◉ *Berita Menu*
+ ${akyu}❏ ${prefix}sindo (internasional)${akyu}
+ ${akyu}❏ ${prefix}sindo2 (nasional)${akyu}
+ ${akyu}❏ ${prefix}okezone${akyu}
+ ${akyu}❏ ${prefix}kompastv${akyu}
+ ${akyu}❏ ${prefix}bbcnews${akyu}
+ ${akyu}❏ ${prefix}beritanews${akyu}
+╭────────────────
+◉ *Download Menu*
+ ${akyu}❏ ${prefix}ytplay${akyu}
+ ${akyu}❏ ${prefix}play${akyu}
+ ${akyu}❏ ${prefix}ytmp3${akyu}
+ ${akyu}❏ ${prefix}ytmp3v2${akyu}
+ ${akyu}❏ ${prefix}ytmp4${akyu}
+ ${akyu}❏ ${prefix}ytmp4v2${akyu}
+ ${akyu}❏ ${prefix}tiktokdownload${akyu}
+ ${akyu}❏ ${prefix}igvideo${akyu}
+ ${akyu}❏ ${prefix}igphoto${akyu}
+╭────────────────
+◉ *Search Menu*
+ ${akyu}❏ ${prefix}gsmarena${akyu}
+ ${akyu}❏ ${prefix}pinterest${akyu}
+ ${akyu}❏ ${prefix}googleimage${akyu}
+ ${akyu}❏ ${prefix}stickersearch${akyu}
+ ${akyu}❏ ${prefix}aesthetic${akyu}
+ ${akyu}❏ ${prefix}searchmusic${akyu}
+ ${akyu}❏ ${prefix}shopee${akyu}
+ ${akyu}❏ ${prefix}jalantikus${akyu}
+ ${akyu}❏ ${prefix}thelazy${akyu}
+ ${akyu}❏ ${prefix}wattpad${akyu}
+ ${akyu}❏ ${prefix}rexdl${akyu}
+ ${akyu}❏ ${prefix}moddroid${akyu}
+ ${akyu}❏ ${prefix}sfile${akyu}
+╭────────────────
+◉ *Islam Menu*
+ ${akyu}❏ ${prefix}quran${akyu}
+ ${akyu}❏ ${prefix}quotesislami${akyu}
+ ${akyu}❏ ${prefix}listsurah${akyu}
+╭────────────────
+◉ *Other Menu*
+ ${akyu}❏ ${prefix}sticker${akyu} 
+ ${akyu}❏ ${prefix}jadwaltv${akyu} 
+ ${akyu}❏ ${prefix}styletext${akyu} 
+ ${akyu}❏ ${prefix}img2url${akyu} 
+ ${akyu}❏ ${prefix}tagstiker${akyu} 
+ ${akyu}❏ ${prefix}nulis${akyu} 
+ ${akyu}❏ ${prefix}swm${akyu} 
+ ${akyu}❏ ${prefix}toimg${akyu}  
+ ${akyu}❏ ${prefix}ssweb${akyu}
+ ${akyu}❏ ${prefix}tomp3${akyu} 
+ ${akyu}❏ ${prefix}shortlink${akyu} 
+ ${akyu}❏ ${prefix}shortlink2${akyu} 
+ ${akyu}❏ ${prefix}shortlink3${akyu}  
+ ${akyu}❏ ${prefix}bass${akyu}  
+ ${akyu}❏ ${prefix}tupai${akyu}
+ ${akyu}❏ ${prefix}slowmo${akyu} 
+ ${akyu}❏ ${prefix}gemok${akyu}
+╭────────────────
+◉ *Anime Menu*
+ ${akyu}❏ ${prefix}kdu${akyu} 
+ ${akyu}❏ ${prefix}femdom${akyu}
+ ${akyu}❏ ${prefix}kemonimimi${akyu}
+ ${akyu}❏ ${prefix}kuni${akyu} 
+ ${akyu}❏ ${prefix}husbu2${akyu}  
+ ${akyu}❏ ${prefix}neko2${akyu}
+ ${akyu}❏ ${prefix}holo${akyu} 
+╭────────────────
+◉ *Owner Menu*
+ ${akyu}❏ ${prefix}receive${akyu}
+ ${akyu}❏ ${prefix}setppbot${akyu}
+ ${akyu}❏ ${prefix}bc${akyu}
+ ${akyu}❏ ${prefix}bcgc${akyu}
+ ${akyu}❏ ${prefix}setreply${akyu}
+ ${akyu}❏ ${prefix}setthumb${akyu}
+ ${akyu}❏ ${prefix}antidelete${akyu}
+ ${akyu}❏ ${prefix}setmemberlimit${akyu}
+ ${akyu}❏ ${prefix}setlimit${akyu}
+ ${akyu}❏ ${prefix}addprem${akyu}
+ ${akyu}❏ ${prefix}unprem${akyu}
+ ${akyu}❏ ${prefix}ban${akyu}
+ ${akyu}❏ ${prefix}unban${akyu}
+ ${akyu}❏ ${prefix}setprefix${akyu}
+ ${akyu}❏ ${prefix}clearall${akyu}
+ ${akyu}❏ ${prefix}block${akyu}
+ ${akyu}❏ ${prefix}unblock${akyu} 
+ ${akyu}❏ ${prefix}leave${akyu}
+ ${akyu}❏ ${prefix}clone${akyu}
+ ${akyu}❏ ${prefix}setppbot${akyu}
+ ${akyu}❏ ${prefix}readall${akyu}
 
-          *❏ ${prefix}info*
-          *❏ ${prefix}donasi*
-          *❏ ${prefix}owner*
-          *❏ ${prefix}profile*
-          
-       ~ ${botName} 2021`
-			await patrickhay(menunya, MessageType.text, tescuk, `${ucapanFakereply}`)
-		} else
-		if (isGroup) {
-			const menunon =
-				`Hello World, ${botName} is here             ${emojiUser}
-Created By @_pa7rick
-
-${a} ❏ Nama : ${pushname}${a}
-${a} ❏ User :${a} ${premi}
-${a} ❏ Balance : $${uangkim}${a}
-${a} ❏ Level : ${lvli}${a}
-
-  ❏  Time: ${time2}
-  ❏  Runtime : ${kyun(process.uptime())}
-  ❏  Total Hit : ${pepolu}
-
-${a}Ketik${a} *${prefix}infogrup*
-${a}Untuk mengetahui 
-Fitur aktif pada grup ini!${a}
-
-*▫️ Fitur Yg Sering Digunakan*
-   *- ${prefix}sticker*
-   *- ${prefix}play*
-   *- ${prefix}tictactoe @tag*
-   *- ${prefix}nulis*
-
-${a}╭────${a}「 *All Menu* 」
-${a}│ ❏ ${prefix}ownermenu
-│ ❏ ${prefix}makermenu
-│ ❏ ${prefix}funmenu
-│ ❏ ${prefix}gamemenu
-│ ❏ ${prefix}kerangmenu
-│ ❏ ${prefix}downloadmenu
-│ ❏ ${prefix}groupmenu
-│ ❏ ${prefix}searchmenu
-│ ❏ ${prefix}beritamenu
-│ ❏ ${prefix}animemenu
-│ ❏ ${prefix}islammenu
-│ ❏ ${prefix}cloudmenu
-│ ❏ ${prefix}othermenu
-╰───────────────${a}
-
-          *❏ ${prefix}info*
-          *❏ ${prefix}donasi*
-          *❏ ${prefix}owner*
-          *❏ ${prefix}profile*
-          
-       ~ ${botName} 2021`
-			await patrickhay(menunon, MessageType.text, tescuk, `${ucapanFakereply}`)
+       ~ ${botName} 2021` 
+			sendButMessage(from, menunon, `${footerButton}`, 
+        [{
+			buttonId: `${prefix}owner`,
+			buttonText: {
+				displayText: `▨ CREATOR ▨`,
+			},
+			type: 1,
+		},
+		{
+			buttonId: `${prefix}profile`,
+			buttonText: {
+				displayText: `▨ PROFILE ▨`,
+			},
+			type: 1,
+		},
+		]);
 		}
-		break */
+		break
 	    case 'help':
 		if (isBanned) return reply(ind.baned())
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
@@ -2383,14 +2566,15 @@ ${a}│ ❏ ${prefix}ownermenu
 `Hello World, ${botName} is here
 Created By @_pa7rick
 
-${a} ❏ Nama : ${pushname}${a}
-${a} ❏ User :${a} ${premi}
-${a} ❏ Balance : $${uangki}${a}
-${a} ❏ Level : ${lvlom}${a}
+ ${a}❏ Nama : ${pushname}${a}
+ ${a}❏ User :${a} ${premi}
+ ${a}❏ Balance : $${uangki}${a}
+ ${a}❏ Level : ${lvlom}${a}
 
   ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
+  ❏  Total Hit Today : ${hit_today.length}
 
 *Pilih Salah satu dibawah ini!*
 *Follow Instagram _pa7rick :)*
@@ -2514,6 +2698,7 @@ ${a} ❏ Level : ${lvlom}${a}
   ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
+  ❏  Total Hit Today : ${hit_today.length}
   
 ${a}Ketik${a} *${prefix}infogrup*
 ${a}Untuk mengetahui 
@@ -2640,6 +2825,7 @@ ${a} ❏ Level : ${lvlom}${a}
   ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
+  ❏  Total Hit Today : ${hit_today.length}
 ${lott}
 *Pilih Salah satu dibawah ini!*
 *Follow Instagram _pa7rick :)*
@@ -2770,6 +2956,7 @@ ${a} ❏ Level : ${lvlom}${a}
   ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
   ❏  Total Hit : ${pepolu}
+  ❏  Total Hit Today : ${hit_today.length}
 ${lott}
 *Pilih Salah satu dibawah ini!*
 *Follow Instagram _pa7rick :)*
@@ -2913,8 +3100,6 @@ ${lott}
 ╰── ${isWelcome ? '*Aktif!*' : 'Belum Aktif!'}
 ❏ *SimiSimi:*
 ╰── ${isSimi ? '*Aktif!*' : 'Belum Aktif!'}
-❏ *Leveling:*
-╰── ${isLevelingOn ? '*Aktif!*' : 'Belum Aktif!'}
 ❏ *Antispam (Sticker):*
 ╰── ${isAntiSpam ? '*Aktif!*' : 'Belum Aktif!'}
 
@@ -2927,7 +3112,25 @@ ${lott}
                  "mentionedJid": [groupMetadata.owner.replace('@c.us', '@s.whatsapp.net')]
              }
 		})
-		break
+		break 
+		case 'sizeimg':
+if (args.length < 1) return reply('Masukan angkanya')
+filsizei = args[0]
+costick3 = await patrick.prepareMessageFromContent(from,{
+"imageMessage": {
+	"url": m.quoted.url,
+	"mimetype": m.quoted.mimetype,
+	"caption": m.quoted.caption,
+	"fileSha256": m.quoted.fileSha256.toString('base64'),
+	"fileLength": filsizei,
+	"height": m.quoted.height,
+	"width": m.quoted.width,
+	"mediaKey": m.quoted.mediaKey.low,
+	"jpegThumbnail": m.quoted.jpegThumbnail
+}
+}, {quoted:mek})
+patrick.relayWAMessage(costick3)
+break
 		//==========================================BATES NGAB==========================================\\
 		//=============APIKEY ALL==============\\    
 	    case 'artinama':
@@ -2982,23 +3185,20 @@ ${lott}
 		if (checkATMuser(sender) <= uang5) return reply(`Balance mu tidak cukup!\nHarga: $${uang5}`)
 		if (checkATMuser(sender) >= uang5) {
 			reply(`*Code ini bersifat PRIVATE*\n*Code mu* ${codeReedem}\nSilahkan ketik ${prefix}reedem untuk menukarnya!`)
-			confirmATM(sender, uang4)
+			confirmATM(sender, uang5)
 		}
 		break 
-		case 'tesssss':
-		replyWithFakeLink('yaya')
-		break
 	    case 'join':
 	    if (!isGroup) return reply(ind.groupo())
 		if (!q) return reply(`Format Salah!\nContoh: ${prefix}join linkgrup`)
-		var codeInvite = body.slice(6).split('https://chat.whatsapp.com/')[1]
+		var codeInvite = body.slice(6).split('https://chat.whatsapp.com/')[0]
 		if (!codeInvite) return reply('pastikan link sudah benar!')
 		if (checkATMuser(sender) <= uang4) return reply(`Pastikan Ub Kamu Tercukupi\nHarga: $${uang4}`)
 		if (checkATMuser(sender) >= uang4) {
 			var response = await patrick.acceptInvite(codeInvite);
 			console.log(response);
 			reply('Segera diproses, Harap tunggu sebentar!')
-			confirmATM(sender, uang4)
+			confirmATM(sender, uang5)
 		}
 		break
 	    case 'info':
@@ -3035,7 +3235,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 
         ~ PatrickBot 2021`
 		await patrickhay(inponya, MessageType.text, tescuk, `${ucapanFakereply}`)
-		break
+		break 
 	    case 'admin':
 	    case 'owner':
 	    case 'creator':
@@ -3099,8 +3299,9 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		var media = await patrick.downloadAndSaveMediaMessage(encmedia, `./sticker/${sender}`)
 		var packname = pembawm.split('|')[0]
 		var author = pembawm.split('|')[1]
-		exif.create(packname, author, `takestick_${sender}`)
-		exec(`webpmux -set exif ./sticker/takestick_${sender}.exif ./sticker/${sender}.webp -o ./sticker/${sender}.webp`, async (error) => {
+		tekes = getRandom('')
+		exif.create(packname, author, `takestick_${tekes}`)
+		exec(`webpmux -set exif ./sticker/takestick_${tekes}.exif ./sticker/${sender}.webp -o ./sticker/${sender}.webp`, async (error) => {
 			if (error) return reply(ind.stikga())
 			patrick.sendMessage(from, fs.readFileSync(`./sticker/${sender}.webp`), MessageType.sticker, {
 				quoted: freply
@@ -3269,7 +3470,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
         const bodyForm = new FormData()
         bodyForm.append('audio', dlfile, 'music.mp3')
         bodyForm.append('apikey', `${zeksApi}`)
-        axios('https://api.zeks.xyz/api/searchmusic', {
+        axios('https://api.zeks.me/api/searchmusic', {
         method: 'POST',
         headers: {
           "Content-Type": "multipart/form-data",
@@ -3279,7 +3480,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
           })
         .then(({data}) =>{
         if (data.status){
-          reply(`*「 Search Music 」*\n\n\n• *Title*: ${data.data.title}\n\n• *Artists*: ${data.data.artists}\n\n• *Genre*: ${data.data.genre}\n\n• *Album*: ${data.data.album}\n\n• *Release date*: ${data.data.release_date}`)
+          reply(`*Identify Music*\n\n${a}> Title: ${data.data.title}\n> Artists: ${data.data.artists}\n> Genre: ${data.data.genre}\n> Album: ${data.data.album}\n>Release date: ${data.data.release_date}${a}`)
           } else reply(data.message)
           }).catch(() => reply('Internal server error!, try again later'))
           } else {
@@ -3319,6 +3520,11 @@ ${a}>  Total Premium User : ${prem.length}${a}
         }
         patrick.sendMessage(`${mente}`, optionns, text, {quoted: mek})
 		break
+        case 'isbaileys': 
+case 'bail': 
+case 'baileys':
+reply(`${mek.quoted.isBaileys}`)
+break
 		case 'delprem':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1 ) return reply(' tag member')
@@ -3391,26 +3597,69 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		reply('Success Menghapu BAD WORD!')
 		break
 		//==========================================BATES NGAB==========================================\\
-		//=============MAKER MENU=============\\ 
+		//=============MAKER MENU=============\\
 		case "triggered":
 		case "glass":
 		case "gay": 
 		case "jail":
 		case "comrade":
+		try {
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		if ((isMedia && !mek.message.videoMessage || isQuotedImage) && args.length == 0) {
 			getqu = isQuotedImage ? JSON.parse(JSON.stringify(mek).replace('quotedM','m')).message.extendedTextMessage.contextInfo : mek 
-			reply(ind.wait)
+			reply(ind.wait())
 			hasilq = await patrick.downloadAndSaveMediaMessage(getqu)
 			var imgbb = require('imgbb-uploader')
             anu = await imgbb("68cb5bee517bce4f74b0e910a5d96346", hasilq)
             teks = `${anu.display_url}`
-			anull = await getBuffer(`https://some-random-api.ml/canvas/glass?avatar=${teks}`)
+			anull = await getBuffer(`https://some-random-api.ml/canvas/${command}?avatar=${teks}`)
 			patrick.sendMessage(from, anull, image, { quoted: freply })
 		} else {
 			reply('Gunakan foto!')
+		} 
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error()) 
+		}
+		await limitAdd(sender) 
+		break 
+		case "removebg":
+		case "delete":
+		case "airpods": 
+		case "ad":
+		case "sepia":
+		case "hacker":
+		case "greyscale": 
+		case "continued":
+		case "captcha":
+		case "approve":
+		case "what": 
+		case "linus":
+		case "facepalm":
+		case "discordblue":
+		case "discordblack": 
+		case "bed":
+		try {
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+		if (isBanned) return reply(ind.baned())
+		if (isLimit(sender)) return reply(ind.limitend(pushname))
+		if ((isMedia && !mek.message.videoMessage || isQuotedImage) && args.length == 0) {
+			getqu = isQuotedImage ? JSON.parse(JSON.stringify(mek).replace('quotedM','m')).message.extendedTextMessage.contextInfo : mek 
+			reply(ind.wait())
+			hasilq = await patrick.downloadAndSaveMediaMessage(getqu)
+			var imgbb = require('imgbb-uploader')
+            anu = await imgbb("68cb5bee517bce4f74b0e910a5d96346", hasilq)
+            teks = `${anu.display_url}`
+			anull = await getBuffer(`https://dapuhy-api.herokuapp.com/api/canvas/${command}?img=${anu.display_url}&apikey=HelloWorld`)
+			patrick.sendMessage(from, anull, image, { quoted: freply })
+		} else {
+			reply('Gunakan foto!')
+		}
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error()) 
 		}
 		await limitAdd(sender) 
 		break 
@@ -3428,19 +3677,17 @@ ${a}>  Total Premium User : ${prem.length}${a}
 			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (isBanned) return reply(ind.baned())
-			if (args.length < 1) return reply(`teksnya mana bruh?\ncontoh ${prefix + command} ${pushname}`)
+			if (args.length < 1) return reply(`*Wrong Format!!*\nExample ${prefix + command} ${pushname}`)
 			teksnya = args.join(' ')
 			reply(ind.wait())
-			patrickganss = await fetchJson(`https://leyscoders-api.herokuapp.com/api/textmaker/${command}?q=${teksnya}&apikey=${leysApi}`)
-			hasil = patrickganss.result
-			poto = await getBuffer(hasil.url)
+			poto = await getBuffer(`https://leyscoders-api.herokuapp.com/api/textmaker/${command}?q=${teksnya}&apikey=${leysApi}`)
 			patrick.sendMessage(from, poto, image, {
 				quoted: ftoko
 			})
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
 		}
 		break
 	    case 'hartatahta':
@@ -3459,7 +3706,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
 		}
 		break
 	    case 'bokeh':
@@ -3469,27 +3716,56 @@ ${a}>  Total Premium User : ${prem.length}${a}
 	    case '3dglowing':
 	    case 'bearlogo':
 	    case 'cloud':
-	    case 'steel':
+	    case 'steel':     
+	    case '3dglue':
+	    case 'lava':
+	    case 'shinymetal':
+	    case 'yellowjewelry':
+	    case 'erodedmetal':
+	    case 'bluegem':
+	    case '3dbox':
+	    case 'neon': 
 		try {
 			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			if (isBanned) return reply(ind.baned())
-			if (args.length < 1) return reply(`teksnya mana bruh?\ncontoh ${prefix + command} ${pushname}`)
+			if (args.length < 1) reply(`*Wrong Format!!*\nExample ${prefix + command} ${pushname}`)
 			teksnya = args.join(' ')
 			reply(ind.wait())
-			patrickganss = await fetchJson(`https://dapuhy-api.herokuapp.com/api/textpro/${command}?text=${q}&apikey=${dappaApi}`)
-			hasil = patrickganss.result
-			poto = await getBuffer(hasil.url)
+			poto = await getBuffer(`https://dapuhy-api.herokuapp.com/api/textpro/${command}?text=${q}&apikey=${dappaApi}`)
 			patrick.sendMessage(from, poto, image, {
 				quoted: ftoko
 			})
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
+		}
+		break 
+		case 'pornhub': 
+		case 'glitch':
+		case '8bit': 
+		case 'marvelstudio':
+		case 'multicolor3d':
+		case 'realisticvintage':
+		try {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+			if (isLimit(sender)) return reply(ind.limitend(pushname))
+			if (isBanned) return reply(ind.baned())
+			if (args.length < 1) return reply(`*Wrong Format!*\nExample: ${prefix + command} kata1:kata2`)
+			reply(ind.wait())
+			var has = q.split(":")[0];
+			var kas = q.split(":")[1];
+			patrickganss = await getBuffer(`https://dapuhy-api.herokuapp.com/api/ephoto/${command}?text1=${has}&text2=${kas}&apikey=${dappaApi}`)
+			patrick.sendMessage(from, patrickganss, image, {
+				quoted: ftoko
+			})
+			await limitAdd(sender)
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error())
 		}
 		break
-	    case '8bit':
 	    case 'naruto':
 	    case 'flaming':
 	    case 'whitecube':
@@ -3504,7 +3780,11 @@ ${a}>  Total Premium User : ${prem.length}${a}
 	    case 'horror':
 	    case 'wood':
 	    case 'greenneon':
-	    case 'breakwall':
+	    case 'breakwall': 
+	    case '3dglue':
+	    case 'holographic':
+	    case 'writing':
+	    case 'greenneon':
 		try {
 			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
@@ -3518,7 +3798,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
 		}
 		break
 	    case 'rainbowshine':
@@ -3536,7 +3816,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
 		}
 		break
 	    case 'styletext':
@@ -3555,7 +3835,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
 		}
 		break
 	    case 'attp':
@@ -3598,9 +3878,9 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		if (isBanned) return reply(ind.baned())
 		if (isLimit(sender)) return reply(ind.limitend(pushname))
 		var gh = body.slice(12)
-		var quote = gh.split("|")[0];
-		var wm = gh.split("|")[1];
-		const pref = `Usage: \n${prefix}quotemaker teks|watermark\n\nEx :\n${prefix}quotemaker ini contoh|bicit`
+		var quote = gh.split(":")[0];
+		var wm = gh.split(":")[1];
+		const pref = `Usage: \n${prefix}quotemaker teks:watermark\n\nEx :\n${prefix}quotemaker ini contoh|bicit`
 		if (args.length < 1) return reply(pref)
 		reply(ind.wait())
 		anu = await fetchJson(`https://terhambar.com/aw/qts/?kata=${quote}&author=${wm}&tipe=random`, {
@@ -3626,36 +3906,6 @@ ${a}>  Total Premium User : ${prem.length}${a}
         })
         limitAdd(sender, limit)
         break
-	    case 'sendkontak':
-		const took = body.slice(12)
-		const nama = took.split("|")[0]
-		const nomerr = took.split("|")[1]
-		const vcart = 'BEGIN:VCARD\n' + 'VERSION:3.0\n' + 'FN:' + nama + '\n' + 'ORG:Kontak\n' + 'TEL;type=CELL;type=VOICE;waid=' + nomer + ':+' + nomer + '\n' + 'END:VCARD'
-		patrick.sendMessage(from, {
-			displayname: nama,
-			vcard: vcart
-		}, MessageType.contact)
-		break 
-	    case 'sendkontag':
-		const pepek = body.slice(12)
-		const adan = pepek.split("|")[0]
-		const nuahh = pepek.split("|")[1]
-		const trot = 'BEGIN:VCARD\n' + 'VERSION:3.0\n' + 'FN:' + adan + '\n' + 'ORG:Kontak\n' + 'TEL;type=CELL;type=VOICE;waid=' + nuahh + ':+' + nuahh + '\n' + 'END:VCARD'
-		let taih = await patrick.groupMetadata(from)
-		let setan = taih.participants
-		let bruy = []
-		for (let go of setan) {
-			bruy.push(go.jid)
-		}
-		patrick.sendMessage(from, {
-			displayname: adan,
-			vcard: trot
-		}, MessageType.contact, {
-			contextInfo: {
-				"mentionedJid": bruy
-			}
-		})
-		break 
 		case 'darkjoke':
 		case 'estetik':
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
@@ -4116,6 +4366,105 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 		//==========================================BATES NGAB==========================================\\
 		//=============GAME MENU==============\\
+        case 'family100':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+		if (isBanned) return reply(ind.baned())
+		if (isLimit(sender)) return reply(limitend(pushname))
+        if (game.isfam(from, family100)) return reply(`Masih ada soal yang belum di selesaikan`)
+        let anehaja = await fetchJson(`https://api.zeks.xyz/api/family100?apikey=${zeksApi}`)
+        getFamily = anehaja.data
+        reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${getFamily.pertanyaan}\n*Total Jawaban :* ${getFamily.jawaban.array.length}\n\nWaktu : ${gamewaktu}s`)
+        let anoh = getFamily.jawaban.array
+        let rgfds = []
+        for (let i of anoh){
+        let fefs = i.split('/') ? i.split('/')[0] : i
+        let iuhbb = fefs.startsWith(' ') ? fefs.replace(' ','') : fefs
+        let axsf = iuhbb.endsWith(' ') ? iuhbb.replace(iuhbb.slice(-1), '') : iuhbb
+        rgfds.push(axsf.toLowerCase())
+        }
+        game.addfam(from, rgfds, gamewaktu, family100)
+        limitAdd(sender)
+        break
+        case 'math':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+	    if (isBanned) return reply(ind.baned())
+	    if (isLimit(sender)) return reply(limitend(pushname))
+        if (game.isMath(from, math)) return reply(`Masih ada soal yang belum di selesaikan`)
+        gamewaktus = 20
+        extsoal5 = `${extsoal}`
+        extanswer5 = `${extanswer}`
+        reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${extsoal5}\n\nWaktu : ${gamewaktus}s`)
+        let anihs = extanswer5.toLowerCase()
+        game.addmath(from, anihs, gamewaktus, math)
+        limitAdd(sender)
+        break 
+        case 'tebakgambar':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+	    if (isBanned) return reply(ind.baned())
+	    if (isLimit(sender)) return reply(limitend(pushname))
+        if (game.isTebakGambar(from, tebakgambar)) return reply(`Masih ada soal yang belum di selesaikan`)
+        let aneaja = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/tebakgambar?apikey=${dappaApi}`)
+        sendFileFromUrl(from, aneaja.result.image, monospace(`Silahkan jawab soal berikut ini\n\nPetunjuk : ${aneaja.result.clue}\nWaktu : ${gamewaktu}s`), mek)
+        let anih = aneaja.result.jawaban.toLowerCase()
+        game.addgambar(from, anih, gamewaktu, tebakgambar)
+        limitAdd(sender)
+        break
+        case 'siapakahaku':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+	    if (isBanned) return reply(ind.baned())
+	    if (isLimit(sender)) return reply(limitend(pushname))
+        if (game.isSiapakah(from, siapakah)) return reply(`Masih ada soal yang belum di selesaikan`)
+        let anesk = await fetchJson(`https://api.zeks.xyz/api/siapa-aku?apikey=${zeksApi}`)
+        reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anesk.data.soal}\n\nWaktu : ${gamewaktu}s`)
+        let anihp = anesk.data.jawaban.toLowerCase()
+        game.addSPK(from, anihp, gamewaktu, siapakah)
+        limitAdd(sender)
+        break
+        case 'tekateki':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+	    if (isBanned) return reply(ind.baned())
+	    if (isLimit(sender)) return reply(limitend(pushname))
+        if (game.isTek(from, tekateki)) return reply(`Masih ada soal yang belum di selesaikan`)
+        let anoohh = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/tekateki?apikey=${dappaApi}`)
+        reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anoohh.pertanyaan}\n\nWaktu : ${gamewaktu}s`)
+        let anohc = anoohh.jawaban.toLowerCase()
+        game.addTek(from, anohc, gamewaktu, tekateki)
+        limitAdd(sender)
+        break
+        case 'susunkata':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+	    if (isBanned) return reply(ind.baned())
+	    if (isLimit(sender)) return reply(limitend(pushname))
+        if (game.isSK(from, susunkata)) return reply(`Masih ada soal yang belum di selesaikan`)
+        let aneeuh = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/susunkata?apikey=${dappaApi}`)
+        reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${aneeuh.acak}\n*Tipe :* ${aneeuh.tipe}\n\nWaktu : ${gamewaktu}s`)
+        let anicch = aneeuh.jawaban.toLowerCase()
+        game.addSK(from, anicch, gamewaktu, susunkata)
+        limitAdd(sender)
+        break
+        case 'asahotak':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+	    if (isBanned) return reply(ind.baned())
+	    if (isLimit(sender)) return reply(limitend(pushname))
+        if (game.isAO(from, asahotak)) return reply(`Masih ada soal yang belum di selesaikan`)
+        let anuh = await fetchJson(`https://dapuhy-api.herokuapp.com/api/fun/asahotak?apikey=${dappaApi}`)
+        reply(`*Jawablah Soal Berikut Ini*\n\n*Soal :* ${anuh.acak}\n\nWaktu : ${gamewaktu}s`)
+        let anncch = anuh.jawaban.toLowerCase()
+        game.addAO(from, anncch, gamewaktu, asahotak)
+        limitAdd(sender)
+        break
+        case 'tebakangka':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+		if (isBanned) return reply(ind.baned())
+		if (isLimit(sender)) return reply(limitend(pushname))
+        if (game.isAngka(from, tebakangka)) return reply(`Masih ada soal yang belum di selesaikan`)
+        gamewaktuts = 10
+        angkaBot = `${Math.floor(Math.random() * 10)}`
+        reply(`*Tebak Angka*\n\nPilih Angka  Dari 1-10\nContoh: 4\nWaktu : ${gamewaktuts}s`)
+        let anoehs = angkaBot.toLowerCase()
+        game.addAngka(from, anoehs, gamewaktuts, tebakangka)
+        limitAdd(sender)
+        break
 	    case 'buylimit':
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
@@ -4201,49 +4550,23 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		mentions(teks, jds, true)
 		await limitAdd(sender)
 		break
-	/*    case 'verify':
-	    case 'daftar':
-		if (isRegistered) return reply(ind.rediregis())
-		const serialUser = createSerial(20)
-		try {
-			ppimg = await patrick.getProfilePicture(`${sender.split('@')[0]}@c.us`)
-		} catch {
-			ppimg = 'https://i0.wp.com/www.gambarunik.id/wp-content/uploads/2019/06/Top-Gambar-Foto-Profil-Kosong-Lucu-Tergokil-.jpg'
-		}
-		addRegisteredUser(sender)
-		addATM(sender)
-		addLevelingId(sender)
-		const kentod = `${a}╭──${a}「 *VERIFIKASI BERHASIL* 」
-${a}❏ Nama : ${pushname}
-❏ Nomor : wa.me/${sender.split("@")[0]}
-❏ Waktu Verify : ${time}
-❏ SN : ${serialUser}
-❏ Total Register : ${_registered.length}${a}
-╰─────「 *${botName}* 」`
-		patrick.sendMessage(from, ppimg, image, {
-			quoted: freply,
-			caption: kentod,
-			contextInfo: {
-				'mentionedJid': [sender]
-			}
-		})
-		break */ 
 		case 'verify':
 	    case 'daftar':
 		if (isRegistered) return 
 		const codeMeme = [`${codeVerification}`, `${codeVerification1}`]
 		const codeMeme1 = [`${codeVerification}`, `${codeVerification1}`]
+		const codeMeme2 = [`${codeVerification}`, `${codeVerification1}`, `${codeVerification2}`, `${codeVerification2}`]
 		const gettNyaa = codeMeme[Math.floor(Math.random() * codeMeme.length)]
 		const gettNyaa1 = codeMeme1[Math.floor(Math.random() * codeMeme1.length)]
-		let gettNyaa2 = (gettNyaa1 == gettNyaa) ? codeMeme1[Math.floor(Math.random() * codeMeme1.length)] : gettNyaa1
+		let gettNyaa2 = (gettNyaa1 === gettNyaa) ? codeMeme2[Math.floor(Math.random() * codeMeme2.length)] : gettNyaa1;
 		meeen = `${sender.replace('@s.whatsapp.net','')}@s.whatsapp.net`
-		console.log('Code Verification: ' + codeVerification + 'From: ' + sender)
+		console.log(bgcolor('Code Verification: ' + codeVerification + ' From: ' + sender, 'green'))
 		textoing = `${a}Your Code: ${codeVerification}\nThis Code is Private!!${a}`
         var optios = {
             text: textoing
         }
 		patrick.sendMessage(`${meeen}`, optios, text, {quoted: mek})
-        sendButMessage(from, `Halo ${pushname}, Silahkan Klik Code yang tadi dikirim bot\nJika tidak ada code yang dikirim bot ketik saja codenya`, `Jika button tidak keliatan\nKetik dan Kirim Code disini`, 
+        sendButMessage(from, `Halo ${pushname}, Silahkan Klik Code yang tadi dikirim bot\nJika tidak ada code button yang dikirim oleh bot ketik saja ${prefix}verify! untuk mendapatkan code ulang`, `Jika button tidak keliatan\nKetik dan Kirim Code disini`, 
         [{
 			buttonId: `${gettNyaa}`,
 			buttonText: {
@@ -4259,7 +4582,7 @@ ${a}❏ Nama : ${pushname}
 			type: 1,
 		},
 		]);
-		if (isGroup) return reply(`${a}Check Your Code in Private Message for Register!!${a}`)
+		if (isGroup) reply(`${a}Check Your Code in Private Message for Register!!${a}`)
 		break
 	    case 'listonline':
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
@@ -4274,11 +4597,12 @@ ${a}❏ Nama : ${pushname}
 				}
 			})
 		} else
-			reply(ind.admin())
+		reply(ind.admin())
 		break
 	    case 'report':
 	    case 'laporbug':
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+		if (!q) return reply(`Example: ${prefix}report error pada menu`)
 		const teks1 = `*ＲＥＰＯＲＴ*\n> From : @${sender.split("@s.whatsapp.net")[0]}\n> Pesan : ${q}`
 		var options = {
 			text: teks1,
@@ -4286,7 +4610,7 @@ ${a}❏ Nama : ${pushname}
 				mentionedJid: [nomor]
 			},
 		}
-		mentions(options, [`sender.split`], true)
+		mentions(options, [sender], true)
 		reply('*Pesan Report Telah Terkirim!*')
 		break
 	    case 'ping':
@@ -4519,12 +4843,6 @@ ${a}❏ Nama : ${pushname}
                 "title": `Anti Spam (Sticker)`,
                 "rowId": '0'
             }, {
-                "title": `Anti ViewOnce`,
-                "rowId": '0'
-            }, {
-                "title": `Anti Hidetag`,
-                "rowId": '0'
-            }, {
                 "title": `Welcome`,
                 "rowId": '0'
             }, {
@@ -4586,12 +4904,6 @@ ${a}❏ Nama : ${pushname}
                 "title": `Disable Anti Spam (Sticker)`,
                 "rowId": '0'
             }, {
-                "title": `Disable Anti Hidetag`,
-                "rowId": '0'
-            }, {
-                "title": `Disable Anti ViewOnce`,
-                "rowId": '0'
-            }, {
                 "title": `Disable Welcome`,
                 "rowId": '0'
             }, {
@@ -4607,7 +4919,123 @@ ${a}❏ Nama : ${pushname}
         patrick.relayWAMessage(po, {
                waitForAck: true
         }) 
+        break 
+        //=== menuu 
+        case 'kdu':
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+		if (isBanned) return reply(ind.baned())
+		data = fs.readFileSync('./lib/husbu.js');
+		jsonData = JSON.parse(data);
+		randIndex = Math.floor(Math.random() * jsonData.length);
+		randKey = jsonData[randIndex];
+		hasil = await getBuffer(randKey.teks.image)
+		patrick.sendMessage(hasil, image, mek, '\`\`\`Husbu\`\`\`')
+	    break
+		case 'femdom':
+		try {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+			if (isBanned) return reply(ind.baned())
+			axios.get(`https://nekos.life/api/v2/img/femdom`).then((res) => {
+			imageToBase64(res.data.url).then((response) => {
+			var buf = Buffer.from(response, 'base64');
+			patrick.sendMessage(from, buf, image, {
+			quoted: mek,
+			caption: "NIH KAK!!" })})})
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error())
+		}
+		   break
+		case 'walpaperanime':
+		try {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+			if (isBanned) return reply(ind.baned())
+			axios.get(`https://nekos.life/api/v2/img/wallpaper`).then((res) => {
+			imageToBase64(res.data.url).then((response) => {
+			var buf = Buffer.from(response, 'base64');
+			patrick.sendMessage(from, buf, image, {
+			quoted: mek,
+			caption: "Nih om" })})})
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error())
+		} 
         break
+		case 'kawai':
+		try {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+			if (isBanned) return reply(ind.baned())
+			axios.get(`https://nekos.life/api/v2/img/kemonomimi`).then((res) => {
+			imageToBase64(res.data.url).then((response) => {
+			var buf = Buffer.from(response, 'base64');
+			patrick.sendMessage(from, buf, image, {
+			quoted: mek,
+			caption: "KAWAII!!" })})})
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error())
+	   } 
+       break
+	   case 'kemonomimi':
+	   try {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+			if (isBanned) return reply(ind.baned())
+			axios.get(`https://nekos.life/api/v2/img/kemonomimi`).then((res) => {
+			imageToBase64(res.data.url).then((response) => {
+			var buf = Buffer.from(response, 'base64');
+			patrick.sendMessage(from, buf, image, {
+			quoted: mek,
+			caption: "ONII CHAN BAKA!!" })})})
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error())
+		}
+		break
+		case 'kuni':
+		try {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+			if (isBanned) return reply(ind.baned())
+			axios.get(`https://nekos.life/api/v2/img/kuni`).then((res) => {
+			imageToBase64(res.data.url).then((response) => {
+			var buf = Buffer.from(response, 'base64');
+			patrick.sendMessage(from, buf, image, {
+			quoted: mek,
+			caption: "*INGAT ADA TUHAN*!!" })})})
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error())
+		}
+	    break
+		case 'neko':
+		try {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+			if (isBanned) return reply(ind.baned())
+			axios.get(`https://nekos.life/api/v2/img/meow`).then((res) => {
+			imageToBase64(res.data.url).then((response) => {
+			var buf = Buffer.from(response, 'base64');
+			patrick.sendMessage(from, buf, image, {
+			quoted: mek,
+			caption: "NYANG!!" })})})
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error())
+		} 
+        break
+		case 'holo':
+		try {
+			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+			if (isBanned) return reply(ind.baned())
+			axios.get(`https://nekos.life/api/v2/img/holo`).then((res) => {
+			imageToBase64(res.data.url).then((response) => {
+			var buf = Buffer.from(response, 'base64');
+			patrick.sendMessage(from, buf, image, {
+			quoted: mek,
+			caption: "NIH OM!!" })})})
+		} catch (e) {
+			console.log(`Error :`, color(e, 'red'))
+			reply(ind.error())
+		}
+		break
 		//==search 
 		case 'searchmenu':
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
@@ -4615,20 +5043,19 @@ ${a}❏ Nama : ${pushname}
 		await patrickhay(ind.search(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break
 		case 'jooxsearch':
-				//[❗] case by DappaGanz 
-                if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
-                if (isBanned) return reply(ind.baned())
-                if (isLimit(sender)) return reply(ind.limitend())
-                judul = args.join(' ')
-				ambl = await fetchJson(`https://leyscoders-api.herokuapp.com/api/joox?q=${judul}&apikey=${leysApi}`)
-				d = ambl.result
-				thm = await getBuffer(d.img)
-				tmlisan = `Lagu : ${d.lagu}\nAlbum : ${d.album}\nPenyanyi : ${d.penyanyi}\nPublish : ${d.publish}`
-				limrik = `「 LIRIK 」\n\n${ambl.lirik.result}`
-				patrick.sendMessage(from, tmlisan, text, {quoted: fkontak})
-				reply(limrik)
-				await limitAdd(sender)
-				break
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+        if (isBanned) return reply(ind.baned())
+        if (isLimit(sender)) return reply(ind.limitend())
+        judul = args.join(' ')
+	    ambl = await fetchJson(`https://leyscoders-api.herokuapp.com/api/joox?q=${judul}&apikey=${leysApi}`)
+	    d = ambl.result
+		thm = await getBuffer(d.img)
+		tmlisan = `Lagu : ${d.lagu}\nAlbum : ${d.album}\nPenyanyi : ${d.penyanyi}\nPublish : ${d.publish}`
+		limrik = `「 LIRIK 」\n\n${ambl.lirik.result}`
+		patrick.sendMessage(from, tmlisan, text, {quoted: fkontak})
+		reply(limrik)
+		await limitAdd(sender)
+		break
 		case 'stickersearch':
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
@@ -4705,7 +5132,7 @@ ${a}❏ Nama : ${pushname}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
 		}
 		break 
 		case 'ytsearch':
@@ -4713,7 +5140,7 @@ ${a}❏ Nama : ${pushname}
         if (isBanned) return reply(ind.baned())
         if (isLimit(sender)) return reply(ind.limitend())
 		reply(ind.wait())
-		anu = await fetchJson(`http://zekais-api.herokuapp.com/yts?query=${q}`)
+		anu = await fetchJson(`http://zekais-api.herokuapp.com/yts?query=${q}&apikey=${zekaisApi}`)
 		teks = '=================\n'
 		for (let i of anu.result) {
 		teks += `Judul: ${i.title}\nChannel: ${i.channel}\nDurasi: ${i.durasi}\nViews: ${i.views}\nLink : ${i.url}\n=================\n`
@@ -4737,11 +5164,10 @@ ${a}❏ Nama : ${pushname}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
 		}
 		break 
 		case 'shopee':
-        	    //[❗] case by DappaGanz
         	    if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
                 if (isLimit(sender)) return reply(ind.limitend())
                 if (isBanned) return reply(ind.banned())
@@ -4957,7 +5383,7 @@ ${a}❏ Nama : ${pushname}
 		if (isBanned) return reply(ind.baned())
 		await patrickhay(ind.download(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break
-	    case 'playv2':
+	    case 'play':
 		try {
 			if (!q) return reply(`Example: ${prefix + command} NGGYU`)
 			if (isBanned) return reply(ind.baned())
@@ -4983,10 +5409,10 @@ ${a}❏ Nama : ${pushname}
 			})
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap Coba .play')
+			reply(ind.error())
 		}
 		break 
-		case 'play':
+		case 'playv2':
 		try {
 			if (!q) return reply(`Example: ${prefix + command} NGGYU`)
 			if (isBanned) return reply(ind.baned())
@@ -4994,7 +5420,7 @@ ${a}❏ Nama : ${pushname}
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
-			anu = await fetchJson(`http://zekais-api.herokuapp.com/ytplay?query=${q}`)
+			anu = await fetchJson(`http://zekais-api.herokuapp.com/ytplay?query=${q}&apikey=${zekaisApi}`)
 			textnya = `*❗ Lagu Telah Ditemukan*\n`
 			textnya += `*Channel:* ${anu.channel}\n`
 			textnya += `*Views:* ${anu.views}\n`
@@ -5015,12 +5441,12 @@ ${a}❏ Nama : ${pushname}
 			})
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap Coba .playv2')
+			reply(ind.error())
 		}
 		break
 		case 'ytplay':
 		if (!isGroup) return reply(ind.groupo())
-        if (!q) return reply('Mau cari apa diyoutube?')
+        if (!q) return reply(`${a}Example: ${prefix}ytplay nggyu`)
         reply(ind.wait())
         datai = [];
         try {
@@ -5052,16 +5478,39 @@ ${a}❏ Nama : ${pushname}
        "listType": "SINGLE_SELECT",
        "sections": datai}}, {}) 
         patrick.relayWAMessage(paoa, {waitForAck: true})
-        break
-		case 'ytmp3':
+        break 
+        case 'ytdl':
+		if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
+		if (isBanned) return reply(ind.baned())
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+		if (isLimit(sender)) return reply(ind.limitend(pushname))
+		sendButMessage(from, `Halo ${pushname}\nSilahkan pilih button dibawah ini!`, `${footerButton}`, 
+        [{
+			buttonId: `audio ${q}`,
+			buttonText: {
+				displayText: `▨ AUDIO ▨`,
+			},
+			type: 1,
+		},
+        {
+			buttonId: `video ${q}`,
+			buttonText: {
+				displayText: `▨ VIDEO ▨`,
+			},
+			type: 1,
+		}
+		]);
+		await limitAdd(sender)
+		break 
+		case 'ytmp3v2':
 		try {
-			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
+			if (!q) return reply(`*Wrong Format!!*\nExample: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
 			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
-			anu = await fetchJson(`http://zekais-api.herokuapp.com/ytmp4?url=${q}`)
+			anu = await fetchJson(`http://zekais-api.herokuapp.com/ytmp4?url=${q}&apikey=${zekaisApi}`)
 			gmteng = anu.result
 			textnya = `Judul: ${gmteng.title}\n`
 			textnya += `Views: ${gmteng.published}\n`
@@ -5087,9 +5536,9 @@ ${a}❏ Nama : ${pushname}
 			reply('Error!, Harap coba .playv2')
 		}
 		break 
-	    case 'ytmp3v2':
+	    case 'ytmp3':
 		try {
-			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
+			if (!q) return reply(`*Wrong Format!!*\nExample: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
 			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
@@ -5116,18 +5565,18 @@ ${a}❏ Nama : ${pushname}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
 		}
 		break 
-		case 'ytmp4':
+		case 'ytmp4v2':
 		try {
-			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
+			if (!q) return reply(`*Wrong Format!!*\nExample: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
 			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
 			fakestatus(ind.wait())
 			tekss = args[0]
-			anu = await fetchJson(`http://zekais-api.herokuapp.com/ytmp4?url=${q}`)
+			anu = await fetchJson(`http://zekais-api.herokuapp.com/ytmp4?url=${q}&apikey=${zekaisApi}`)
 			gmteng = anu.result
 			textnya = `Judul: ${gmteng.title}\n`
 			textnya += `Views: ${gmteng.published}\n`
@@ -5150,12 +5599,12 @@ ${a}❏ Nama : ${pushname}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba .playv2')
+			reply(ind.error())
 		}
 		break 
-	    case 'ytmp4v2':
+	    case 'ytmp4':
 		try {
-			if (!q) return reply(`Example: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
+			if (!q) return replyreply(`*Wrong Format!!*\nExample: ${prefix + command} https://youtu.be/dQw4w9WgXcQ`)
 			if (isBanned) return reply(ind.baned())
 			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
@@ -5182,15 +5631,16 @@ ${a}❏ Nama : ${pushname}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba .play')
+			reply(ind.error())
 		}
 		break 
 	    case 'tiktokdownload':
+	    case 'tiktok':
 		try {
 			if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 			if (isBanned) return reply(ind.baned())
 			if (isLimit(sender)) return reply(ind.limitend(pushname))
-			if (args.length < 1) return reply(`link mana broh?\ncontoh : ${prefix + command} https://vm.tiktok.com/ZSJkHUCwK/`) 
+			if (args.length < 1) return reply(`*Wrong Format!!*\nExample: ${prefix + command} https://vm.tiktok.com/ZSJkHUCwK/`) 
 			reply(ind.wait())
 			link = args.join(' ')
 			dppa = await getBuffer(`https://dapuhy-api.herokuapp.com/api/socialmedia/tiktoknowm?url=${q}&apikey=${dappaApi}`)
@@ -5201,7 +5651,7 @@ ${a}❏ Nama : ${pushname}
 			await limitAdd(sender)
 		} catch (e) {
 			console.log(`Error :`, color(e, 'red'))
-			reply('Error!, Harap coba lagi nanti')
+			reply(ind.error())
 		}
 		break
 	    case 'igvideo':
@@ -5263,12 +5713,14 @@ ${a}❏ Nama : ${pushname}
 		if (isBanned) return reply(ind.baned())
 		await patrickhay(ind.other(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break 
-		case 'cloudmenu':
+		case 'styletext':
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (isBanned) return reply(ind.baned())
-		await patrickhay(ind.cloud(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
-		break 
+		styleText = await fetchJson(`https://dapuhy-api.herokuapp.com/api/others/styletext?text=DappaUhuy&apikey=${dappaApi}`)
+		stma = styleText.result
+		patrick.sendMessage(from, stma, text, { quoted: freply })
 		case "img2url":
+		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (((isMedia && !mek.message.videoMessage) || isQuotedImage || isQuotedVideo) && args.length == 0) {
 			boij = isQuotedImage || isQuotedVideo ? JSON.parse(JSON.stringify(mek).replace("quotedM", "m")).message.extendedTextMessage.contextInfo : mek;
 			owgi = await patrick.downloadMediaMessage(boij);
@@ -5351,8 +5803,8 @@ ${a}❏ Nama : ${pushname}
 				})
 				.on('end', function() {
 					muach = getRandom('')
-					exif.create('Created By PatrickBot', '', `takestick_${muach}`)
-					exec(`webpmux -set exif ./sticker/takestick_${muach}.exif ${ran} -o ${ran}`, async (error) => {
+					exif.create('Created By PatrickBot', '', `take_${muach}`)
+					exec(`webpmux -set exif ./sticker/take_${muach}.exif ${ran} -o ${ran}`, async (error) => {
 						console.log('Finish')
 						if (error) return console.log(error) && reply('Error, Harap coba lagi nanti!')
 						patrick.sendMessage(from, fs.readFileSync(ran), sticker, {
@@ -5538,6 +5990,25 @@ ${a}❏ Nama : ${pushname}
 			})
 			fs.unlinkSync(ran)
 		})
+		break 
+		case 'jadwaltv':
+        if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
+        if (isBanned) return reply(ind.baned())
+        if (isLimit(sender)) return reply(ind.limitend())
+        if (args.length < 1) return reply(`*Wrong Format!!*\nExample: ${prefix + command} nettv`)
+		reply(ind.wait())
+		anu = await fetchJson(`https://dapuhy-api.herokuapp.com/api/others/jadwaltv?channel=${q}&apikey=HelloWorld`)
+		if (anu.status === true) {
+		teks = '=================\n'
+		for (let s of anu.result) {
+			teks += `Jam : ${s.jam}\nProgram : ${s.tayang}\n=================\n`
+		}
+		reply(teks.trim())
+		await limitAdd(sender)
+		} else 
+		if (anu.status === false) {
+		reply(`Channel Tidak Ditemukan!!\nList Channel:\n- nettv\n- indosiar\n- sctv\n- tvone\n- mnctv\n- antv\n- gtv\n- inews`)
+		}
 		break
 		case 'brainly':
 				if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
@@ -5595,15 +6066,16 @@ Your Limit: ${letCount}/20${a}
 		addATM(sender)
 		addLevelingId(sender)
 		const kenver = `${a}Succes, Registered in Database${a}
-${a}❏ Email : ${pushname}@bot.id
-❏ Nomor : wa.me/${sender.split("@")[0]}
+${a}❏ Email : ${pushname.replace(' ', '')}@bot.id
 ❏ Waktu Verify : ${time}
 ❏ SN : ${serialUser}
 ❏ Total Register : ${_registered.length}${a}`
-        const getVerification = Math.floor(Math.random(40) * 200) + 8000
+        const getVerification = Math.floor(Math.random(40) * 16902) + 50
         codeVerification = `${getVerification}`
-        const getVerification10 = Math.floor(Math.random(40) * 200) + 8000
+		const getVerification10 = Math.floor(Math.random(40) * 14776) + 86
         codeVerification1 = `${getVerification10}`
+        const getVerification21 = Math.floor(Math.random(40) * 15243) + 43
+        codeVerification2 = `${getVerification21}`
         sendButMessage(from, `${kenver}`, `${footerButton}`, 
         [{
             buttonId: `${prefix}rules`, 
@@ -5619,12 +6091,16 @@ ${a}❏ Email : ${pushname}@bot.id
             type: 1,
         }]);
 		} 
-		if (_chats.startsWith(`${codeVerification1}`)) {
+		if (_chats.startsWith(`${codeVerification1 || codeVerification2}`)) {
 		if (isRegistered) return 
-		const getVerification0 = Math.floor(Math.random(40) * 200) + 8000
+		const getVerification0 = Math.floor(Math.random(40) * 16902) + 50
         codeVerification = `${getVerification0}`
-		const getVerification1 = Math.floor(Math.random(40) * 200) + 8000
-        codeVerification1 = `${getVerification1}`
+		const getVerification1 = Math.floor(Math.random(40) * 14686) + 44
+		let getVerify = (getVerification1 === getVerification0) ? Math.floor(Math.random(40) * 20989) + 32  : getVerification1
+        codeVerification1 = `${getVerify}`
+        const getVerification2 = Math.floor(Math.random(40) * 15243) + 53
+        let getVerify1 = (getVerification2 === getVerification0) ? Math.floor(Math.random(40) * 18721) + 36  : getVerification2
+        codeVerification2 = `${getVerify1}`
         sendButMessage(from, `${a}Failed Register, Wrong Code!!\nGagal Register, Code Salah!!${a}\n*Silahkan Verify Lagi!!*`, `Jika button tidak keliatan\nKetik ${prefix}verify`, 
         [{
             buttonId: `${prefix}verify`, 
@@ -5633,6 +6109,56 @@ ${a}❏ Email : ${pushname}@bot.id
             }, 
             type: 1,
         }]);
+		} // Audio
+		if (_chats.startsWith(`audio ${q}`)) {
+		if (!q) return 
+		if (!isRegistered) return 
+		anu = await fetchJson(`http://zekais-api.herokuapp.com/ytmp3?url=${q}&apikey=${zekaisApi}`)
+		gmteng = anu.result
+		textnya = `Judul: ${gmteng.title}\n`
+		textnya += `Views: ${gmteng.published}\n`
+		textnya += `Likes: ${gmteng.views}\n`
+		textnya += `Dislike: ${gmteng.views}\n` 
+		textnya += `Size: ${gmteng.views}\n`
+		textnya += `Upload Date: ${gmteng.channel}\n`
+		textnya += `Tunggu!, Sedang Proses Download`
+		tamnel = await getBuffer(gmteng.thumb)
+		patrick.sendMessage(from, tamnel, image, {
+			quoted: freply,
+			caption: textnya
+		})
+		aumdeo = await getBuffer(gmteng.url)
+		patrick.sendMessage(from, aumdeo, audio, {
+			mimetype: 'audio/mp4',
+			filename: `${gmteng.title}.mp4`,
+			quoted: fakevn
+		})
+		} // Video
+		if (_chats.startsWith(`video ${q}`)) {
+		if (!q) return 
+		if (!isRegistered) return 
+		if (!q) return 
+		if (!isRegistered) return 
+		anu = await fetchJson(`http://zekais-api.herokuapp.com/ytmp4?url=${q}&apikey=${zekaisApi}`)
+		gmteng = anu.result
+		textnya = `Judul: ${gmteng.title}\n`
+		textnya += `Views: ${gmteng.published}\n`
+		textnya += `Likes: ${gmteng.views}\n`
+		textnya += `Dislike: ${gmteng.views}\n` 
+		textnya += `Size: ${gmteng.views}\n`
+		textnya += `Upload Date: ${gmteng.channel}\n`
+		textnya += `Tunggu!, Sedang Proses Download`
+		tamnel = await getBuffer(gmteng.thumb)
+		patrick.sendMessage(from, tamnel, image, {
+			quoted: freply,
+			caption: textnya
+		})
+		pimdeo = await getBuffer(gmteng.url)
+		patrick.sendMessage(from, pimdeo, video, {
+			mimetype: 'video/mp4',
+			filename: `${gmteng.title}.mp4`,
+			quoted: fvideo
+		})
 		}
 		if (isGroup && !isCmd && isSimi && budy != undefined) {
 			console.log(budy)
