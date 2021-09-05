@@ -84,7 +84,7 @@ const {
 	jadibot,
 	stopjadibot,
 	listjadibot
-} = require("./lib/jadibot");
+} = require("./lib/jadibot")
 const {
 	wait,
 	simih,
@@ -365,149 +365,12 @@ function addMetadata(packname, author) {
 		return `./sticker/${name}.exif`
 	})
 }
-async function starts() {
-	const patrick = new WAConnection()
-	 patrick.version = [2,2119,6]
-	 patrick.logger.level = 'warn'
-	 console.log(banner.string)
-	 patrick.on('qr', () => {
-		console.log(color('[','white'), color('!','red'), color(']','white'), color(' Scan QR code nya'))
-	})
-	fs.existsSync('./session.json') &&  patrick.loadAuthInfo('./session.json')
-	 patrick.on('connecting', () => {
-		start('2', ' Loading... For Connect!!')
-	})
-	 patrick.on('open', () => {
-		console.log(color('', 'white'), color('━━━━━━━━━━━━━━━━━━━━', 'green'), color(' Connect ', 'green'), color('━━━━━━━━━━━━━━━━━━━━', 'green'), color('', 'white'));
-        console.log(`\
-        `);
-        success('2', 'Sukses Connect Ke Whatsapp Web, Silahkan Ketik .menu')
-        console.log(color('', 'white'), bgcolor('Your Session Whatsapp Web Information', 'red'))
-        console.log(color('▣', 'white'), color('WA Version', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.wa_version));
-        console.log(color('▣', 'white'), color('OS Version', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.os_version));
-        console.log(color('▣', 'white'), color('Device', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.device_manufacturer));
-        console.log(color('▣', 'white'), color('Model', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.device_model));
-        console.log(color('▣', 'white'), color('OS Build Number', 'yellow'), color(':', 'aqua'), bgcolor(patrick.user.phone.os_build_number));
-        console.log(bgcolor('Note: Script by Instagram _pa7rick', 'blue'));
-        console.log(`\
-        `);
-        console.log(color('', 'white'), color('━━━━━━━━━━━━━━━━━━━━', 'green'), color(' PatrickBot ', 'green'), color('━━━━━━━━━━━━━━━━━━━━', 'green'), color('', 'white'));
-	})
-	await patrick.connect({timeoutMs: 30*1000})
-    fs.writeFileSync('./session.json', JSON.stringify( patrick.base64EncodedAuthInfo(), null, '\t'))
-
-    patrick.on('group-participants-update', async (anu) => {
-	if (!welcome.includes(anu.jid)) return
-	try {
-		const mdata = await patrick.groupMetadata(anu.jid)
-		num = anu.participants[0]
-		console.log(anu)
-		ini_user = patrick.contacts[num]
-		namaewa = ini_user.notify
-		member = mdata.participants.length
-		try {
-			var ppimg = await patrick.getProfilePicture(`${anu.participants[0].split('@')[0]}@c.us`)
-		} catch {
-			var ppimg = 'https://i0.wp.com/www.gambarunik.id/wp-content/uploads/2019/06/Top-Gambar-Foto-Profil-Kosong-Lucu-Tergokil-.jpg'
-		}
-
-		try {
-			var ppgc = await patrick.getProfilePicture(anu.jid)
-		} catch {
-			var ppgc = 'https://i0.wp.com/www.gambarunik.id/wp-content/uploads/2019/06/Top-Gambar-Foto-Profil-Kosong-Lucu-Tergokil-.jpg'
-		}
-		try {
-			var iwelcome = await getBuffer(`http://hadi-api.herokuapp.com/api/card/welcome2?nama=${encodeUrl(namaewa)}&descriminator=${member}&memcount=${member}&gcname=${encodeUrl(mdata.subject)}&gcicon=${ppgc}&pp=${ppimg}&bg=https://i.ibb.co/LvCNb3H/Background03.jpg`)
-		} catch {
-			var iwelcome = `${ppimg}`
-		}
-		try {
-			var imageleave = await getBuffer(`http://hadi-api.herokuapp.com/api/card/goodbye2?nama=${encodeUrl(namaewa)}&descriminator=${member}&memcount=${member}&gcname=${encodeUrl(mdata.subject)}&gcicon=${ppgc}&pp=${ppimg}&bg=https://i.ibb.co/LvCNb3H/Background03.jpg`)
-		} catch {
-			var imageleave = `${ppimg}`
-		}
-		shortpc = await axios.get(`https://tinyurl.com/api-create.php?url=${ppimg}`)
-		shortgc = await axios.get(`https://tinyurl.com/api-create.php?url=${ppgc}`)
-		if (anu.action == 'add') {
-			teks = 
-`*Halo* *${ini_user.notify}*
-Welcome To *${mdata.subject}*
-*> Nama:*
-*> Umur:*
-*> Hobby:*
-*> Gender:*
-*> Asal Kota:*
-*Jika Privasi ketik Private di kolom*
-*Semoga Betah di group🌈*`
-			patrick.sendMessage(mdata.id, iwelcome, MessageType.image, {
-				caption: teks,
-				contextInfo: {
-					'mentionedJid': [num]
-				}
-			})
-		} else
-		if (anu.action == 'remove') {
-			teks = `  Goodbye ${namaewa} 👋🍁`
-			patrick.sendMessage(mdata.id, imageleave, MessageType.image, {
-				caption: teks,
-				contextInfo: {
-					'mentionedJid': [num]
-				}
-			})
-		} else
-		if (anu.action == 'promote') {
-			img = await getBuffer(`http://hadi-api.herokuapp.com/api/card/promote?nama=${encodeUrl(namaewa)}&member=${member}&pesan=Selamat anda menjadi admin group!&pp=${shortpc.data}&bg=https://dappa-result.herokuapp.com/bgverify.jpeg`)
-			teks = ` Information *${mdata.subject}*
->  Terdeteksi *Di-Promote*
->  Nomor: ${num.replace('@s.whatsapp.net', '')}
->  @${num.split('@')[0]}`
-			patrick.sendMessage(mdata.id, img, MessageType.image, {
-				caption: teks,
-				contextInfo: {
-					'mentionedJid': [num]
-				}
-			})
-		} else
-		if (anu.action == 'demote') {
-			img = await getBuffer(`http://hadi-api.herokuapp.com/api/card/demote?nama=${encodeUrl(namaewa)}&member=${member}&pesan=Awokawok di unadmin, mampus:v&pp=${shortpc.data}&bg=https://dappa-result.herokuapp.com/bgverify.jpeg`)
-			teks = 
-` Information *${mdata.subject}*
->  Terdeteksi *Di-Demote*
->  Nomor: ${num.replace('@s.whatsapp.net', '')}
->  @${num.split('@')[0]}`
-			patrick.sendMessage(mdata.id, img, MessageType.image, {
-				caption: teks,
-				contextInfo: {
-					'mentionedJid': [num]
-				}
-			})
-		}
-	} catch (e) {
-		console.log('Error : %s', color(e, 'red'))
-	}
-})
-patrick.on('CB:Blocklist', json => {
-	if (blocked.length > 2) return
-	for (let i of json[1].blocklist) {
-		blocked.push(i.replace('c.us', 's.whatsapp.net'))
-	}
-})
-const sleep = async (ms) => {
-	return new Promise(resolve => setTimeout(resolve, ms))
-}
-    patrick.on('CB:action,,call', async json => {
-	const callerId = json[2][0][1].from;
-	console.log('call dari ' + callerId)
-	patrick.sendMessage(callerId, '*Auto block system, dont call please*\nUnblock chat wa.me/6288989029718', MessageType.text)
-	await sleep(4000)
-	await patrick.blockUser(callerId, 'add')
-})
-     
-        patrick.on('chat-update', async (mek) => {
+        module.exports = patrick = async (patrick, mek) => {
 		try { 
 			if (!mek.hasNewMessage) return
             mek = mek.messages.all()[0]
 			if (!mek.message) return 
+			if (mek.key.fromMe) return
 			if (mek.key && mek.key.remoteJid == 'status@broadcast') return 
 			const m = smsg(patrick, mek)
 			global.prefix
@@ -604,13 +467,13 @@ const sleep = async (ms) => {
 			}
 			const patrickhay = (pesan, tipe, target, target2) => {
 		    patrick.sendMessage(from, pesan, tipe, { 'contextInfo': {mentionedJid: [sender], 'forwardingScore': 999,'isForwarded': true}, quoted: { 'key': { 'participant': `${target}`, 'remoteJid': '393470602054-1351628616@g.us', 'fromMe': false, 'id': 'B391837A58338BA8186C47E51FFDFD4A' }, 'message': { 'documentMessage': { 'jpegThumbnail': fs.readFileSync('./lib/image/logo.jpeg'), 'mimetype': 'application/octet-stream', 'title': `${target2}`, 'fileLength': '36', 'pageCount': 0, 'fileName': `${target2}` }}, 'messageTimestamp': '1614069378', 'status': 'PENDING'}})
-		    }
+		    } 
+		    const sleep = async (ms) => {
+	        return new Promise(resolve => setTimeout(resolve, ms))
+            }
 		    const sendPtt = (teks) => {
 		    patrick.sendMessage(from, audio, mp3, {quoted:mek})
 		    } 
-		    const sleep = async (ms) => {
-            return new Promise(resolve => setTimeout(resolve, ms));
-            }
 		    patrick.updatePresence(from, Presence.available)
 		    if (isTicTacToe(from, tictactoe)) tictac(patrick, mek, tictactoe)
             async function sendFileFromUrl(from, url, caption, mek, men) {
@@ -1988,20 +1851,19 @@ await reply(m)
                }
             }
             function clockString(ms) {
-	    let h = isNaN(ms) ? "--" : Math.floor(ms / 3600000);
-	    let m = isNaN(ms) ? "--" : Math.floor(ms / 60000) % 60;
-	    let s = isNaN(ms) ? "--" : Math.floor(ms / 1000) % 60;
-	    return [h, m, s].map((v) => v.toString().padStart(2, 0)).join(":");
-	    }
-	
+			let h = isNaN(ms) ? "--" : Math.floor(ms / 3600000);
+			let m = isNaN(ms) ? "--" : Math.floor(ms / 60000) % 60;
+			let s = isNaN(ms) ? "--" : Math.floor(ms / 1000) % 60;
+			return [h, m, s].map((v) => v.toString().padStart(2, 0)).join(":");
+		    }
+		
             let settingstatus = 0;
-	    if (new Date() * 1 - settingstatus > 1000) {
-	    let _uptime = process.uptime() * 1000;
-	    let uptime = clockString(_uptime);
-	    await patrick.setStatus(`User: ${_registered.length} | Runtime ${uptime}\n~ ${patrick.user.name}`).catch((_) => _);
-	    settingstatus = new Date() * 1;
-	    }
-	    
+		    if (new Date() * 1 - settingstatus > 1000) {
+			let _uptime = process.uptime() * 1000;
+			let uptime = clockString(_uptime);
+			await patrick.setStatus(`User: ${registered.length} | Runtime ${uptime}\n~ ${patrick.user.name}`).catch((_) => _);
+			settingstatus = new Date() * 1;
+		    }
 const extsoal1 = rnumber[Math.floor(Math.random() * (rnumber.length))]
 const extsoal2 = rnumber[Math.floor(Math.random() * (rnumber.length))]
 const extoperator = ['+', '-', '*']
@@ -2031,8 +1893,9 @@ switch (command) {
 		const lvlim = getLevelingLevel(sender)
 		if (!isGroup) {
 			const menunya =
-`Hello World, ${botName} is here
-Created By @_pa7rick
+`Hello World, ${patrick.user.name} is here
+Created By @_pa7rick 
+*Bot Ini Adalah Bot Numpang (◠‿◕)*
 
 ${a} ❏ Nama : ${pushname}${a}
 ${a} ❏ User :${a} ${premi}
@@ -2290,13 +2153,14 @@ ${a} ❏ Level : ${lvlim}${a}
 		} else
 		if (isGroup) {
 			const menunon =
-`Hello World, ${botName} is here
+`Hello World, ${patrick.user.name} is here
 Created By @_pa7rick
 
 ${a} ❏ Nama : ${pushname}${a}
 ${a} ❏ User :${a} ${premi}
 ${a} ❏ Balance : $${uangkim}${a}
 ${a} ❏ Level : ${lvlim}${a}
+*Bot Ini Adalah Bot Numpang (◠‿◕)*
 
   ❏  Time: ${time2}
   ❏  Runtime : ${kyun(process.uptime())}
@@ -6213,7 +6077,4 @@ ${a}❏ Email : ${pushname.replace(' ', '')}@bot.id
 		console.log('Error : %s', color(e, 'red'))
 		}
 }
-})
 }
-
-starts()
