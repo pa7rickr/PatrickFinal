@@ -3672,7 +3672,8 @@ break
 		}
 		break 
 		case "jadibot":
-		if (isGroup) return reply('Only In Provate Message')
+		if (isGroup) return reply('Only In Private Message')
+		if (!isOwner) return reply('Maaf Ini Bot Numpang, Untuk Jadibot\nBisa Di Nomor wa.me/6283816188102')
 		if (!isRegistered) return
 		if (mek.key.fromMe) return reply("Tidak bisa jadibot di dalam bot");
 		jadibot(reply, patrick, from);
