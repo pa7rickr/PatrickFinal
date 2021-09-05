@@ -1516,7 +1516,8 @@ if (isGroup) {
 			} else */
             //=================== Menu Nya =============\\ 
             if (rspndbutton == '▨ Owner Menu ▨') {
-            if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true) 
+            if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true) 
             await patrickhay(ind.owner(prefix), MessageType.text, tescuk, `${ucapanFakereply}`) 
             } else 
             if (rspndbutton == '▨ Premium Menu ▨') {
@@ -1861,7 +1862,7 @@ await reply(m)
 		    if (new Date() * 1 - settingstatus > 1000) {
 			let _uptime = process.uptime() * 1000;
 			let uptime = clockString(_uptime);
-			await patrick.setStatus(`User: ${registered.length} | Runtime ${uptime}\n~ ${patrick.user.name}`).catch((_) => _);
+			await client.setStatus(`User: ${_registered.length} | Runtime ${uptime}\n~ ${patrick.user.name}`).catch((_) => _);
 			settingstatus = new Date() * 1;
 		    }
 const extsoal1 = rnumber[Math.floor(Math.random() * (rnumber.length))]
@@ -3241,6 +3242,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		//=============OWNER MENU==============\\
 	    case 'ownermenu':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		await patrickhay(ind.owner(prefix), MessageType.text, tescuk, `${ucapanFakereply}`)
 		break 
 		case "addcmd":
@@ -3275,6 +3277,8 @@ ${a}>  Total Premium User : ${prem.length}${a}
         break;
 	    case 'readall':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		var chatis = await patrick.chats.all()
 		chats.map(async ({
 			jid
@@ -3289,6 +3293,8 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'resetlimit':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		var ngonsol = []
 		rest = _limit.indexOf([])
 		_limit.splice(rest)
@@ -3298,6 +3304,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 	    case 'receive':
 		if (!isRegistered) return sendButMessage(from, `${descButton}`, `${footerButton}`, [{buttonId: `${prefix}verify`, buttonText: {displayText: `▨ VERIFY ▨`,},type: 1,}]);
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (!q.includes('|')) return reply(ind.wrongf())
 		const tujuanfe = q.substring(0, q.indexOf('|') - 1)
 		const jumlahfe = q.substring(q.lastIndexOf('|') + 1)
@@ -3310,6 +3317,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'setppbot':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		patrick.updatePresence(from, Presence.composing)
 		if (!isQuotedImage) return reply(`Kirim gambar dengan caption ${prefix}setbotpp atau tag gambar yang sudah dikirim`)
 		enmedia = JSON.parse(JSON.stringify(mek).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo
@@ -3319,6 +3327,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'clearall':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		anu = await patrick.chats.all()
 		patrick.setMaxListeners(25)
 		for (let _ of anu) {
@@ -3331,18 +3340,21 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		patrick.chatRead(from)
 		if (!isGroup) return reply(ind.groupo())
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		patrick.blockUser(`${body.slice(7)}@c.us`, "add")
 		patrick.sendMessage(from, `perintah Diterima, memblokir ${body.slice(7)}@c.us`, text)
 		break
 	    case 'unblock':
 		if (!isGroup) return reply(ind.groupo())
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		patrick.blockUser(`${body.slice(9)}@c.us`, "remove")
 		patrick.sendMessage(from, `Perintah diterima, Membuka ${body.slice(9)}@c.us`, text)
 		break
 	    case 'leave':
 		if (!isGroup) return reply(ind.groupo())
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		await reply(from, 'bye').then(() => patrick.groupLeave(from))
 		break
         case 'searchmusic':
@@ -3373,6 +3385,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
          break
 	    case 'bc':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1) return reply('.......')
 		anu = await patrick.chats.all()
 		if (isMedia && !mek.message.videoMessage || isQuotedImage) {
@@ -3393,6 +3406,7 @@ ${a}>  Total Premium User : ${prem.length}${a}
 		break
 	    case 'addprem':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1 ) return reply(' tag member')
 		mente = `${args[0].replace('@','')}@s.whatsapp.net`
 		addPremiumUser(mente, args[1], prem)
@@ -3410,6 +3424,7 @@ reply(`${mek.quoted.isBaileys}`)
 break
 		case 'delprem':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1 ) return reply(' tag member')
 		mente = `${args[0].replace('@','')}@s.whatsapp.net`
   	  prem.splice(getPremiumPosition(mente, premium), 1)
@@ -3427,6 +3442,7 @@ break
         break
 	    case 'ban':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		bnnd = body.slice(6)
 		ban.push(`${bnnd}@s.whatsapp.net`)
 		fs.writeFileSync('./database/json/banned.json', JSON.stringify(ban))
@@ -3434,6 +3450,7 @@ break
 		break
 	    case 'unban':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		bnnd = body.slice(8)
 		ban.splice(`${bnnd}@s.whatsapp.net`, 1)
 		fs.writeFileSync('./database/json/banned.json', JSON.stringify(ban))
@@ -3441,6 +3458,7 @@ break
 		break
 	    case 'setreply':
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		patrick.updatePresence(from, Presence.composing)
 		if (args.length < 1) return
 		cr = body.slice(10)
@@ -3450,6 +3468,7 @@ break
 	    case 'setmemberlimit':
 		if (args.length < 1) return
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (isNaN(args[0])) return reply('*Limit wajib angka!*')
 		memberLimit = args[0]
 		reply(`memberLimit berhasil diubah menjadi ${memberLimit}`)
@@ -3457,6 +3476,7 @@ break
 	    case 'setlimit':
 		if (args.length < 1) return
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (isNaN(args[0])) return reply('Limit Wajib Angka')
 		limit = args[0]
 		reply(`*Sukses* Mengubah limit menjadi ➣ : ${limit}`)
@@ -3464,6 +3484,7 @@ break
 	    case 'addbadword':
 		if (!isGroup) return reply(ind.groupo)
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1) return reply(`Kirim perintah ${prefix}addbadword [kata kasar]. contoh ${prefix}addbadword bego`)
 		const bw = body.slice(11)
 		bad.push(bw)
@@ -3473,6 +3494,7 @@ break
 	    case 'delbadword':
 		if (!isGroup) return reply(ind.groupo)
 		if (!isOwner) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
+		if (mek.key.fromMe) return mentions(`*Perintah ini Khusus Owner @6288989029718 !*`, [`6288989029718@s.whatsapp.net`], true)
 		if (args.length < 1) return reply(`Kirim perintah ${prefix}addbadword [kata kasar]. contoh ${prefix}addbadword bego`)
 		let dbw = body.slice(11)
 		bad.splice(dbw)
@@ -3650,7 +3672,7 @@ break
 		}
 		break 
 		case "jadibot":
-		if (isGroup) return reply('Only in DM')
+		if (isGroup) return reply('Only In Provate Message')
 		if (!isRegistered) return
 		if (mek.key.fromMe) return reply("Tidak bisa jadibot di dalam bot");
 		jadibot(reply, patrick, from);
