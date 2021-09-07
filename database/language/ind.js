@@ -2,11 +2,11 @@ const a = '```'
 const c = '```'
 
 exports.wait = () => {
-	return`*❕ Tunggu | PatrickBot sedang memproses*`
+	return`*❕ Wait | PatrickBot is processing*`
 }
 
 exports.succes = () => {
-	return`*Berhasil!*`
+	return`*Succes!*`
 }
 
 exports.lvlon = () => {
@@ -22,7 +22,7 @@ exports.lvlnul = () => {
 }
 
 exports.baned = () => {
-	return`*Maaf, anda telah dibanned karena melanggar aturan\nketik _.report pesan_ jika ada masalah*`
+	return`*You have been banned*`
 }
 
 exports.lvlnoon = () => {
@@ -47,23 +47,15 @@ exports.linkga = () => {
 }
 
 exports.groupo = () => {
-	return`*Maaf, fitur ini hanya tersedia di dalam Group*`
-}
-
-exports.ownerb = () => {
-	return`*Maaf, fitur ini hanya untuk owner PatrickBot*`
-}
-
-exports.ownerg = () => {
-	return`*Maaf, fitur ini hanya tersedia di dalam Group*`
+	return`*This feature is only available in Groups*`
 }
 
 exports.admin = () => {
-	return`*Maaf, fitur ini hanya untuk Admin Group*`
+	return`*This feature is only for Group Admins*`
 }
 
 exports.badmin = () => {
-	return`*Maaf, fitur ini bekerja ketika PatrickBot menjadi Admin Group*`
+	return`*Make PatrickBot a group admin*`
 }
 
 exports.nsfwoff = () => {
@@ -393,7 +385,7 @@ exports.levelup = (pushname, sender, getLevelingXp,  getLevel, getLevelingLevel,
 `}
  
 exports.limitend = (pushname) => {
-	return`*Your limit is out today*\n*Please buy limit to get limit!*`
+	return`*Maaf ${pushname} Limit Hari Ini Habis*\n*Beli Limit Untuk Mendapatkan Limit/ Naik Level*`
 }
 
 exports.limitcount = (isPrem, isAdmin, isOwner, limitCounts) => {
